@@ -13,6 +13,7 @@ Wertet die Ausdrücke aus
 package evaluator;
 
 use Switch;
+use List::MoreUtils qw(firstidx);
 use Exporter;
 
 our @ISA=qw(Exporter);
@@ -27,32 +28,22 @@ Macht eine Auswertung
 
 sub evaluate {
     my $input = @_[0];
+    
+    @list = split(/([\+\-\*\/])/, $input);
 
-    my $result = 0;
-    my $op = "";
+    while(scalar(@list) >= 3) {
+	my $index = (firstidx { $_ eq "*" || $_ eq "/"} @list) - 1;
 
-    foreach $val (split(/([\+\-\*\/])/, $input)) {
-	# Operator
-	if($val == "+" || $val == "-" || $val == "/" || $val == "*") {
-	    $op = $val;
-	} 
-	# Zahl und schon eine im Speicher
-	elsif($op ne "") {
-	    $result = calculate($op, $result, $val);
-
-	    $op = "";
-	} 
-	# erste Zahl
-	else {
-	    $result = $val;
+	if($index < 0) {
+	    $index = 0;
 	}
-    }
 
-    if($temp != 0 && $result == 0) {
-	$result = $temp;
+	splice(@list, $index, 2, calculate(@list[$index + 1], 
+					   @list[$index], 
+					   @list[$index + 2]));
     }
-
-    return $result;
+    
+    return @list[0];
 }
 
 =item calculate

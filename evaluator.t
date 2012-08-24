@@ -15,6 +15,9 @@ is(evaluate("1"), 1, "Zahlen werden erkannt");
 # mehrfache Operationen
 is(evaluate("1+1+1"), 3, "1+1+1=3");
 is(evaluate("5+2-3"), 4, "5+2-3=4");
-#is(evaluate("5+2*3"), 11, "5+2*3=11");
+is(evaluate("5+2*3"), 11, "5+2*3=11");
+is(evaluate("5+2*3+3*3"), 20, "5+2*3+3*3=20");
+is(evaluate("7-10/2+2"), 4, "7-10/2+2=4");
+
 
 done_testing();
