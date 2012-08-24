@@ -41,7 +41,9 @@ sub evaluate {
 	    $result = calculate($op, $result, $val);
 
 	    $op = "";
-	} else {
+	} 
+	# erste Zahl
+	else {
 	    $result = $val;
 	}
     }
