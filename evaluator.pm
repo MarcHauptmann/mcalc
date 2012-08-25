@@ -15,6 +15,7 @@ package evaluator;
 use Switch;
 use List::MoreUtils qw(firstidx);
 use Exporter;
+use Tree;
 
 our @ISA=qw(Exporter);
 our @EXPORT_OK=qw(evaluate);
@@ -27,54 +28,26 @@ Macht eine Auswertung
 =cut
 
 sub evaluate {
-    my $input = @_[0];
-    
-    @list = split(/([\+\-\*\/])/, $input);
+    $tree = $_[0];
 
-    while(scalar(@list) >= 3) {
-	my $index = (firstidx { $_ eq "*" || $_ eq "/"} @list) - 1;
+    if($tree->size() == 1) {
+	return $tree->value();
+    } else {
+	@children = $tree->children();
 
-	if($index < 0) {
-	    $index = 0;
-	}
-
-	splice(@list, $index, 2, calculate(@list[$index + 1], 
-					   @list[$index], 
-					   @list[$index + 2]));
-    }
-    
-    return @list[0];
-}
-
-=item calculate
-    
-Macht eine simple Berechnung. Der Operator kann dabei als String übergeben werden.
-
-=cut
-
-sub calculate {
-    my $op = @_[0];
-    my $result = @_[1];
-    my $val = @_[2];
-
-    switch($op) {
-	case("+") {
-	    $result += $val;
-	}
-	case("-") {
-	    $result -= $val;
-	}
-	case("*") {
-	    $result *= $val;
-	}
-	case("/") {
-	    $result /= $val;
+	switch($tree->value()) {
+	    case("+") {
+		return evaluate($children[0]) + evaluate($children[1]);
+	    }
+	    case("-") {
+		return evaluate($children[0]) - evaluate($children[1]);
+	    }
+	    case("*") {
+		return evaluate($children[0]) * evaluate($children[1]);
+	    }
+	    case("/") {
+		return evaluate($children[0]) / evaluate($children[1]);
+	    }
 	}
     }
-
-    return $result;
 }
-
-=back
-
-=cut

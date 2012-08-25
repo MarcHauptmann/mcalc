@@ -3,6 +3,8 @@
 use parser;
 use evaluator;
 
+print "Marc´s calculator v0.0.1\n";
+
 while(1) {
     print "> ";
     my $input = <STDIN>;
@@ -17,11 +19,11 @@ while(1) {
     }
 
     # parsen
-    $matches = parse($input);
+    my $tree = parseTree($input);
 
-    if($matches) {
+    if($tree->value()) {
 	# auswerten
-	my $result = evaluate($input);
+	my $result = evaluate($tree);
 
 	printf "%f\n", $result;
     } else {

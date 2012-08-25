@@ -1,0 +1,26 @@
+* Grammatik
+
+<Term>		::= <Zahl> <Operator> <Zahl>
+<Operator>	::= + | - | * | /
+<Zahl> 		::= regex \d+\.\d*
+
+* Syntax-Bäume
+
+** Addition
+Eingabe: 1 + 1
+
+Baum:
+  + 
+ / \
+1   1
+
+** Addition mit Multiplikation
+
+Eingabe: 1 + 2 * 3
+
+Baum:
+  +
+ / \
+1   *
+   / \
+  2   3
