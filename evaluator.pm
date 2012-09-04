@@ -28,26 +28,26 @@ Macht eine Auswertung
 =cut
 
 sub evaluate {
-    $tree = $_[0];
+  my $tree = $_[0];
+  my @values = ();
+  my @list = $tree->traverse($tree->PRE_ORDER);
 
-    if($tree->size() == 1) {
-	return $tree->value();
+  while(scalar(@list) > 0) {
+    my $sym = pop @list;
+    $sym = $sym->value();
+
+    if($sym eq "+") {
+      push @values, (pop @values) + (pop @values);
+    } elsif($sym eq "-") {
+      push @values, -((pop @values) - (pop @values));
+    } elsif($sym eq "*") {
+      push @values, (pop @values) * (pop @values);
+    } elsif($sym eq "/") {
+      push @values, 1/((pop @values) / (pop @values));
     } else {
-	@children = $tree->children();
-
-	switch($tree->value()) {
-	    case("+") {
-		return evaluate($children[0]) + evaluate($children[1]);
-	    }
-	    case("-") {
-		return evaluate($children[0]) - evaluate($children[1]);
-	    }
-	    case("*") {
-		return evaluate($children[0]) * evaluate($children[1]);
-	    }
-	    case("/") {
-		return evaluate($children[0]) / evaluate($children[1]);
-	    }
-	}
+      push @values, $sym;
     }
+  }
+
+  return pop @values;
 }

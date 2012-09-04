@@ -19,7 +19,7 @@ while(1) {
     }
 
     # parsen
-    my $tree = parseTree($input);
+    my $tree = parse($input);
 
     if($tree->value()) {
 	# auswerten
