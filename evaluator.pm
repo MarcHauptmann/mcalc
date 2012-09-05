@@ -27,27 +27,32 @@ Macht eine Auswertung
 
 =cut
 
+%functions =  (
+	       "+" => sub {
+		 return $_[0] + $_[1];
+	       },
+	       "-" => sub {
+		 return $_[0] - $_[1];
+	       },
+	       "/" => sub {
+		 return $_[0] / $_[1];
+	       },
+	       "*" => sub {
+		 return $_[0] * $_[1];
+	       }
+	      );
+
 sub evaluate {
-  my $tree = $_[0];
+  my $tree = ${$_[0]};
   my @values = ();
-  my @list = $tree->traverse($tree->PRE_ORDER);
 
-  while(scalar(@list) > 0) {
-    my $sym = pop @list;
-    $sym = $sym->value();
+  if($tree->size() == 1) {
+    return $tree->value();
+  } else {
+    my $func = $functions{$tree->value()};
 
-    if($sym eq "+") {
-      push @values, (pop @values) + (pop @values);
-    } elsif($sym eq "-") {
-      push @values, -((pop @values) - (pop @values));
-    } elsif($sym eq "*") {
-      push @values, (pop @values) * (pop @values);
-    } elsif($sym eq "/") {
-      push @values, 1/((pop @values) / (pop @values));
-    } else {
-      push @values, $sym;
-    }
+    @args = map { evaluate(\$_) } $tree->children();
+
+    return &{$func}(@args);
   }
-
-  return pop @values;
 }

@@ -135,8 +135,8 @@ sub popOperator {
   my $operator = pop @operators;
 
   my $newNode = Tree->new($operator);
-  $newNode->add_child($node1);
   $newNode->add_child($node2);
+  $newNode->add_child($node1);
 
   push @operands, $newNode;
 }

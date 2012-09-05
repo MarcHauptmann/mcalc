@@ -33,15 +33,15 @@ print <<"EOF";
 # erwarteter Baum:
 #          +
 #         / \\
-#        2   1
+#        1   2
 #
-# preorder: + 2 1
+# preorder: + 1 2
 EOF
 
 subtest "Addition" => sub {
     my @tokens = getTree("1+2");
 
-    is_deeply(\@tokens, ["+", 2, 1], "Ergebnis stimmt");
+    is_deeply(\@tokens, ["+", 1, 2], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -51,17 +51,17 @@ print <<"EOF";
 # erwarteter Baum:
 #        +    
 #       / \\
-#      +   1
-#     / \\
-#    3   2
+#      1   +
+#         / \\
+#         2   3
 #
-# preorder: + + 3 2 1
+# preorder: + 1 + 2 3
 EOF
 
 subtest "3-er Addition" => sub {
     my @tokens = getTree("1+2+3");
 
-    is_deeply(\@tokens, ["+", "+", 3, 2, 1], "Ergebnis stimmt");
+    is_deeply(\@tokens, ["+", 1, "+", 2, 3], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -71,17 +71,17 @@ print <<"EOF";
 # erwarteter Baum:
 #          +
 #         / \\
-#        4   *
-#           / \\
-#          3   2
+#        *   4
+#       / \\
+#      2   3
 #
-# preorder: + 4 * 3 2
+# preorder: + * 2 3 4
 EOF
 
 subtest "Operatorrangfolge" => sub {
     my @tokens = getTree("2*3+4");
 
-    is_deeply(\@tokens, ["+", 4, "*", 3, 2], "Ergebnis stimmt");
+    is_deeply(\@tokens, ["+", "*", 2, 3, 4], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -95,13 +95,13 @@ print <<"EOF";
 #           / \\
 #          3   4
 #
-# preorder: + * 4 3 2
+# preorder: + 2 * 3 4
 EOF
 
 subtest "Operatorrangfolge" => sub {
     my @tokens = getTree("2+3*4");
 
-    is_deeply(\@tokens, ["+", "*", 4, 3, 2]);
+    is_deeply(\@tokens, ["+", 2, "*", 3, 4]);
 };
 
     print <<"EOF";
@@ -114,15 +114,15 @@ subtest "Operatorrangfolge" => sub {
 #         /   \\
 #        *     *
 #       / \\   / \\
-#      5   4 3   2
+#      2   3 4   5
 #
-# preorder: + * 5 4 * 3 2
+# preorder: + * 2 3 * 4 5
 EOF
 
 subtest "Addition zweier Multiplikationen" => sub {
   my @tokens = getTree("2*3+4*5");
 
-  is_deeply(\@tokens, ["+", "*", 5, 4, "*", 3, 2], "Ergebnis stimmt");
+  is_deeply(\@tokens, ["+", "*", 2, 3, "*", 4, 5], "Ergebnis stimmt");
 };
 
 print<<"EOF";
@@ -130,21 +130,22 @@ print<<"EOF";
 # Teste großen Ausdruck
 # Eingabe: 2*3+4*5+6
 # erwarteter Baum:
-#               +
-#             /   \\
-#           +       *
-#          / \\     / \\
-#         6   *   3   2
-#            / \\
-#           5   4 
+#              +
+#             / \\
+#            /   \\
+#           *     +
+#          / \\   / \\
+#         2   3 *   6
+#              / \\
+#             4   5
 #
-# preorder: + + 6 * 5 4 * 3 2
+# preorder: + * 2 3 + * 4 5 6
 EOF
 
 subtest "großer Ausdruck" => sub {
     my @tokens = getTree("2*3+4*5+6");
 
-    is_deeply(\@tokens, ["+", "+", 6, "*", 5, 4, "*", 3, 2], "Ergebnis stimmt");
+    is_deeply(\@tokens, ["+", "*", 2, 3, "+", "*", 4, 5, 6], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -154,17 +155,17 @@ print <<"EOF";
 # erwarteter Baum:
 #          *
 #         / \\
-#        +   2
-#       / \\
-#      4   3
+#        2   +
+#           / \\
+#          4   3
 #
-# preorder: * + 4 3 2
+# preorder: * 2 + 3 4
 EOF
 
 subtest "Operatorrangfolge" => sub {
   my @tokens = getTree("2*(3+4)");
 
-  is_deeply(\@tokens, ["*", "+", 4, 3, 2], "Ergebnis stimmt");
+  is_deeply(\@tokens, ["*", 2, "+", 3, 4], "Ergebnis stimmt");
 };
 
 
@@ -175,17 +176,17 @@ print <<"EOF";
 # erwarteter Baum:
 #          *
 #         / \\
-#        2   +
-#           / \\
-#          4   3
+#        +   2
+#       / \\
+#      3   4
 #
-# preorder: * 2 + 4 3
+# preorder: * + 3 4 2
 EOF
 
 subtest "Operatorrangfolge" => sub {
     my @tokens = getTree("(3+4)*2");
 
-    is_deeply(\@tokens, ["*", "2", "+", "4", "3"], "Ergebnis passt");
+    is_deeply(\@tokens, ["*", "+", 3, 4, 2], "Ergebnis passt");
 };
 
 done_testing();

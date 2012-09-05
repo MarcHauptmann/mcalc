@@ -24,7 +24,7 @@ while(1) {
       $tree = parse($input);
 
       # auswerten
-      my $result = evaluate($tree);
+      my $result = evaluate(\$tree);
 
       printf "%.3f\n", $result;
     };

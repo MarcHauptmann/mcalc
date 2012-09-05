@@ -12,7 +12,7 @@ EOF
 subtest "Zahl" => sub {
     my $tree = Tree->new("2");
 
-    is(evaluate($tree), 2, "Ergebnis ist 2");
+    is(evaluate(\$tree), 2, "Ergebnis ist 2");
 };
 
 print <<"EOF";
@@ -29,7 +29,7 @@ subtest "Addition" => sub {
     $tree->add_child(Tree->new("2"));
     $tree->add_child(Tree->new("4"));
 
-    is(evaluate($tree), 6, "Ergebnis ist 6");
+    is(evaluate(\$tree), 6, "Ergebnis ist 6");
 };
 
 print <<"EOF";
@@ -46,7 +46,7 @@ subtest "Multiplikation" => sub {
     $tree->add_child(Tree->new("2"));
     $tree->add_child(Tree->new("4"));
 
-    is(evaluate($tree), 8, "Ergebnis ist 8");
+    is(evaluate(\$tree), 8, "Ergebnis ist 8");
 };
 
 print <<"EOF";
@@ -60,10 +60,10 @@ EOF
 
 subtest "Subtraktion" => sub {
     my $tree = Tree->new("-");
-    $tree->add_child(Tree->new("4"));
     $tree->add_child(Tree->new("2"));
+    $tree->add_child(Tree->new("4"));
 
-    is(evaluate($tree), -2, "Ergebnis ist -2");
+    is(evaluate(\$tree), -2, "Ergebnis ist -2");
 };
 
 print <<"EOF";
@@ -77,16 +77,16 @@ EOF
 
 subtest "Division" => sub {
     my $tree = Tree->new("/");
-    $tree->add_child(Tree->new("4"));
     $tree->add_child(Tree->new("2"));
+    $tree->add_child(Tree->new("4"));
 
-    is(evaluate($tree), .5, "Ergebnis ist 0.5");
+    is(evaluate(\$tree), .5, "Ergebnis ist 0.5");
 };
 
 
 print <<"EOF";
 # ----------------------------------------
-# Testet die Auswertung einer Division
+# Testet die Auswertung eines mehrstufigen Baums
 # Eingabe:
 #      +
 #     / \\
@@ -105,7 +105,7 @@ subtest "Operatorrangfolge" => sub {
   $tree->add_child($mul);
   $tree->add_child(Tree->new("11"));
 
-  is(evaluate($tree), 19, "Ergebnis ist 19");
+  is(evaluate(\$tree), 19, "Ergebnis ist 19");
 };
 
 
