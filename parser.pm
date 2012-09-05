@@ -205,12 +205,19 @@ sub P {
 
 
 sub parse {
-  my $str = join("_", split(/([\(\)\+\-\*\/])/, $_[0]));
-  $str =~ s/_+/_/g;
-  our @tokens = split(/_/, $str);
-  push @tokens, ";";
   our @operators = (";");
   our @operands = (";");
+
+  my @tokens_plain = split(/([\(\)\+\-\*\/])/, $_[0]);
+  our @tokens = ();
+
+  foreach $token (@tokens_plain) {
+    if($token ne "") {
+      push @tokens, $token;
+    }
+  }
+
+  push @tokens, ";";
 
   E();
   expect(";");

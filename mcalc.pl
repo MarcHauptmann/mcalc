@@ -11,23 +11,24 @@ while(1) {
 
     # Leerzeichen entfernen
     $input =~ s/\s//g;
-    
+
     # Sonderbehandlung für 'quit'
     if($input =~ /^(quit|bye|exit)$/) {
 	print "bye :)\n";
 	exit;
     }
 
-    # parsen
-    my $tree = parse($input);
+    my $tree;
+    eval {
+      # parsen
+      $tree = parse($input);
 
-    if($tree->value()) {
-	# auswerten
-	my $result = evaluate($tree);
+      # auswerten
+      my $result = evaluate($tree);
 
-	printf "%f\n", $result;
-    } else {
-	# Fehler
-	printf ":(\n";
+      printf "%.3f\n", $result;
+    };
+    if(my $error = $@) {
+      print $error;
     }
 }
