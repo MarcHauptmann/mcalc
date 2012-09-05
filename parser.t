@@ -6,12 +6,14 @@ use Test::More;
 sub getTree {
     my $tree = parse(@_[0]);
 
+    my @preorder = map { $_->value() } $tree->traverse($tree->PRE_ORDER);
+
     print "# Rückgabe: ";
-    foreach ($tree->traverse($tree->PRE_ORDER)) { 
-	print $_->value()." "; 
+    foreach (@preorder) { 
+	print $_." "; 
     } print "\n";
 
-    return $tree;
+    return @preorder;
 }
 
 print <<"EOF";
@@ -20,10 +22,9 @@ print <<"EOF";
 EOF
     
 subtest "eine Zahl" => sub {
-    my $tree = getTree("1");
+    my @tokens = getTree("1");
 
-    is($tree->size(), 1, "nur ein Element");
-    is($tree->value(), "1", "Element ist 1");
+    is_deeply(\@tokens, [1], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -38,13 +39,9 @@ print <<"EOF";
 EOF
 
 subtest "Addition" => sub {
-    my $tree = getTree("1+2");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
+    my @tokens = getTree("1+2");
 
-    is(scalar(@tokens), 3, "drei Elemente");
-    is($tokens[0]->value(), "+", "Root ist +");
-    is($tokens[1]->value(), 2, "erstes Kind ist 2");
-    is($tokens[2]->value(), 1, "zweites Kind ist 1");
+    is_deeply(\@tokens, ["+", 2, 1], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -62,15 +59,9 @@ print <<"EOF";
 EOF
 
 subtest "3-er Addition" => sub {
-    my $tree = getTree("1+2+3");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
+    my @tokens = getTree("1+2+3");
 
-    is(scalar(@tokens), 5, "fünf Elemente");
-    is($tokens[0]->value(), "+", "Root ist +");
-    is($tokens[1]->value(), "+", "neuer Zweig +");
-    is($tokens[2]->value(), "3", "erstes Kind ist 3");
-    is($tokens[3]->value(), "2", "zweites Kind ist 2");
-    is($tokens[4]->value(), "1", "zweites Kind ist 1");
+    is_deeply(\@tokens, ["+", "+", 3, 2, 1], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -88,15 +79,9 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my $tree = getTree("2*3+4");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
+    my @tokens = getTree("2*3+4");
 
-    is(scalar(@tokens), 5, "fünf Elemente");
-    is($tokens[0]->value(), "+", "+ erwartet");
-    is($tokens[1]->value(), "4", "4 erwartet");
-    is($tokens[2]->value(), "*", "* erwartet");
-    is($tokens[3]->value(), "3", "3 erwartet");
-    is($tokens[4]->value(), "2", "2 erwartet");
+    is_deeply(\@tokens, ["+", 4, "*", 3, 2], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -114,18 +99,11 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my $tree = getTree("2+3*4");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
+    my @tokens = getTree("2+3*4");
 
-    is(scalar(@tokens), 5, "fünf Elemente");
-    is($tokens[0]->value(), "+", "+ erwartet");
-    is($tokens[1]->value(), "*", "* erwartet");
-    is($tokens[2]->value(), "4", "4 erwartet");
-    is($tokens[3]->value(), "3", "3 erwartet");
-    is($tokens[4]->value(), "2", "2 erwartet");
+    is_deeply(\@tokens, ["+", "*", 4, 3, 2]);
 };
 
-subtest "" => sub {
     print <<"EOF";
 # ----------------------------------------
 # Teste Addition von zwei Multiplikationen
@@ -141,17 +119,10 @@ subtest "" => sub {
 # preorder: + * 5 4 * 3 2
 EOF
 
-	my $tree = getTree("2*3+4*5");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
+subtest "Addition zweier Multiplikationen" => sub {
+  my @tokens = getTree("2*3+4*5");
 
-    is(scalar(@tokens), 7, "7 Elemente");
-    is($tokens[0]->value(), "+", "+ erwartet");
-    is($tokens[1]->value(), "*", "* erwartet");
-    is($tokens[2]->value(), "5", "5 erwartet");
-    is($tokens[3]->value(), "4", "4 erwartet");
-    is($tokens[4]->value(), "*", "* erwartet");
-    is($tokens[5]->value(), "3", "3 erwartet");
-    is($tokens[6]->value(), "2", "2 erwartet");
+  is_deeply(\@tokens, ["+", "*", 5, 4, "*", 3, 2], "Ergebnis stimmt");
 };
 
 print<<"EOF";
@@ -170,20 +141,10 @@ print<<"EOF";
 # preorder: + + 6 * 5 4 * 3 2
 EOF
 
-subtest "großer Ausdruck" => sub {    
-    my $tree = getTree("2*3+4*5+6");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
-    
-    is(scalar(@tokens), 9, "9 Elemente");
-    is($tokens[0]->value(), "+", "+ erwartet");
-    is($tokens[1]->value(), "+", "+ erwartet");
-    is($tokens[2]->value(), "6", "6 erwartet");
-    is($tokens[3]->value(), "*", "* erwartet");
-    is($tokens[4]->value(), "5", "5 erwartet");
-    is($tokens[5]->value(), "4", "4 erwartet");
-    is($tokens[6]->value(), "*", "* erwartet");
-    is($tokens[7]->value(), "3", "3 erwartet");
-    is($tokens[8]->value(), "2", "2 erwartet");
+subtest "großer Ausdruck" => sub {
+    my @tokens = getTree("2*3+4*5+6");
+
+    is_deeply(\@tokens, ["+", "+", 6, "*", 5, 4, "*", 3, 2], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -201,15 +162,9 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my $tree = getTree("2*(3+4)");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
+  my @tokens = getTree("2*(3+4)");
 
-    is(scalar(@tokens), 5, "fünf Elemente");
-    is($tokens[0]->value(), "*", "* erwartet");
-    is($tokens[1]->value(), "+", "+ erwartet");
-    is($tokens[2]->value(), "4", "4 erwartet");
-    is($tokens[3]->value(), "3", "3 erwartet");
-    is($tokens[4]->value(), "2", "2 erwartet");
+  is_deeply(\@tokens, ["*", "+", 4, 3, 2], "Ergebnis stimmt");
 };
 
 
@@ -228,15 +183,9 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my $tree = getTree("(3+4)*2");
-    my @tokens = $tree->traverse($tree->PRE_ORDER);
+    my @tokens = getTree("(3+4)*2");
 
-    is(scalar(@tokens), 5, "fünf Elemente");
-    is($tokens[0]->value(), "*", "* erwartet");
-    is($tokens[1]->value(), "2", "2 erwartet");
-    is($tokens[2]->value(), "+", "+ erwartet");
-    is($tokens[3]->value(), "4", "4 erwartet");
-    is($tokens[4]->value(), "3", "3 erwartet");
+    is_deeply(\@tokens, ["*", "2", "+", "4", "3"], "Ergebnis passt");
 };
 
 done_testing();
