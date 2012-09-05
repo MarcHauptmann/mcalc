@@ -3,7 +3,7 @@
 use parser;
 use Test::More;
 
-sub getTree {
+sub getTokens {
     my $tree = parse(@_[0]);
 
     my @preorder = map { $_->value() } $tree->traverse($tree->PRE_ORDER);
@@ -22,7 +22,7 @@ print <<"EOF";
 EOF
     
 subtest "eine Zahl" => sub {
-    my @tokens = getTree("1");
+    my @tokens = getTokens("1");
 
     is_deeply(\@tokens, [1], "Ergebnis stimmt");
 };
@@ -39,7 +39,7 @@ print <<"EOF";
 EOF
 
 subtest "Addition" => sub {
-    my @tokens = getTree("1+2");
+    my @tokens = getTokens("1+2");
 
     is_deeply(\@tokens, ["+", 1, 2], "Ergebnis stimmt");
 };
@@ -59,7 +59,7 @@ print <<"EOF";
 EOF
 
 subtest "3-er Addition" => sub {
-    my @tokens = getTree("1+2+3");
+    my @tokens = getTokens("1+2+3");
 
     is_deeply(\@tokens, ["+", 1, "+", 2, 3], "Ergebnis stimmt");
 };
@@ -79,7 +79,7 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my @tokens = getTree("2*3+4");
+    my @tokens = getTokens("2*3+4");
 
     is_deeply(\@tokens, ["+", "*", 2, 3, 4], "Ergebnis stimmt");
 };
@@ -99,7 +99,7 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my @tokens = getTree("2+3*4");
+    my @tokens = getTokens("2+3*4");
 
     is_deeply(\@tokens, ["+", 2, "*", 3, 4]);
 };
@@ -120,7 +120,7 @@ subtest "Operatorrangfolge" => sub {
 EOF
 
 subtest "Addition zweier Multiplikationen" => sub {
-  my @tokens = getTree("2*3+4*5");
+  my @tokens = getTokens("2*3+4*5");
 
   is_deeply(\@tokens, ["+", "*", 2, 3, "*", 4, 5], "Ergebnis stimmt");
 };
@@ -143,7 +143,7 @@ print<<"EOF";
 EOF
 
 subtest "großer Ausdruck" => sub {
-    my @tokens = getTree("2*3+4*5+6");
+    my @tokens = getTokens("2*3+4*5+6");
 
     is_deeply(\@tokens, ["+", "*", 2, 3, "+", "*", 4, 5, 6], "Ergebnis stimmt");
 };
@@ -163,7 +163,7 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-  my @tokens = getTree("2*(3+4)");
+  my @tokens = getTokens("2*(3+4)");
 
   is_deeply(\@tokens, ["*", 2, "+", 3, 4], "Ergebnis stimmt");
 };
@@ -184,9 +184,40 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my @tokens = getTree("(3+4)*2");
+    my @tokens = getTokens("(3+4)*2");
 
     is_deeply(\@tokens, ["*", "+", 3, 4, 2], "Ergebnis passt");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Funktionen
+# Eingabe: sum(2, 5, 7)
+# erwarteter Baum:
+#             +
+#            / \\
+#           /   \\
+#         sum   cos
+#         /|\\   / \\
+#        2 5 7 1   2
+EOF
+
+subtest "Funktionen" => sub {
+  my $tree = parse("sum(2,5,7)+cos(1,2)");
+
+  is($tree->size(), 7, "Größe ist 7");
+  is($tree->value(), "+", "Operation ist +");
+  is($tree->children(0)->value(), "sum", "erster Zweig ist sum");
+  is($tree->children(0)->size(), 4, "sum-Tree hat Größe 4");
+
+  my @sum_elements = map { $_->value() } $tree->children(0)->children();
+  is_deeply(\@sum_elements, [2, 5, 7], "Elemente stimmen");
+
+  is($tree->children(1)->value(), "cos", "zweiter Zweig ist cos");
+  is($tree->children(1)->size(), 3, "cos-Tree hat Größe 3");
+
+  my @cos_elements = map { $_->value() } $tree->children(1)->children();
+  is_deeply(\@cos_elements, [1, 2], "Elemente stimmen");
 };
 
 done_testing();

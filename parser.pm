@@ -7,96 +7,6 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(parse parseTree number addition top);
 our @EXPORT = qw(parse parseTree number addition top);
 
-#sub parse {
-#     my $input = @_[0];
-
-#     return $input =~ /^\d+\.?\d*([\+\-\*\/]\d+\.?\d*)*$/;
-# }
-
-sub parseTree {
-    my $input = @_[0];
-
-    my @tokens = split(/([\+\-\*\/])/, $input);
-    my $tree = Tree->new("");
-    my $root = $tree;
-
-    foreach $token (@tokens) {
-	# Zahl erkannt
-	if($token =~ /\d+\.?\d*/) {
-	    # leerer Baum
-	    if($tree->value() eq "") {
-		$tree->set_value($token);
-	    } 
-	    # schon Elemente enthalten
-	    else {
-		my $node = Tree->new($token);
-		
-		$tree->add_child($node);
-	    }
-	}
-	# Operator
-	elsif($token =~ /[\+\-]/) {
-	    if($root->size() >= 2) {
-		my $temp = $root;
-
-		$root = Tree->new($token);
-		$root->add_child($temp);
-		$tree = Tree->new("");
-		$root->add_child($tree);
-	    } else {
-		# Wurzel austauschen und neuen Zweig beginnen
-		my $node = Tree->new($tree->value());
-		my $nextTree = Tree->new("");
-
-		$tree->set_value($token);
-		$tree->add_child($node);
-		$tree->add_child($nextTree);
-		$tree = $nextTree;	    
-	    }
-	} elsif($token =~ /[\*\/]/) {
-	    # Wurzel austauschen und neuen Zweig beginnen
-	    my $node = Tree->new($tree->value());
-	    my $nextTree = Tree->new("");
-
-	    $tree->set_value($token);
-	    $tree->add_child($node);
-	    $tree->add_child($nextTree);
-	    $tree = $nextTree;
-	}
-    }
-
-    return $root;
-}
-
-
-
-sub number {
-    my $sym = shift(@{$_[0]});
-
-    if($sym =~ /\d+\.?\d*/) {
-	return Tree->new($sym);
-    } else {
-	print "error";
-    }
-}
-
-sub addition {
-    
-    my @list = @{$_[0]};
-
-    $num1 = number(\@list);
-    $op = shift(@list);
-    $num2 = number(\@list);
-
-    $tree = Tree->new($op);
-    $tree->add_child($num1);
-    $tree->add_child($num2);
-
-    return $tree;
-}
-
-###########################################################
-
 sub consume {
   shift(@tokens);
 }
@@ -185,6 +95,29 @@ sub E {
   }
 }
 
+sub args {
+  $argCount = 1;
+  push @operands, ";";
+  P();
+
+  while(getNext() eq ",") {
+    consume();
+    P();
+    $argCount++;
+  }
+
+  my $node = Tree->new(pop @operators);
+  my @values = ();
+
+  while(top(@operands) ne ";") {
+    push @values, pop @operands
+  }
+  pop @operands;
+  map { $node->add_child($_) } reverse @values;
+
+  push @operands, $node;
+}
+
 sub P {
   my $sym = getNext();
 
@@ -198,7 +131,13 @@ sub P {
     E();
     expect(")");
     pop @operators;
-  } else {
+  } elsif($sym =~ /[a-zA-Z]+/) {
+    push @operators, $sym;
+    consume();
+    expect("(");
+    args();
+    expect(")");
+  }else {
     die "unbekanntes Symbol: '".$sym."'";
   }
 }
@@ -208,7 +147,7 @@ sub parse {
   our @operators = (";");
   our @operands = (";");
 
-  my @tokens_plain = split(/([\(\)\+\-\*\/])/, $_[0]);
+  my @tokens_plain = split(/([\(\)\+\-\*\/,])/, $_[0]);
   our @tokens = ();
 
   foreach $token (@tokens_plain) {
