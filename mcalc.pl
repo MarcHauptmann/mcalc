@@ -2,12 +2,14 @@
 
 use parser;
 use evaluator;
+use Term::ReadLine;
 
 print "Marc´s calculator v0.0.1\n";
 
+my $term = Term::ReadLine->new("Marc's calculator");
+
 while(1) {
-    print "> ";
-    my $input = <STDIN>;
+    my $input = $term->readline("mcalc> ");
 
     # Leerzeichen entfernen
     $input =~ s/\s//g;
