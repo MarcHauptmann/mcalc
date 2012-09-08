@@ -205,7 +205,7 @@ EOF
 subtest "Funktionen" => sub {
   my $tree = parse("sum(2,5,7)+cos(1,2)");
 
-  is($tree->size(), 7, "Größe ist 7");
+  is($tree->size(), 8, "Größe ist 8");
   is($tree->value(), "+", "Operation ist +");
   is($tree->children(0)->value(), "sum", "erster Zweig ist sum");
   is($tree->children(0)->size(), 4, "sum-Tree hat Größe 4");

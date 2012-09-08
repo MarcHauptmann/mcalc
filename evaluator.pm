@@ -12,7 +12,6 @@ Wertet die Ausdrücke aus
 
 package evaluator;
 
-use Switch;
 use List::MoreUtils qw(firstidx);
 use Exporter;
 use Tree;
