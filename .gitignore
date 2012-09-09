@@ -7,3 +7,9 @@ help.pod
 help.txt
 mcalc
 mcalc.1
+
+*.in
+*.m4
+configure
+missing
+install-sh
