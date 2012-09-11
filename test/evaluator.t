@@ -83,6 +83,22 @@ subtest "Division" => sub {
     is(evaluate(\$tree), .5, "Ergebnis ist 0.5");
 };
 
+print <<"EOF";
+# ----------------------------------------
+# Testet die Auswertung einer Potenz
+# Eingabe:
+#      ^
+#     / \\
+#    2   4
+EOF
+
+subtest "Potenz" => sub {
+    my $tree = Tree->new("^");
+    $tree->add_child(Tree->new("2"));
+    $tree->add_child(Tree->new("4"));
+
+    is(evaluate(\$tree), 16, "Ergebnis ist 16");
+};
 
 print <<"EOF";
 # ----------------------------------------

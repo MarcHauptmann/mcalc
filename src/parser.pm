@@ -30,14 +30,13 @@ sub weight {
     return 1;
   } elsif($_[0] eq "*" || $_[0] eq "/") {
     return 2;
+  } elsif($_[0] eq "^") {
+    return 3;
   } else {
     return 0;
   }
 }
 
-sub isOp {
-  return $tokens[0] =~ /\+|\-|\*|\//;
-}
 
 sub popOperator {
   my $node1 = pop @operands;
@@ -66,28 +65,23 @@ sub expect {
 
   if ($sym eq $_[0]) {
     consume();
-  } else { 
-    die "erwartet: ".$sym;
-  }
-}
-
-sub op {
-  my $sym = getNext();
-
-  if ($sym eq "+" || $sym eq "-" || $sym eq "*" || $sym eq "/") {
-    pushOperator($sym);
-    consume();
   } else {
-    die "kein Operator: ".$sym;
+    die "'$sym' erwartet";
   }
 }
 
-sub E {
-  P();
+sub isOp {
+  return getNext() =~ /\+|\-|\*|\/|\^/;
+}
+
+sub expression {
+  term();
 
   while (isOp()) {
-    op();
-    P();
+    pushOperator(getNext());
+    consume();
+
+    term();
   }
 
   while (top(@operators) ne ";") {
@@ -96,42 +90,55 @@ sub E {
 }
 
 sub args {
-  $argCount = 1;
-  push @operands, ";";
-  P();
+  my $numArgs = 1;
+
+  push @operators, ";";
+  expression();
+  pop @operators;
 
   while(getNext() eq ",") {
     consume();
-    P();
-    $argCount++;
+
+    push @operators, ";";
+    expression();
+    pop @operators;
+
+    $numArgs++;
   }
 
   my $node = Tree->new(pop @operators);
   my @values = ();
 
-  while(top(@operands) ne ";") {
+  for($i = 0; $i<$numArgs; $i++) {
     push @values, pop @operands
   }
-  pop @operands;
   map { $node->add_child($_) } reverse @values;
 
   push @operands, $node;
 }
 
-sub P {
+sub number() {
+  return getNext() =~ /\d+\.?\d?/;
+}
+
+sub identifier() {
+  return getNext() =~ /[a-zA-Z]+/;
+}
+
+sub term {
   my $sym = getNext();
 
-  if ($sym =~ /\d+\.?\d?/) {
+  if (number()) {
     $num = Tree->new($sym);
     push @operands, $num;
     consume();
   } elsif ($sym eq "(") {
     push @operators, ";";
     consume();
-    E();
+    expression();
     expect(")");
     pop @operators;
-  } elsif($sym =~ /[a-zA-Z]+/) {
+  } elsif(identifier()) {
     push @operators, $sym;
     consume();
     expect("(");
@@ -147,7 +154,7 @@ sub parse {
   our @operators = (";");
   our @operands = (";");
 
-  my @tokens_plain = split(/([\(\)\+\-\*\/,])/, $_[0]);
+  my @tokens_plain = split(/([\(\)\+\-\*\/,\^])/, $_[0]);
   our @tokens = ();
 
   foreach $token (@tokens_plain) {
@@ -158,7 +165,7 @@ sub parse {
 
   push @tokens, ";";
 
-  E();
+  expression();
   expect(";");
 
   my $tree = pop @operands;

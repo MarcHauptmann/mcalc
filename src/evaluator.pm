@@ -41,6 +41,9 @@ Macht eine Auswertung
 	       "*" => sub {
 		 return $_[0] * $_[1];
 	       },
+	       "^" => sub {
+		 return $_[0] ** $_[1];
+	       },
 	       "cos" => sub {
 		 return cos($_[0]);
 	       },

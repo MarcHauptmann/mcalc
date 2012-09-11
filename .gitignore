@@ -13,3 +13,8 @@ mcalc.1
 configure
 missing
 install-sh
+
+Makefile
+autom4te.cache
+*.log
+*.status

@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use parser;
 use evaluator;
 use Term::ReadLine;

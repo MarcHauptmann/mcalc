@@ -104,6 +104,27 @@ subtest "Operatorrangfolge" => sub {
     is_deeply(\@tokens, ["+", 2, "*", 3, 4]);
 };
 
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Operatorrangfolge mit Potenzieren
+# Eingabe: 2^3*4
+# erwarteter Baum:
+#          *
+#         / \\
+#        ^   4
+#       / \\
+#      2   3
+#
+# preorder: * ^ 2 3 4
+EOF
+
+subtest "Operatorrangfolge" => sub {
+    my @tokens = getTokens("2^3*4");
+
+    is_deeply(\@tokens, ["*", "^", 2, 3, 4]);
+};
+
     print <<"EOF";
 # ----------------------------------------
 # Teste Addition von zwei Multiplikationen
@@ -192,7 +213,50 @@ subtest "Operatorrangfolge" => sub {
 print <<"EOF";
 # ----------------------------------------
 # Teste Funktionen
-# Eingabe: sum(2, 5, 7)
+# Eingabe: cos(1-1)
+# erwarteter Baum:
+#            cos
+#             |
+#             -
+#            / \\
+#           1   1
+EOF
+
+subtest "Funktionen" => sub {
+  my $tree = parse("cos(1-1)");
+
+  is($tree->size(), 4, "Größe ist 4");
+  is($tree->value(), "cos", "Oberste Funktion ist cos");
+  is($tree->children(0)->value(), "-", "Operation ist -");
+  is($tree->children(0)->children(0)->value, 1, "Kind 1 ist 1");
+  is($tree->children(0)->children(1)->value, 1, "Kind 2 ist 1");
+};
+
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Funktionen mit mehreren Parametern
+# Eingabe: cos(1,2,3)
+# erwarteter Baum:
+#            cos
+#            /|\\
+#           1 2 3
+EOF
+
+subtest "Funktionen" => sub {
+  my $tree = parse("cos(1,2,3)");
+
+  is($tree->size(), 4, "Größe ist 3");
+  is($tree->value(), "cos", "Oberste Funktion ist cos");
+  is($tree->children(0)->value, 1, "Kind 1 ist 1");
+  is($tree->children(1)->value, 2, "Kind 2 ist 2");
+  is($tree->children(2)->value, 3, "Kind 3 ist 3");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Funktionen
+# Eingabe: sum(2,5,7)+cos(1,2)
 # erwarteter Baum:
 #             +
 #            / \\
@@ -204,6 +268,9 @@ EOF
 
 subtest "Funktionen" => sub {
   my $tree = parse("sum(2,5,7)+cos(1,2)");
+
+  map {print $_->value()." "} $tree->traverse($tree->PRE_ORDER);
+  print "\n";
 
   is($tree->size(), 8, "Größe ist 8");
   is($tree->value(), "+", "Operation ist +");
