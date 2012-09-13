@@ -31,6 +31,8 @@ sub weight {
   } elsif($_[0] eq "*" || $_[0] eq "/") {
     return 2;
   } elsif($_[0] eq "^") {
+    return 4;
+  } elsif($_[0] eq "neg") {
     return 3;
   } else {
     return 0;
@@ -74,7 +76,16 @@ sub isOp {
   return getNext() =~ /\+|\-|\*|\/|\^/;
 }
 
+sub negation {
+  return getNext() eq "-";
+}
+
 sub expression {
+  if(negation()) {
+    consume();
+    push @operators, "neg";
+  }
+
   term();
 
   while (isOp()) {

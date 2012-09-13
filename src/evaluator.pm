@@ -29,40 +29,43 @@ Macht eine Auswertung
 =cut
 
 our %functions =  (
-	       "+" => sub {
-		 return $_[0] + $_[1];
-	       },
-	       "-" => sub {
-		 return $_[0] - $_[1];
-	       },
-	       "/" => sub {
-		 return $_[0] / $_[1];
-	       },
-	       "*" => sub {
-		 return $_[0] * $_[1];
-	       },
-	       "^" => sub {
-		 return $_[0] ** $_[1];
-	       },
-	       "cos" => sub {
-		 return cos($_[0]);
-	       },
-	       "sin" => sub {
-		 return sin($_[0]);
-	       },
-	       "tan" => sub {
-		 return tan($_[0]);
-	       },
-	       "sqrt" => sub {
-		 return sqrt($_[0]);
-	       },
-	       "ln" => sub {
-		 return log($_[0]);
-	       },
-	       "logn" => sub {
-		 return logn($_[0], $_[1]);
-	       }
-	      );
+		   "+" => sub {
+		     return $_[0] + $_[1];
+		   },
+		   "-" => sub {
+		     return $_[0] - $_[1];
+		   },
+		   "/" => sub {
+		     return $_[0] / $_[1];
+		   },
+		   "*" => sub {
+		     return $_[0] * $_[1];
+		   },
+		   "^" => sub {
+		     return $_[0] ** $_[1];
+		   },
+		   "cos" => sub {
+		     return cos($_[0]);
+		   },
+		   "sin" => sub {
+		     return sin($_[0]);
+		   },
+		   "tan" => sub {
+		     return tan($_[0]);
+		   },
+		   "sqrt" => sub {
+		     return sqrt($_[0]);
+		   },
+		   "ln" => sub {
+		     return log($_[0]);
+		   },
+		   "logn" => sub {
+		     return logn($_[0], $_[1]);
+		   },
+		   "neg" => sub {
+		     return -$_[0];
+		   }
+		  );
 
 our %variables = (
 		  "pi" => 3.1415

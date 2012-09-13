@@ -344,4 +344,56 @@ subtest "Variablen" => sub {
   dies_ok { parse("var+1=1") } "Test";
 };
 
+print <<"EOF";
+# ----------------------------------------
+# Teste Negierung von Zahlen
+# Eingabe: -1
+# erwarteter Baum:
+#          neg
+#           |
+#           1
+EOF
+
+subtest "Negierung von Zahlen" => sub {
+  my @tokens = getTokens("-1");
+
+  is_deeply(\@tokens, ["neg", 1], "Ergebnis passt");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Rechnen mit negativen Zahlen
+# Eingabe: -2+2
+# erwarteter Baum:
+#             +
+#            / \\
+#          neg  2
+#           |
+#           2
+EOF
+
+subtest "Negierung von Zahlen" => sub {
+  my @tokens = getTokens("-2+2");
+
+  is_deeply(\@tokens, ["+", "neg", 2, 2], "Ergebnis passt");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Potenzieren mit negativem Vorzeichen
+# Eingabe: -2^2
+# erwarteter Baum:
+#            neg
+#             |
+#             ^
+#            / \\
+#           2   2
+EOF
+
+subtest "Negierung von Zahlen" => sub {
+  my @tokens = getTokens("-2^2");
+
+  is_deeply(\@tokens, ["neg", "^", 2, 2], "Ergebnis passt");
+};
+
 done_testing();
