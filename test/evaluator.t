@@ -124,5 +124,37 @@ subtest "Operatorrangfolge" => sub {
   is(evaluate(\$tree), 19, "Ergebnis ist 19");
 };
 
+print <<"EOF";
+# ----------------------------------------
+# Testet Auswertung von Variable
+# Eingabe: pi
+EOF
+
+subtest "Auswertung" => sub {
+  $val = Tree->new("pi");
+
+  $expected = getVariable("pi");
+  is(evaluate(\$val), $expected, "pi geht");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Testet eine Zuweisung
+# Eingabe:
+#      =
+#     / \\
+#   var  1
+EOF
+
+subtest "Zuweisung" => sub {
+  my $stmt = Tree->new("=");
+  $stmt->add_child(Tree->new("var"));
+  $stmt->add_child(Tree->new("1"));
+
+  evaluate(\$stmt);
+
+  isnt(getVariable("var"), undef, "var ist definiert");
+  is(getVariable("var"), 1, "var ist 1");
+};
 
 done_testing();

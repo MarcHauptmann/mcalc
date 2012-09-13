@@ -35,11 +35,11 @@ sub calculate {
   eval {
     # parsen
     my $tree = parse($input);
-    
+
     # auswerten
     my $result = evaluate(\$tree);
 
-    printf "%.3f\n", $result;
+    printf "$result\n";
   };
   if (my $error = $@) {
     print $error;

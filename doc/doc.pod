@@ -58,9 +58,25 @@ B<mcalc> can perform standard calculations as you would expect it to work.
 
 =item I<bye>, I<exit>, I<quit>, 
 
-Exists the program
+Exits the program
 
 =back
+
+=head1 SYNTAX
+
+I<statement>    := [ I<identifier> = ] I<expression>
+
+I<expression>   := I<term> [ I<operator> I<term> ] ...
+
+I<term>         := I<number> | ( I<expression> ) | I<identifier> [ ( I<args> ) ]
+
+I<args>         := I<expression> [ , I<expression> ] ...
+
+I<identifier>   := regex([a-zA-Z]+)
+
+I<number>       := regex(\d+\.?\d*)
+
+I<operator>     := + | - | * | / | ^
 
 =head1 AUTHOR
 

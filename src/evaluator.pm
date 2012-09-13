@@ -19,8 +19,8 @@ use Math::Trig;
 use Math::Complex;
 
 our @ISA=qw(Exporter);
-our @EXPORT_OK=qw(evaluate);
-our @EXPORT = qw(evaluate);
+our @EXPORT_OK=qw(evaluate getVariable);
+our @EXPORT = qw(evaluate getVariable);
 
 =item evaluate
 
@@ -28,7 +28,7 @@ Macht eine Auswertung
 
 =cut
 
-%functions =  (
+our %functions =  (
 	       "+" => sub {
 		 return $_[0] + $_[1];
 	       },
@@ -64,12 +64,35 @@ Macht eine Auswertung
 	       }
 	      );
 
+our %variables = (
+		  "pi" => 3.1415
+		 );
+
+sub getVariable {
+  return $variables{$_[0]};
+}
+
+sub setVariable {
+  $variables{$_[0]} = $_[1];
+}
+
 sub evaluate {
   my $tree = ${$_[0]};
-  my @values = ();
+  my $val = $tree->value();
 
   if($tree->size() == 1) {
-    return $tree->value();
+    if($val =~ /[a-zA-Z]+/) {
+      return getVariable($val);
+    } else {
+      return $val;
+    }
+  } elsif($val eq "=") {
+    my $var = $tree->children(0)->value();
+    my $value = evaluate(\$tree->children(1));
+
+    setVariable($var, $value);
+
+    return "$var = $value";
   } else {
     my $func = $functions{$tree->value()};
 

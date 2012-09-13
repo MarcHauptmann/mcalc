@@ -2,6 +2,7 @@
 
 use parser;
 use Test::More;
+use Test::Exception;
 
 sub getTokens {
     my $tree = parse(@_[0]);
@@ -285,6 +286,62 @@ subtest "Funktionen" => sub {
 
   my @cos_elements = map { $_->value() } $tree->children(1)->children();
   is_deeply(\@cos_elements, [1, 2], "Elemente stimmen");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Variablen
+# Eingabe: var
+# erwarteter Baum:
+#             var
+EOF
+
+subtest "Variablen" => sub {
+  my @tokens = getTokens("var");
+
+  is_deeply(\@tokens, ["var"], "Ergebnis passt");
+};
+
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Variable in Ausdruck
+# Eingabe: var
+# erwarteter Baum:
+#             1+var
+EOF
+
+subtest "Variablen" => sub {
+  my @tokens = getTokens("1+var");
+
+  is_deeply(\@tokens, ["+", 1, "var"], "Ergebnis passt");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Teste Zuweisung
+# Eingabe: var=1
+# erwarteter Baum:
+#             =
+#            / \\
+#          var  1
+EOF
+
+subtest "Variablen" => sub {
+  my @tokens = getTokens("var=1");
+
+  is_deeply(\@tokens, ["=", "var", 1], "Ergebnis passt");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Teste nicht zulässige Zuweisung
+# Eingabe: var+1=1
+# Exception erwartet
+EOF
+
+subtest "Variablen" => sub {
+  dies_ok { parse("var+1=1") } "Test";
 };
 
 done_testing();

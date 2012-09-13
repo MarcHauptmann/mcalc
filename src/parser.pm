@@ -90,7 +90,7 @@ sub expression {
 }
 
 sub args {
-  my $numArgs = 1;
+  push @operands, ";";
 
   push @operators, ";";
   expression();
@@ -109,16 +109,17 @@ sub args {
   my $node = Tree->new(pop @operators);
   my @values = ();
 
-  for($i = 0; $i<$numArgs; $i++) {
+  while(top(@operands) ne ";") {
     push @values, pop @operands
   }
   map { $node->add_child($_) } reverse @values;
+  pop @operands;
 
   push @operands, $node;
 }
 
 sub number() {
-  return getNext() =~ /\d+\.?\d?/;
+  return getNext() =~ /\d+\.?\d*/;
 }
 
 sub identifier() {
@@ -139,22 +140,26 @@ sub term {
     expect(")");
     pop @operators;
   } elsif(identifier()) {
-    push @operators, $sym;
     consume();
-    expect("(");
-    args();
-    expect(")");
+    if(getNext() eq "(") {
+      consume();
+
+      push @operators, $sym;
+      args();
+      expect(")");
+    } else {
+      push @operands, Tree->new($sym);
+    }
   }else {
     die "unbekanntes Symbol: '".$sym."'";
   }
 }
 
-
 sub parse {
   our @operators = (";");
   our @operands = (";");
 
-  my @tokens_plain = split(/([\(\)\+\-\*\/,\^])/, $_[0]);
+  my @tokens_plain = split(/([\(\)\+\-\*\/,\^=])/, $_[0]);
   our @tokens = ();
 
   foreach $token (@tokens_plain) {
@@ -165,8 +170,19 @@ sub parse {
 
   push @tokens, ";";
 
+  # wenn Zuweisung
+  if(identifier() && scalar(@tokens) >= 2 && $tokens[1] eq "=") {
+    push @operands, Tree->new(getNext());
+    consume();
+    push @operators, "=";
+    consume();
+  }
+
   expression();
-  expect(";");
+
+  if(getNext() ne ";") {
+    die "vorzeitiges Ende der Eingabe";
+  }
 
   my $tree = pop @operands;
 
