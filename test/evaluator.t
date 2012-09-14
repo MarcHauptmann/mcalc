@@ -157,4 +157,28 @@ subtest "Zuweisung" => sub {
   is(getVariable("var"), 1, "var ist 1");
 };
 
+print <<"EOF";
+# ----------------------------------------
+# test completion
+EOF
+
+subtest "completion pi" => sub{
+  my @completions = getCompletions("p");
+
+  is(scalar(@completions), 1, "one completion");
+  is_deeply(\@completions, ["pi"], "pi wird komplettiert");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# test completion
+EOF
+
+subtest "completion cos" => sub{
+  my @completions = getCompletions("co");
+
+  is(scalar(@completions), 2, "one completion");
+  is_deeply(\@completions, ["cos", "cot"], "'cos' and 'cot' works");
+};
+
 done_testing();

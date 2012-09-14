@@ -19,8 +19,8 @@ use Math::Trig;
 use Math::Complex;
 
 our @ISA=qw(Exporter);
-our @EXPORT_OK=qw(evaluate getVariable);
-our @EXPORT = qw(evaluate getVariable);
+our @EXPORT_OK=qw(evaluate getVariable getCompletions);
+our @EXPORT = qw(evaluate getVariable getCompletions);
 
 =item evaluate
 
@@ -43,6 +43,9 @@ our %functions =  (
 		   },
 		   "^" => sub {
 		     return $_[0] ** $_[1];
+		   },
+		   "cot" => sub {
+		     return cot($_[0]);
 		   },
 		   "cos" => sub {
 		     return cos($_[0]);
@@ -70,6 +73,24 @@ our %functions =  (
 our %variables = (
 		  "pi" => 3.1415
 		 );
+
+sub getCompletions {
+  my @values = ();
+
+  foreach $val (keys %variables) {
+    if($val =~ /^$_[0]/) {
+      push @values, $val;
+    }
+  }
+
+  foreach $val (keys %functions) {
+    if($val =~ /^$_[0]/) {
+      push @values, $val;
+    }
+  }
+
+  return @values;
+}
 
 sub getVariable {
   return $variables{$_[0]};

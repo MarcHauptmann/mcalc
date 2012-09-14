@@ -14,6 +14,7 @@ our $verbose = 0;
 our $version = 0;
 
 # Hier geht es los!
+our $term;
 
 sub printWelcome {
   print "Welcome to mcalc v$VERSION\n"
@@ -46,6 +47,23 @@ sub calculate {
   }
 }
 
+sub complete {
+  my ($text, $line, $start) = @_;
+  my $attribs = $term->Attribs;
+
+  $attribs->{completion_suppress_append} = 1;
+
+  @completions = getCompletions($line);
+
+  foreach $val ("quit", "exit", "bye") {
+    if($val =~ /^$line/) {
+      push @completions, $val;
+    }
+  }
+
+  return @completions;
+}
+
 GetOptions(
 	   "help" => \$help,
 	   "prompt|p=s" => \$prompt,
@@ -67,7 +85,11 @@ else {
     printWelcome();
   }
 
-  my $term = Term::ReadLine->new("mcalc");
+  $term = Term::ReadLine->new("mcalc");
+  my $attribs = $term->Attribs;
+
+  $attribs->{completion_function} = \&complete;
+  $attribs->{completer_word_break_characters} = "+-*/^()";
 
   while (1) {
     my $input = $term->readline("$prompt ");
