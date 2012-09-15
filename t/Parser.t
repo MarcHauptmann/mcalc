@@ -6,7 +6,7 @@ use Test::Exception;
 
 sub getTokens {
   my $parser = Parser->new();
-  my $tree = $parser->parse(@_[0]);
+  my $tree = $parser->parse($_[0]);
 
   my @preorder = map { $_->value() } $tree->traverse($tree->PRE_ORDER);
 

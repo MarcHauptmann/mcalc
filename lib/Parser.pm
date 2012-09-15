@@ -223,6 +223,9 @@ sub parse {
 
   my $tree = pop @{$this->operands};
 
+  pop @{$this->operands};
+  pop @{$this->operators};
+
   return $tree;
 }
 

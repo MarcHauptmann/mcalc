@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use Test::More;
-use evaluator;
+use Evaluator;
 
 print <<"EOF";
 # ----------------------------------------
@@ -10,9 +10,10 @@ print <<"EOF";
 EOF
 
 subtest "Zahl" => sub {
-    my $tree = Tree->new("2");
+  my $evaluator = Evaluator->new();
+  my $tree = Tree->new("2");
 
-    is(evaluate(\$tree), 2, "Ergebnis ist 2");
+  is($evaluator->evaluate(\$tree), 2, "Ergebnis ist 2");
 };
 
 print <<"EOF";
@@ -29,7 +30,9 @@ subtest "Addition" => sub {
     $tree->add_child(Tree->new("2"));
     $tree->add_child(Tree->new("4"));
 
-    is(evaluate(\$tree), 6, "Ergebnis ist 6");
+    my $evaluator = Evaluator->new();
+
+    is($evaluator->evaluate(\$tree), 6, "Ergebnis ist 6");
 };
 
 print <<"EOF";
@@ -46,7 +49,9 @@ subtest "Multiplikation" => sub {
     $tree->add_child(Tree->new("2"));
     $tree->add_child(Tree->new("4"));
 
-    is(evaluate(\$tree), 8, "Ergebnis ist 8");
+    my $evaluator = Evaluator->new();
+
+    is($evaluator->evaluate(\$tree), 8, "Ergebnis ist 8");
 };
 
 print <<"EOF";
@@ -63,7 +68,9 @@ subtest "Subtraktion" => sub {
     $tree->add_child(Tree->new("2"));
     $tree->add_child(Tree->new("4"));
 
-    is(evaluate(\$tree), -2, "Ergebnis ist -2");
+    my $evaluator = Evaluator->new();
+
+    is($evaluator->evaluate(\$tree), -2, "Ergebnis ist -2");
 };
 
 print <<"EOF";
@@ -80,7 +87,9 @@ subtest "Division" => sub {
     $tree->add_child(Tree->new("2"));
     $tree->add_child(Tree->new("4"));
 
-    is(evaluate(\$tree), .5, "Ergebnis ist 0.5");
+    my $evaluator = Evaluator->new();
+
+    is($evaluator->evaluate(\$tree), .5, "Ergebnis ist 0.5");
 };
 
 print <<"EOF";
@@ -97,7 +106,9 @@ subtest "Potenz" => sub {
     $tree->add_child(Tree->new("2"));
     $tree->add_child(Tree->new("4"));
 
-    is(evaluate(\$tree), 16, "Ergebnis ist 16");
+    my $evaluator = Evaluator->new();
+
+    is($evaluator->evaluate(\$tree), 16, "Ergebnis ist 16");
 };
 
 print <<"EOF";
@@ -121,7 +132,9 @@ subtest "Operatorrangfolge" => sub {
   $tree->add_child($mul);
   $tree->add_child(Tree->new("11"));
 
-  is(evaluate(\$tree), 19, "Ergebnis ist 19");
+  my $evaluator = Evaluator->new();
+
+  is($evaluator->evaluate(\$tree), 19, "Ergebnis ist 19");
 };
 
 print <<"EOF";
@@ -131,10 +144,13 @@ print <<"EOF";
 EOF
 
 subtest "Auswertung" => sub {
-  $val = Tree->new("pi");
+  my $evaluator = Evaluator->new();
+  my $val = Tree->new("pi");
 
-  $expected = getVariable("pi");
-  is(evaluate(\$val), $expected, "pi geht");
+  $expected = $evaluator->getVariable("pi");
+
+
+  is($evaluator->evaluate(\$val), $expected, "pi geht");
 };
 
 print <<"EOF";
@@ -151,10 +167,12 @@ subtest "Zuweisung" => sub {
   $stmt->add_child(Tree->new("var"));
   $stmt->add_child(Tree->new("1"));
 
-  evaluate(\$stmt);
+  my $evaluator = Evaluator->new();
 
-  isnt(getVariable("var"), undef, "var ist definiert");
-  is(getVariable("var"), 1, "var ist 1");
+  $evaluator->evaluate(\$stmt);
+
+  isnt($evaluator->getVariable("var"), undef, "var ist definiert");
+  is($evaluator->getVariable("var"), 1, "var ist 1");
 };
 
 print <<"EOF";
@@ -163,7 +181,9 @@ print <<"EOF";
 EOF
 
 subtest "completion pi" => sub{
-  my @completions = getCompletions("p");
+  my $evaluator = Evaluator->new();
+
+  my @completions = $evaluator->getCompletions("p");
 
   is(scalar(@completions), 1, "one completion");
   is_deeply(\@completions, ["pi"], "pi wird komplettiert");
@@ -175,7 +195,9 @@ print <<"EOF";
 EOF
 
 subtest "completion cos" => sub{
-  my @completions = getCompletions("co");
+  my $evaluator = Evaluator->new();
+
+  my @completions = $evaluator->getCompletions("co");
 
   is(scalar(@completions), 2, "one completion");
   is_deeply(\@completions, ["cos", "cot"], "'cos' and 'cot' works");
