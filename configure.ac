@@ -10,7 +10,7 @@ AC_PATH_PROG(PROVE, prove, no)
 AC_CONFIG_FILES([Makefile])	
 
 # Perl-Module checken
-AX_PROG_PERL_MODULES(Term::ReadLine Getopt::Long PAR Tree Math::Complex Math::Trig Test::Exception)
+AX_PROG_PERL_MODULES(Term::ReadLine Getopt::Long PAR Tree Math::Complex Math::Trig Test::Exception Moose)
 
 AC_OUTPUT
 

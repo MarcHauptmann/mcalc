@@ -1,20 +1,21 @@
 #!/usr/bin/perl
 
-use parser;
+use Parser;
 use Test::More;
 use Test::Exception;
 
 sub getTokens {
-    my $tree = parse(@_[0]);
+  my $parser = Parser->new();
+  my $tree = $parser->parse(@_[0]);
 
-    my @preorder = map { $_->value() } $tree->traverse($tree->PRE_ORDER);
+  my @preorder = map { $_->value() } $tree->traverse($tree->PRE_ORDER);
 
-    print "# Rückgabe: ";
-    foreach (@preorder) { 
-	print $_." "; 
-    } print "\n";
+  print "# Rückgabe: ";
+  foreach (@preorder) {
+    print $_." ";
+  } print "\n";
 
-    return @preorder;
+  return @preorder;
 }
 
 print <<"EOF";
@@ -224,7 +225,8 @@ print <<"EOF";
 EOF
 
 subtest "Funktionen" => sub {
-  my $tree = parse("cos(1-1)");
+  my $parser = Parser->new();
+  my $tree = $parser->parse("cos(1-1)");
 
   is($tree->size(), 4, "Größe ist 4");
   is($tree->value(), "cos", "Oberste Funktion ist cos");
@@ -245,7 +247,8 @@ print <<"EOF";
 EOF
 
 subtest "Funktionen" => sub {
-  my $tree = parse("cos(1,2,3)");
+  my $parser = Parser->new();
+  my $tree = $parser->parse("cos(1,2,3)");
 
   is($tree->size(), 4, "Größe ist 3");
   is($tree->value(), "cos", "Oberste Funktion ist cos");
@@ -268,7 +271,8 @@ print <<"EOF";
 EOF
 
 subtest "Funktionen" => sub {
-  my $tree = parse("sum(2,5,7)+cos(1,2)");
+  my $parser = Parser->new();
+  my $tree = $parser->parse("sum(2,5,7)+cos(1,2)");
 
   map {print $_->value()." "} $tree->traverse($tree->PRE_ORDER);
   print "\n";

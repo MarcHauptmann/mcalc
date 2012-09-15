@@ -1,8 +1,8 @@
-dist_bin_SCRIPTS = mcalc
+dist_bin_SCRIPTS = bin/mcalc
 man1_MANS=mcalc.1
 
 TESTS_ENVIRONMENT=$(PROVE) -I src
-TESTS=test/evaluator.t test/parser.t
+TESTS=test/evaluator.t test/Parser.t
 
 CLEANFILES=$(dict_bin_SCRIPTS) $(man1_MANS) help.txt
 

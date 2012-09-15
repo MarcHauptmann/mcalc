@@ -1,4 +1,6 @@
-use parser;
+#!/usr/bin/perl
+
+use Parser;
 use evaluator;
 use Term::ReadLine;
 use Getopt::Long;
@@ -35,7 +37,8 @@ sub calculate {
 
   eval {
     # parsen
-    my $tree = parse($input);
+    my $parser = Parser->new();
+    my $tree = $parser->parse($input);
 
     # auswerten
     my $result = evaluate(\$tree);
