@@ -1,15 +1,3 @@
-=head1 NAME
-
-evaluator
-
-=head1 DESCRIPTION
-
-Wertet die Ausdrücke aus
-
-=over 12
-
-=cut
-
 package evaluator;
 
 use List::MoreUtils qw(firstidx);
@@ -21,12 +9,6 @@ use Math::Complex;
 our @ISA=qw(Exporter);
 our @EXPORT_OK=qw(evaluate getVariable getCompletions);
 our @EXPORT = qw(evaluate getVariable getCompletions);
-
-=item evaluate
-
-Macht eine Auswertung
-
-=cut
 
 our %functions =  (
 		   "+" => sub {

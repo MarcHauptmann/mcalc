@@ -76,9 +76,7 @@ GetOptions(
 );
 
 if($help) {
-  $help = PAR::read_file("help.txt");
-
-  print $help;
+  pod2usage( -verbose => 1 );
 }
 elsif($version) {
   printVersion();
@@ -115,3 +113,88 @@ else {
 
 __END__
 
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+mcalc - a simple calculcator for the terminal
+
+=head1 SYNOPSIS
+
+B<mcalc> [I<OPTIONS>] [EXPRESSION]
+
+=head1 DESCRIPTION
+
+B<mcalc> is a simple calculator for the terminal. By default it presents a prompt for evaluating mathematical expressions. See L</"EXPRESSIONS"> for further information about the syntax.
+
+If I<EXPRESSION> is submitted, the result is directly printed to the standard output and B<mcalc> terminates.
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print help and exit
+
+=item B<-p> I<STRING>, B<--prompt> I<STRING>
+
+Uses I<STRING> as command promt. The standard prompt is I<mcalcE<gt>>.
+
+=item B<-s>, B<--silent>
+
+Does not print messages at start or exit.
+
+=item B<--version>
+
+Prints the version number of B<mcalc> and exits.
+
+=back
+
+=cut
+
+=head1 EXPRESSIONS
+
+=head2 Simple calculations
+
+B<mcalc> can perform standard calculations as you would expect it to work.
+
+    mcalc> 1+1
+    2
+    mcalc> 4*(7+3)
+    40
+
+=head2 Special commands
+
+=over 8
+
+=item I<bye>, I<exit>, I<quit>, 
+
+Exits the program
+
+=back
+
+=head1 SYNTAX
+
+I<statement>    := [ I<identifier> = ] I<expression>
+
+I<expression>   := [ - ] I<term> [ I<operator> I<term> ] ...
+
+I<term>         := I<number> | ( I<expression> ) | I<identifier> [ ( I<args> ) ]
+
+I<args>         := I<expression> [ , I<expression> ] ...
+
+I<identifier>   := regex([a-zA-Z]+)
+
+I<number>       := regex(\d+\.?\d*)
+
+I<operator>     := + | - | * | / | ^
+
+=head1 AUTHOR
+
+Marc Hauptmann <marc.hauptmann@stud.uni-hannover.de>
+
+=cut
