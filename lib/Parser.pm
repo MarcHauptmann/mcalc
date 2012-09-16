@@ -1,7 +1,6 @@
 package Parser;
 
 use Moose;
-use Exporter;
 use Tree;
 
 has "operators" => (is => "rw", 

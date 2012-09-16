@@ -5,7 +5,6 @@ use Evaluator;
 use Term::ReadLine;
 use Getopt::Long;
 use Pod::Usage;
-use PAR;
 
 our $VERSION = "0.0.1";
 

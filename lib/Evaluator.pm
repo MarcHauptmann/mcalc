@@ -1,8 +1,6 @@
 package Evaluator;
 
 use Moose;
-use List::MoreUtils qw(firstidx);
-use Exporter;
 use Tree;
 use Math::Trig;
 use Math::Complex;
