@@ -23,7 +23,15 @@ sub printWelcome {
 }
 
 sub printVersion {
-  print "mcalc v$VERSION by Marc Hauptmann\n"
+  print "mcalc v$VERSION by Marc Hauptmann\n";
+
+  exit;
+}
+
+sub printHelp {
+  pod2usage( -verbose => 1 );
+
+  exit;
 }
 
 sub batch {
@@ -68,48 +76,41 @@ sub complete {
 }
 
 GetOptions(
-	   "help" => \$help,
+	   "help" => sub { printHelp() },
 	   "prompt|p=s" => \$prompt,
 	   "silent|s" => \$silent,
-	   "version" => \$version,
+	   "version" => sub { printVersion() },
 	   "<>" => \&batch
 );
 
-if($help) {
-  pod2usage( -verbose => 1 );
+if (!$silent) {
+  printWelcome();
 }
-elsif($version) {
-  printVersion();
-}
-else {
-  if (!$silent) {
-    printWelcome();
-  }
 
-  $term = Term::ReadLine->new("mcalc");
-  my $attribs = $term->Attribs;
+$term = Term::ReadLine->new("mcalc");
+my $attribs = $term->Attribs;
 
-  $attribs->{completion_function} = \&complete;
-  $attribs->{completer_word_break_characters} = "+-*/^()";
+$attribs->{completion_function} = \&complete;
+$attribs->{completer_word_break_characters} = "+-*/^()";
 
-  while (1) {
-    my $input = $term->readline("$prompt ");
+while (1) {
+  my $input = $term->readline("$prompt ");
 
-    # Leerzeichen entfernen
-    $input =~ s/\s//g;
+  # Leerzeichen entfernen
+  $input =~ s/\s//g;
 
-    # Sonderbehandlung für 'quit'
-    if ($input =~ /^(quit|bye|exit)$/) {
-      if(!$silent) {
-	print "bye :)\n";
-      }
-
-      exit;
+  # Sonderbehandlung für 'quit'
+  if ($input =~ /^(quit|bye|exit)$/) {
+    if (!$silent) {
+      print "bye :)\n";
     }
 
-    calculate($input);
+    exit;
   }
+
+  calculate($input);
 }
+
 
 __END__
 
@@ -129,8 +130,7 @@ B<mcalc> [I<OPTIONS>] [EXPRESSION]
 
 B<mcalc> is a simple calculator for the terminal. By default it presents a prompt for evaluating mathematical expressions. See L</"EXPRESSIONS"> for further information about the syntax.
 
-If I<EXPRESSION> is submitted, the result is directly printed to the standard output and B<mcalc> terminates.
-
+If I<EXPRESSION> is submitted, the result is directly printed to the standard output and B<mcalc> terminates. This is useful for performing calculations in shell scripts.
 
 =head1 OPTIONS
 
@@ -162,10 +162,7 @@ Prints the version number of B<mcalc> and exits.
 
 B<mcalc> can perform standard calculations as you would expect it to work.
 
-    mcalc> 1+1
-    2
-    mcalc> 4*(7+3)
-    40
+    
 
 =head2 Special commands
 
@@ -178,6 +175,8 @@ Exits the program
 =back
 
 =head1 SYNTAX
+
+=over 4
 
 I<statement>    := [ I<identifier> = ] I<expression>
 
@@ -192,6 +191,27 @@ I<identifier>   := regex([a-zA-Z]+)
 I<number>       := regex(\d+\.?\d*)
 
 I<operator>     := + | - | * | / | ^
+
+=back
+
+=head1 EXAMPLES
+
+You can use B<mcalc> to calculate the answer to life, the universe and everything else:
+
+    mcalc> 2^2*(7+3)+2
+    42
+
+Some trigonometry stuff with a variable:
+
+    mcalc> alpha=pi/5
+    alpha = 0.6238
+    mcalc> sin(alpha)^2+cos(alpha)^2
+    1
+
+Calculating a phytagorean triple using B<mcalc>'s batch mode:
+
+    $> mcalc "sqrt(3^2+4^2)"
+    5
 
 =head1 AUTHOR
 
