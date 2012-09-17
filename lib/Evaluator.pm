@@ -16,43 +16,131 @@ has "functions" => (is => "rw",
 		    default => sub {
 		      {
 		       "+" => sub {
-			 return $_[0] + $_[1];
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+			 my $v2 = $$evaluatorRef->evaluate($args[1]);
+
+			 return $v1 + $v2;
 		       },
 		       "-" => sub {
-			 return $_[0] - $_[1];
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+			 my $v2 = $$evaluatorRef->evaluate($args[1]);
+
+			 return $v1 - $v2;
 		       },
 		       "/" => sub {
-			 return $_[0] / $_[1];
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+			 my $v2 = $$evaluatorRef->evaluate($args[1]);
+
+			 return $v1 / $v2;
 		       },
 		       "*" => sub {
-			 return $_[0] * $_[1];
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+			 my $v2 = $$evaluatorRef->evaluate($args[1]);
+
+			 return $v1 * $v2;
 		       },
 		       "^" => sub {
-			 return $_[0] ** $_[1];
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+			 my $v2 = $$evaluatorRef->evaluate($args[1]);
+
+			 return $v1 ** $v2;
 		       },
 		       "cot" => sub {
-			 return cot($_[0]);
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+
+			 return cot($v1);
 		       },
 		       "cos" => sub {
-			 return cos($_[0]);
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+
+			 return cos($v1);
 		       },
 		       "sin" => sub {
-			 return sin($_[0]);
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+
+			 return sin($v1);
 		       },
 		       "tan" => sub {
-			 return tan($_[0]);
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+
+			 return tan($v1);
 		       },
 		       "sqrt" => sub {
-			 return sqrt($_[0]);
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+
+			 return sqrt($v1);
 		       },
 		       "ln" => sub {
-			 return log($_[0]);
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+
+			 return log($v1);
 		       },
 		       "logn" => sub {
-			 return logn($_[0], $_[1]);
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+			 my $v2 = $$evaluatorRef->evaluate($args[1]);
+
+			 return logn($v1, $v2);
 		       },
 		       "neg" => sub {
-			 return -$_[0];
+			 my ($evaluatorRef, @args) = @_;
+
+			 my $v1 = $$evaluatorRef->evaluate($args[0]);
+
+			 return -$v1;
+		       },
+		       "=" => sub {
+			 my ($evaluator, @args) = @_;
+
+			 my $var = ${$args[0]}->value();
+			 my $value = $$evaluator->evaluate($args[1]);
+
+			 $$evaluator->setVariable($var, $value);
+
+			 return "$var = $value";
+		       },
+		       "sum" => sub {
+			 my ($evaluator, $exRef, $varRef, $fromRef, $toRef) = @_;
+
+			 my $var = $$varRef->value();
+			 my $from = $$evaluator->evaluate($fromRef);
+			 my $to = $$evaluator->evaluate($toRef);
+
+			 my $result = 0;
+
+			 my $oldVar = $$evaluator->getVariable($var);
+
+			 for(my $i=$from; $i<=$to; $i++) {
+			   $$evaluator->setVariable($var, $i);
+			   $result += $$evaluator->evaluate($exRef);
+			 }
+
+			 $$evaluator->setVariable($var, $oldVar);
+
+			 return $result;
 		       }
 		     }
 		    });
@@ -99,19 +187,12 @@ sub evaluate {
     } else {
       return $val;
     }
-  } elsif($val eq "=") {
-    my $var = $tree->children(0)->value();
-    my $value = $this->evaluate(\$tree->children(1));
-
-    $this->setVariable($var, $value);
-
-    return "$var = $value";
   } else {
     my $func = ${$this->functions}{$tree->value()};
 
-    my @args = map { $this->evaluate(\$_) } $tree->children();
+    my @args = map { \$_ } $tree->children();
 
-    return &{$func}(@args);
+    return &{$func}(\$this, @args);
   }
 }
 

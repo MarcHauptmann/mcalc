@@ -203,4 +203,26 @@ subtest "completion cos" => sub{
   is_deeply(\@completions, ["cos", "cot"], "'cos' and 'cot' works");
 };
 
+print <<"EOF";
+# ----------------------------------------
+# test sum function
+EOF
+
+subtest "sum function" => sub {
+  my $evaluator = Evaluator->new();
+
+  $evaluator->setVariable("i", 100);
+
+  my $tree = Tree->new("sum");
+  $tree->add_child(Tree->new("i"));
+  $tree->add_child(Tree->new("i"));
+  $tree->add_child(Tree->new("1"));
+  $tree->add_child(Tree->new("4"));
+
+  my $result = $evaluator->evaluate(\$tree);
+
+  is($result, 10, "result is 10");
+  is($evaluator->getVariable("i"), 100, "varable i may not change");
+};
+
 done_testing();
