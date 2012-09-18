@@ -160,9 +160,59 @@ Prints the version number of B<mcalc> and exits.
 
 =head2 Simple calculations
 
-B<mcalc> can perform standard calculations as you would expect it to work.
+B<mcalc> can perform simple calculations using the following operators: I<+>, I<->, I<*>, I</> and I<^>. Their behaviour should be clear. Further braces can be used to change the order of evaluations.
 
-    
+=head2 Functions
+
+More complex calculations require the use of functions. B<mcalc> can evaluate common mathematical functions.
+
+=head3 Trigonometric Functions
+
+This section describes the trigonimetric functions available in B<mcalc>. All those functions expect their parameters as radians.
+
+=over 8
+
+=item B<cos>(x)
+
+computes the cosine of a real number C<x>
+
+=item B<cot>(x)
+
+comutes the cotangent of a real number C<x>
+
+=item B<sin>(x)
+
+computes the sine of a real number C<x>
+
+=item B<tan>(x)
+
+computes the tangent of a real number C<x>
+
+=back
+
+=head3 Logarithms
+
+=over 8
+
+=item B<ln>(x)
+
+computes the natural logarithm of a real number C<x>
+
+=item B<logn>(x, n)
+
+computes the logarithm to the base  C<n> of a real number C<x>; same as C<ln(x)/ln(n)>
+
+=back
+
+=head3 Other functions
+
+=over8
+
+=item B<sum>(expr, var, from, to)
+
+This function calculates a sum expression. C<var> takes the values from the expression C<from> to C<to>.
+
+=back
 
 =head2 Special commands
 
