@@ -139,6 +139,24 @@ subtest "Operatorrangfolge" => sub {
 
 print <<"EOF";
 # ----------------------------------------
+# Testet die Auswertung eines mehrstufigen Baums
+# Eingabe:
+#     cos
+#      |
+#      0
+EOF
+
+subtest "Cosine" => sub {
+  my $cos = Tree->new("cos");
+  $cos->add_child(Tree->new("0"));
+
+  my $evaluator = Evaluator->new();
+
+  is($evaluator->evaluate(\$cos), 1, "Ergebnis ist 1");
+};
+
+print <<"EOF";
+# ----------------------------------------
 # Testet Auswertung von Variable
 # Eingabe: pi
 EOF
