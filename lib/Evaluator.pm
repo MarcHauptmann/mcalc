@@ -8,33 +8,37 @@ use TrigonometricFunctions;
 
 has "variables" => (is => "rw",
                     isa => "HashRef",
-                    default => sub {
-                      {
-                        "pi" => 3.1415;
-                      }
-                      ;
-                    });
+                    default => sub { {} }
+                   );
 
 has "functions" => (is => "rw",
                     isa => "HashRef",
-                    default => sub {
-                      {("+" => \&SimpleFunctions::plus,
-                        "-" => \&SimpleFunctions::minus,
-                        "/" => \&SimpleFunctions::divide,
-                        "*" => \&SimpleFunctions::multiplicate,
-                        "^" => \&SimpleFunctions::potentiate,
-                        "cot" => \&TrigonometricFunctions::cotangent,
-                        "cos" => \&TrigonometricFunctions::cosine,
-                        "sin" => \&TrigonometricFunctions::sine,
-                        "tan" => \&TrigonometricFunctions::tangent,
-                        "sqrt" => \&ComplexFunctions::square_root,
-                        "ln" => \&ComplexFunctions::natural_logarithm,
-                        "logn" => \&ComplexFunctions::logarithm,
-                        "neg" => \&SimpleFunctions::negate,
-                        "=" => \&SimpleFunctions::assign,
-                        "sum" => \&SimpleFunctions::sum
-                       )}
-                    });
+                    default => sub { {} }
+                   );
+
+sub BUILD {
+  my $this = shift;
+
+  # Variablen definieren
+  $this->setVariable("pi", 3.1415);
+
+  # Funktionen definieren
+  $this->setFunction("+", \&SimpleFunctions::plus);
+  $this->setFunction("-", \&SimpleFunctions::minus);
+  $this->setFunction("/", \&SimpleFunctions::divide);
+  $this->setFunction("*", \&SimpleFunctions::multiplicate);
+  $this->setFunction("^", \&SimpleFunctions::potentiate);
+  $this->setFunction("cot", \&TrigonometricFunctions::cotangent);
+  $this->setFunction("tan", \&TrigonometricFunctions::tangent);
+  $this->setFunction("cos", \&TrigonometricFunctions::cosine);
+  $this->setFunction("sin", \&TrigonometricFunctions::sine);
+  $this->setFunction("sqrt", \&ComplexFunctions::square_root);
+  $this->setFunction("ln", \&ComplexFunctions::natural_logarithm);
+  $this->setFunction("logn", \&ComplexFunctions::logarithm);
+  $this->setFunction("neg", \&SimpleFunctions::negate);
+  $this->setFunction("=", \&SimpleFunctions::assign);
+  $this->setFunction("sum", \&SimpleFunctions::sum);
+}
 
 sub getCompletions {
   my $this = shift;
@@ -67,6 +71,18 @@ sub setVariable {
   ${$this->variables}{$key} = $value;
 }
 
+sub getFunction {
+  my ($this, $key) = @_;
+
+  return ${$this->functions}{$key};
+}
+
+sub setFunction {
+  my ($this, $key, $ref) = @_;
+
+  ${$this->functions}{$key} = $ref;
+}
+
 sub evaluate {
   my ($this, $treeRef) = @_;
   my $tree = $$treeRef;
@@ -79,7 +95,7 @@ sub evaluate {
       return $val;
     }
   } else {
-    my $func = ${$this->functions}{$tree->value()};
+    my $func = $this->getFunction($tree->value());
 
     my @args = map { \$_ } $tree->children();
 
