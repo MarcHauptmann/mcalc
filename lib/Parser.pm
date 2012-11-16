@@ -39,12 +39,14 @@ sub top {
 sub weight {
   if($_[0] eq "+" || $_[0] eq "-") {
     return 1;
-  } elsif($_[0] eq "*" || $_[0] eq "/") {
+  } elsif($_[0] eq "*") {
     return 2;
-  } elsif($_[0] eq "^") {
-    return 4;
-  } elsif($_[0] eq "neg") {
+  } elsif($_[0] eq "/") {
     return 3;
+  } elsif($_[0] eq "^") {
+    return 5;
+  } elsif($_[0] eq "neg") {
+    return 4;
   } else {
     return 0;
   }

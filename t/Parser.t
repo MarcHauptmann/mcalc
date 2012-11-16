@@ -48,6 +48,25 @@ subtest "Addition" => sub {
 
 print <<"EOF";
 # ----------------------------------------
+# Teste Bruch mal Kehrwert
+# Eingabe: -2^2
+# erwarteter Baum:
+#             *
+#            / \\
+#           /   2
+#          / \\
+#         1   2
+EOF
+
+subtest "Bruch mal Kehrwert" => sub {
+  my @tokens = getTokens("1/2*2");
+
+  is_deeply(\@tokens, ["*", "/", 1, 2, 2], "Ergebnis passt");
+};
+
+
+print <<"EOF";
+# ----------------------------------------
 # Teste Parsen einer Addition von drei Zahlen
 # Eingabe: 1+2+3
 # erwarteter Baum:
