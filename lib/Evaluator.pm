@@ -21,6 +21,7 @@ sub BUILD {
 
   # Variablen definieren
   $this->setVariable("pi", 3.1415);
+  $this->setVariable("e", exp(1));
 
   # Funktionen definieren
   $this->setFunction("+", \&SimpleFunctions::plus);
@@ -62,7 +63,19 @@ sub getCompletions {
 sub getVariable {
   my ($this, $key) = @_;
 
-  return ${$this->variables}{$key};
+  my $value = ${$this->variables}{$key};
+
+  if (defined($value)) {
+    return $value;
+  } else {
+    die "unknown variable: $key";
+  }
+}
+
+sub variableIsDefined {
+  my ($this, $key) = @_;
+
+  return defined(${$this->variables}{$key});
 }
 
 sub setVariable {
@@ -74,7 +87,13 @@ sub setVariable {
 sub getFunction {
   my ($this, $key) = @_;
 
-  return ${$this->functions}{$key};
+  my $function = ${$this->functions}{$key};
+
+  if (defined($function)) {
+    return $function;
+  } else {
+    die "unknown function: $key";
+  }
 }
 
 sub setFunction {

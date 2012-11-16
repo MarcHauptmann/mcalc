@@ -73,9 +73,13 @@ sub sum {
   my $from = $$evaluator->evaluate($fromRef);
   my $to = $$evaluator->evaluate($toRef);
 
+  my $oldVar = undef;
   my $result = 0;
 
-  my $oldVar = $$evaluator->getVariable($var);
+  # ggf. alten Wert von Laufvariable sichern
+  if ($$evaluator->variableIsDefined($var)) {
+    $oldVar = $$evaluator->getVariable($var);
+  }
 
   for (my $i=$from; $i<=$to; $i++) {
     $$evaluator->setVariable($var, $i);

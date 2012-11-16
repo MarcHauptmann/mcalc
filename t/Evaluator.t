@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use Test::More;
+use Test::Exception;
 use Evaluator;
 
 print <<"EOF";
@@ -26,13 +27,13 @@ print <<"EOF";
 EOF
 
 subtest "Addition" => sub {
-    my $tree = Tree->new("+");
-    $tree->add_child(Tree->new("2"));
-    $tree->add_child(Tree->new("4"));
+  my $tree = Tree->new("+");
+  $tree->add_child(Tree->new("2"));
+  $tree->add_child(Tree->new("4"));
 
-    my $evaluator = Evaluator->new();
+  my $evaluator = Evaluator->new();
 
-    is($evaluator->evaluate(\$tree), 6, "Ergebnis ist 6");
+  is($evaluator->evaluate(\$tree), 6, "Ergebnis ist 6");
 };
 
 print <<"EOF";
@@ -45,13 +46,13 @@ print <<"EOF";
 EOF
 
 subtest "Multiplikation" => sub {
-    my $tree = Tree->new("*");
-    $tree->add_child(Tree->new("2"));
-    $tree->add_child(Tree->new("4"));
+  my $tree = Tree->new("*");
+  $tree->add_child(Tree->new("2"));
+  $tree->add_child(Tree->new("4"));
 
-    my $evaluator = Evaluator->new();
+  my $evaluator = Evaluator->new();
 
-    is($evaluator->evaluate(\$tree), 8, "Ergebnis ist 8");
+  is($evaluator->evaluate(\$tree), 8, "Ergebnis ist 8");
 };
 
 print <<"EOF";
@@ -64,13 +65,13 @@ print <<"EOF";
 EOF
 
 subtest "Subtraktion" => sub {
-    my $tree = Tree->new("-");
-    $tree->add_child(Tree->new("2"));
-    $tree->add_child(Tree->new("4"));
+  my $tree = Tree->new("-");
+  $tree->add_child(Tree->new("2"));
+  $tree->add_child(Tree->new("4"));
 
-    my $evaluator = Evaluator->new();
+  my $evaluator = Evaluator->new();
 
-    is($evaluator->evaluate(\$tree), -2, "Ergebnis ist -2");
+  is($evaluator->evaluate(\$tree), -2, "Ergebnis ist -2");
 };
 
 print <<"EOF";
@@ -83,13 +84,13 @@ print <<"EOF";
 EOF
 
 subtest "Division" => sub {
-    my $tree = Tree->new("/");
-    $tree->add_child(Tree->new("2"));
-    $tree->add_child(Tree->new("4"));
+  my $tree = Tree->new("/");
+  $tree->add_child(Tree->new("2"));
+  $tree->add_child(Tree->new("4"));
 
-    my $evaluator = Evaluator->new();
+  my $evaluator = Evaluator->new();
 
-    is($evaluator->evaluate(\$tree), .5, "Ergebnis ist 0.5");
+  is($evaluator->evaluate(\$tree), .5, "Ergebnis ist 0.5");
 };
 
 print <<"EOF";
@@ -102,13 +103,13 @@ print <<"EOF";
 EOF
 
 subtest "Potenz" => sub {
-    my $tree = Tree->new("^");
-    $tree->add_child(Tree->new("2"));
-    $tree->add_child(Tree->new("4"));
+  my $tree = Tree->new("^");
+  $tree->add_child(Tree->new("2"));
+  $tree->add_child(Tree->new("4"));
 
-    my $evaluator = Evaluator->new();
+  my $evaluator = Evaluator->new();
 
-    is($evaluator->evaluate(\$tree), 16, "Ergebnis ist 16");
+  is($evaluator->evaluate(\$tree), 16, "Ergebnis ist 16");
 };
 
 print <<"EOF";
@@ -226,10 +227,8 @@ print <<"EOF";
 # test sum function
 EOF
 
-subtest "sum function" => sub {
+subtest "sum function calculates sum" => sub {
   my $evaluator = Evaluator->new();
-
-  $evaluator->setVariable("i", 100);
 
   my $tree = Tree->new("sum");
   $tree->add_child(Tree->new("i"));
@@ -240,7 +239,32 @@ subtest "sum function" => sub {
   my $result = $evaluator->evaluate(\$tree);
 
   is($result, 10, "result is 10");
+};
+
+subtest "sum function does not redefine variable" => sub {
+  my $evaluator = Evaluator->new();
+
+  $evaluator->setVariable("i", 100);
+
+  my $tree = Tree->new("sum");
+  $tree->add_child(Tree->new("i"));
+  $tree->add_child(Tree->new("i"));
+  $tree->add_child(Tree->new("1"));
+  $tree->add_child(Tree->new("4"));
+
   is($evaluator->getVariable("i"), 100, "varable i may not change");
+};
+
+subtest "dies on unknown variable" => sub {
+  my $evaluator = Evaluator->new();
+
+  dies_ok { $evaluator->getVariable("unknownVar"); };
+};
+
+subtest "dies on unknown function" => sub {
+  my $evaluator = Evaluator->new();
+
+  dies_ok { $evaluator->getFunction("unknownFunction"); };
 };
 
 done_testing();
