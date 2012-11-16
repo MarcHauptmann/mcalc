@@ -166,6 +166,32 @@ B<mcalc> can perform simple calculations using the following operators: I<+>, I<
 
 More complex calculations require the use of functions. B<mcalc> can evaluate common mathematical functions.
 
+=head3 Basic Functions
+
+=over 8
+
+=item B<abs>(x)
+
+returns the absolute of C<x>. This is C<x> if C<x> is positive, or C<-x> otherwise.
+
+=item B<ceil>(x)
+
+returns the smallest integer greater than C<x>
+
+=item B<floor>(x)
+
+returns the biggest integer smaller than C<x>
+
+=item B<round>(x)
+
+returns C<floor(x + 0.5)>
+
+=item B<sqrt>(x)
+
+computes the positive square root of C<x>
+
+=back
+
 =head3 Trigonometric Functions
 
 This section describes the trigonimetric functions available in B<mcalc>. All those functions expect their parameters as radians.
@@ -200,13 +226,13 @@ computes the natural logarithm of a real number C<x>
 
 =item B<logn>(x, n)
 
-computes the logarithm to the base  C<n> of a real number C<x>; same as C<ln(x)/ln(n)>
+computes the logarithm to the base C<n> of a real number C<x>; same as C<ln(x)/ln(n)>
 
 =back
 
 =head3 Other functions
 
-=over8
+=over 8
 
 =item B<sum>(expr, var, from, to)
 
@@ -223,6 +249,18 @@ This function calculates a sum expression. C<var> takes the values from the expr
 Exits the program
 
 =back
+
+=head2 Assignments
+
+You can assign values to variables by using the assignment operator C<=>. For example you can use 
+    
+    alpha = pi/2
+
+to declare the new variable C<alpha>. After that you can use the following expression
+
+    sin(alpha)
+
+which will evaulate to 1 (well, nearly).
 
 =head1 SYNTAX
 

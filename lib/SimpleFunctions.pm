@@ -1,5 +1,6 @@
 package SimpleFunctions;
 
+use POSIX;
 use strict;
 
 sub plus {
@@ -55,6 +56,12 @@ sub negate {
   return -$v1;
 }
 
+sub absolute {
+  my ($evaluatorRef, @args) = @_;
+
+  return abs($$evaluatorRef->evaluate($args[0]));
+}
+
 sub assign {
   my ($evaluator, @args) = @_;
 
@@ -64,6 +71,26 @@ sub assign {
   $$evaluator->setVariable($var, $value);
 
   return "$var = $value";
+}
+
+sub floor {
+  my ($evaluator, @args) = @_;
+
+  return POSIX::floor($$evaluator->evaluate($args[0]));
+}
+
+sub ceil {
+  my ($evaluator, @args) = @_;
+
+  return POSIX::ceil($$evaluator->evaluate($args[0]));
+}
+
+sub round {
+  my ($evaluator, @args) = @_;
+
+  my $value = $$evaluator->evaluate($args[0]);
+
+  return POSIX::floor($value + 0.5);
 }
 
 sub sum {

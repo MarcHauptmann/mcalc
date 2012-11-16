@@ -29,6 +29,10 @@ sub BUILD {
   $this->setFunction("/", \&SimpleFunctions::divide);
   $this->setFunction("*", \&SimpleFunctions::multiplicate);
   $this->setFunction("^", \&SimpleFunctions::potentiate);
+  $this->setFunction("abs", \&SimpleFunctions::absolute);
+  $this->setFunction("floor", \&SimpleFunctions::floor);
+  $this->setFunction("ceil", \&SimpleFunctions::ceil);
+  $this->setFunction("round", \&SimpleFunctions::round);
   $this->setFunction("cot", \&TrigonometricFunctions::cotangent);
   $this->setFunction("tan", \&TrigonometricFunctions::tangent);
   $this->setFunction("cos", \&TrigonometricFunctions::cosine);
