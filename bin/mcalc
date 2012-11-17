@@ -7,6 +7,8 @@ use Getopt::Long;
 use Pod::Usage;
 use MCalc::Context;
 
+use MCalc::Functions::Product;
+
 our $VERSION = "0.0.1";
 
 our $help = 0;
@@ -19,6 +21,7 @@ our $version = 0;
 our $term;
 our $evaluator = Evaluator->new();
 our $context = MCalc::Context->new();
+$context->setFunction("product", MCalc::Functions::Product->new());
 
 sub printWelcome {
   print "Welcome to mcalc v$VERSION\n"
