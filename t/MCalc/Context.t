@@ -31,13 +31,13 @@ subtest "function can be completed" => sub{
 subtest "dies on unknown variable" => sub {
   my $context = MCalc::Context->new();
 
-  dies_ok { $context->getVariable("unknownVar"); };
+  throws_ok { $context->getVariable("unknownVar"); } "Error::Simple";
 };
 
 subtest "dies on unknown function" => sub {
   my $context = MCalc::Context->new();
 
-  dies_ok { $context->getFunction("unknownFunction"); };
+  throws_ok { $context->getFunction("unknownFunction"); } "Error::Simple";
 };
 
 done_testing();

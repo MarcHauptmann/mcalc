@@ -23,7 +23,8 @@ sub evaluate {
     my @args = map { $_->value() } $lhs->children();
 
     my $function = MCalc::Functions::UserFunction->new(arguments => \@args,
-						       body => $rhs);
+                                                       body => $rhs,
+                                                       name => $key);
 
     $$contextRef->setFunction($key, $function);
 

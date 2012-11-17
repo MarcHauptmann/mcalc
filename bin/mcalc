@@ -6,6 +6,7 @@ use Term::ReadLine;
 use Getopt::Long;
 use Pod::Usage;
 use MCalc::Context;
+use Error qw(:try);
 
 use MCalc::Functions::Product;
 
@@ -48,7 +49,7 @@ sub batch {
 sub calculate {
   my $input = $_[0];
 
-  eval {
+  try {
     # parsen
     my $parser = Parser->new();
     my $tree = $parser->parse($input);
@@ -57,9 +58,14 @@ sub calculate {
     my $result = $evaluator->evaluate(\$context, \$tree);
 
     printf "$result\n";
-  };
-  if (my $error = $@) {
-    print $error;
+  } catch Error with {
+    my $error = shift;
+
+    if (defined($error->text)) {
+      print $error->text."\n";
+    } else {
+      print $error;
+    }
   }
 }
 
@@ -72,7 +78,7 @@ sub complete {
   @completions = $context->getCompletions($line);
 
   foreach $val ("quit", "exit", "bye") {
-    if($val =~ /^$line/) {
+    if ($val =~ /^$line/) {
       push @completions, $val;
     }
   }
@@ -81,12 +87,12 @@ sub complete {
 }
 
 GetOptions(
-	   "help" => sub { printHelp() },
-	   "prompt|p=s" => \$prompt,
-	   "silent|s" => \$silent,
-	   "version" => sub { printVersion() },
-	   "<>" => \&batch
-);
+           "help" => sub { printHelp() },
+           "prompt|p=s" => \$prompt,
+           "silent|s" => \$silent,
+           "version" => sub { printVersion() },
+           "<>" => \&batch
+          );
 
 if (!$silent) {
   printWelcome();
@@ -249,7 +255,7 @@ This function calculates a sum expression. C<var> takes the values from the expr
 
 =over 8
 
-=item I<bye>, I<exit>, I<quit>, 
+=item I<bye>, I<exit>, I<quit>,
 
 Exits the program
 
@@ -257,8 +263,8 @@ Exits the program
 
 =head2 Assignments
 
-You can assign values to variables by using the assignment operator C<=>. For example you can use 
-    
+You can assign values to variables by using the assignment operator C<=>. For example you can use
+
     alpha = pi/2
 
 to declare the new variable C<alpha>. After that you can use the following expression

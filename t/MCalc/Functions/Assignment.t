@@ -42,7 +42,8 @@ subtest "function can be assigned" => sub {
   $evaluator->evaluate(\$context, \$stmt);
 
   my $expected = MCalc::Functions::UserFunction->new(arguments => ["x", "y"],
-						     body => $bodyTree);
+                                                     body => $bodyTree,
+                                                     name => "f");
 
   ok($context->functionIsDefined("f"));
   is_deeply($context->getFunction("f"), $expected, "function matches");

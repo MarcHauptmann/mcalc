@@ -1,6 +1,7 @@
 package MCalc::Functions::UserFunction;
 
 use Moose;
+use Error;
 
 with "MCalc::Evaluateable";
 
@@ -10,8 +11,22 @@ has arguments => (isa => "ArrayRef",
 has body => (isa => "Ref",
              is => "rw");
 
+has name => (isa => "Str",
+             is => "rw",
+             default => "");
+
+sub getArgumentCount {
+  my ($this) = @_;
+
+  return scalar(@{$this->arguments});
+}
+
 sub evaluate {
   my ($this, $evaluatorRef, $contextRef, @args) = @_;
+
+  if ($this->getArgumentCount() != scalar(@args)) {
+    throw Error::Simple $this->name.": argument count does not match";
+  }
 
   my %oldValues = ();
 
@@ -23,7 +38,7 @@ sub evaluate {
     }
   }
 
-  for (my $i=0; $i<scalar(@{$this->arguments}); $i++) {
+  for (my $i=0; $i<$this->getArgumentCount; $i++) {
     my $argName = ${$this->arguments}[$i];
     my $argValue = $$evaluatorRef->evaluate($contextRef, $args[$i]);
 

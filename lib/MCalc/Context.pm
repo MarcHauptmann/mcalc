@@ -1,6 +1,7 @@
 package MCalc::Context;
 
 use Moose;
+use Error;
 
 use MCalc::Functions::Addition;
 use MCalc::Functions::Multiplication;
@@ -69,7 +70,7 @@ sub getVariable {
   if (defined($value)) {
     return $value;
   } else {
-    die "unknown variable: $key";
+    throw Error::Simple "unknown variable: $key";
   }
 }
 
@@ -99,7 +100,7 @@ sub getFunction {
   if (defined($function)) {
     return $function;
   } else {
-    die "unknown function: $key";
+    throw Error::Simple "unknown function: $key";
   }
 }
 

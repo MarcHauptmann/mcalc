@@ -462,4 +462,12 @@ subtest "simple function call works" => sub {
   is_deeply(\@tokens, ["f", "x"], "Ergebnis passt");
 };
 
+subtest "dies on invalid function definition" => sub {
+  throws_ok { getTokens("f(x,)=x") } "Error::Simple";
+};
+
+subtest "dies on invalid term" => sub {
+  throws_ok { getTokens("(a+b") } "Error::Simple";
+};
+
 done_testing();

@@ -2,6 +2,7 @@ package Parser;
 
 use Moose;
 use Tree;
+use Error;
 
 has "operators" => (is => "rw",
                     isa => "ArrayRef",
@@ -32,7 +33,7 @@ sub top {
   if ($size > 0) {
     return $_[$size - 1];
   } else {
-    die "Element erwartet";
+    throw Error::Simple "element expected";
   }
 }
 
@@ -84,7 +85,7 @@ sub expect {
   if ($sym eq $expected) {
     $this->consume();
   } else {
-    die "'$sym' erwartet";
+    throw Error::Simple "'$sym' expected";
   }
 }
 
@@ -190,7 +191,7 @@ sub term {
       push @{$this->operands}, Tree->new($sym);
     }
   } else {
-    die "unbekanntes Symbol: '".$sym."'";
+    throw Error::Simple "unknown symbol: '$sym'";
   }
 }
 
@@ -256,7 +257,7 @@ sub parse {
   $this->expression();
 
   if ($this->getNext() ne ";") {
-    die "vorzeitiges Ende der Eingabe";
+    throw Error::Simple "unexpected end of input";
   }
 
   my $tree = pop @{$this->operands};
