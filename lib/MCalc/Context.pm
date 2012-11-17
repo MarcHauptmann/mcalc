@@ -79,6 +79,12 @@ sub variableIsDefined {
   return defined(${$this->variables}{$key});
 }
 
+sub functionIsDefined {
+  my ($this, $key) = @_;
+
+  return defined(${$this->functions}{$key});
+}
+
 sub setVariable {
   my ($this, $key, $value) = @_;
 

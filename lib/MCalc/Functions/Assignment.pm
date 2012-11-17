@@ -1,18 +1,34 @@
 package MCalc::Functions::Assignment;
 
 use Moose;
+use MCalc::Functions::UserFunction;
 
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $evaluatorRef, $contextRef, @args) = @_;
+  my ($this, $evaluatorRef, $contextRef, $lhsRef, $rhsRef) = @_;
 
-  my $var = ${$args[0]}->value();
-  my $value = $$evaluatorRef->evaluate($contextRef, $args[1]);
+  my $lhs = $$lhsRef;
+  my $rhs = $$rhsRef;
 
-  $$contextRef->setVariable($var, $value);
+  if ($lhs->size() == 1) {
+    my $var = $lhs->value();
+    my $value = $$evaluatorRef->evaluate($contextRef, $rhsRef);
 
-  return "$var = $value";
+    $$contextRef->setVariable($var, $value);
+
+    return "$var = $value";
+  } else {
+    my $key = $lhs->value();
+    my @args = map { $_->value() } $lhs->children();
+
+    my $function = MCalc::Functions::UserFunction->new(arguments => \@args,
+						       body => $rhs);
+
+    $$contextRef->setFunction($key, $function);
+
+    return "$key(".join(", ", @args).") defined";
+  }
 }
 
 1;

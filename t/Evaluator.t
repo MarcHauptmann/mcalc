@@ -184,27 +184,4 @@ subtest "Auswertung" => sub {
   is($evaluator->evaluate(\$context, \$val), $expected, "pi geht");
 };
 
-print <<"EOF";
-# ----------------------------------------
-# Testet eine Zuweisung
-# Eingabe:
-#      =
-#     / \\
-#   var  1
-EOF
-
-subtest "Zuweisung" => sub {
-  my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
-
-  my $stmt = Tree->new("=");
-  $stmt->add_child(Tree->new("var"));
-  $stmt->add_child(Tree->new("1"));
-
-  $evaluator->evaluate(\$context, \$stmt);
-
-  isnt($context->getVariable("var"), undef, "var ist definiert");
-  is($context->getVariable("var"), 1, "var ist 1");
-};
-
 done_testing();

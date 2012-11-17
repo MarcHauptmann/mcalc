@@ -3,16 +3,16 @@ package Parser;
 use Moose;
 use Tree;
 
-has "operators" => (is => "rw", 
-		    isa => "ArrayRef",
-		    default => sub { [] });
-has "operands" => (is => "rw", 
-		   isa => "ArrayRef",
-		   default => sub { [] });
+has "operators" => (is => "rw",
+                    isa => "ArrayRef",
+                    default => sub { [] });
+has "operands" => (is => "rw",
+                   isa => "ArrayRef",
+                   default => sub { [] });
 
 has "tokens" => (is => "rw",
-		 isa => "ArrayRef",
-		 default => sub { [] });
+                 isa => "ArrayRef",
+                 default => sub { [] });
 
 sub consume {
   my $this = shift;
@@ -29,7 +29,7 @@ sub getNext {
 sub top {
   my $size = scalar(@_);
 
-  if($size > 0) {
+  if ($size > 0) {
     return $_[$size - 1];
   } else {
     die "Element erwartet";
@@ -37,15 +37,15 @@ sub top {
 }
 
 sub weight {
-  if($_[0] eq "+" || $_[0] eq "-") {
+  if ($_[0] eq "+" || $_[0] eq "-") {
     return 1;
-  } elsif($_[0] eq "*") {
+  } elsif ($_[0] eq "*") {
     return 2;
-  } elsif($_[0] eq "/") {
+  } elsif ($_[0] eq "/") {
     return 3;
-  } elsif($_[0] eq "^") {
+  } elsif ($_[0] eq "^") {
     return 5;
-  } elsif($_[0] eq "neg") {
+  } elsif ($_[0] eq "neg") {
     return 4;
   } else {
     return 0;
@@ -103,7 +103,7 @@ sub negation {
 sub expression {
   my $this = shift;
 
-  if($this->negation()) {
+  if ($this->negation()) {
     $this->consume();
     push @{$this->operators}, "neg";
   }
@@ -131,7 +131,7 @@ sub args {
   $this->expression();
   pop @{$this->operators};
 
-  while($this->getNext() eq ",") {
+  while ($this->getNext() eq ",") {
     $this->consume();
 
     push @{$this->operators}, ";";
@@ -142,7 +142,7 @@ sub args {
   my $node = Tree->new(pop @{$this->operators});
   my @values = ();
 
-  while(top(@{$this->operands}) ne ";") {
+  while (top(@{$this->operands}) ne ";") {
     push @values, pop @{$this->operands};
   }
   map { $node->add_child($_) } reverse @values;
@@ -177,9 +177,10 @@ sub term {
     $this->expression();
     $this->expect(")");
     pop @{$this->operators};
-  } elsif($this->identifier()) {
+  } elsif ($this->identifier()) {
     $this->consume();
-    if($this->getNext() eq "(") {
+
+    if ($this->getNext() eq "(") {
       $this->consume();
 
       push @{$this->operators}, $sym;
@@ -188,8 +189,33 @@ sub term {
     } else {
       push @{$this->operands}, Tree->new($sym);
     }
-  }else {
+  } else {
     die "unbekanntes Symbol: '".$sym."'";
+  }
+}
+
+sub varAssignment {
+  my ($this) = @_;
+
+  return $this->identifier()
+    && scalar(@{$this->tokens}) >= 2
+      && ${$this->tokens}[1] eq "=";
+}
+
+sub functionAssignment {
+  my ($this) = @_;
+
+  if ($this->identifier() && ${$this->tokens}[1] eq "(") {
+    my $index = 2;
+
+    while(${$this->tokens}[$index] =~ /[a-zA-Z]/ && ${$this->tokens}[$index + 1] eq ",") {
+      $index += 2;
+    }
+
+    return ${$this->tokens}[$index] =~ /[a-zA-Z]/ && ${$this->tokens}[$index+1] eq ")"
+      && ${$this->tokens}[$index+2] eq "=";
+  } else {
+    return 0;
   }
 }
 
@@ -201,7 +227,7 @@ sub parse {
   my @tokens_plain = split(/([\(\)\+\-\*\/,\^=])/, $input);
 
   foreach my $token (@tokens_plain) {
-    if($token ne "") {
+    if ($token ne "") {
       push @{$this->tokens}, $token;
     }
   }
@@ -209,16 +235,27 @@ sub parse {
   push @{$this->tokens}, ";";
 
   # wenn Zuweisung
-  if($this->identifier() && scalar(@{$this->tokens}) >= 2 && ${$this->tokens}[1] eq "=") {
+  if ($this->varAssignment()) {
     push @{$this->operands}, Tree->new($this->getNext());
     $this->consume();
     push @{$this->operators}, "=";
+    $this->consume();           # =
+  } elsif ($this->functionAssignment()) {
+    push @{$this->operators}, $this->getNext();
     $this->consume();
+    $this->consume();           # (
+
+    $this->args();
+
+    $this->consume();           # )
+
+    $this->consume();           # =
+    push @{$this->operators}, "=";
   }
 
   $this->expression();
 
-  if($this->getNext() ne ";") {
+  if ($this->getNext() ne ";") {
     die "vorzeitiges Ende der Eingabe";
   }
 

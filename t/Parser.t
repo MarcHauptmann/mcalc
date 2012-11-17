@@ -419,4 +419,47 @@ subtest "Negierung von Zahlen" => sub {
   is_deeply(\@tokens, ["neg", "^", 2, 2], "Ergebnis passt");
 };
 
+print <<"EOF";
+# ----------------------------------------
+# Testing assignment of function
+# input: f(x)=x^2
+# expected tree:
+#             =
+#            / \\
+#           f   ^
+#           |  / \\
+#           x x   2
+EOF
+
+subtest "function assignment" => sub {
+  my @tokens = getTokens("f(x)=x^2");
+
+  is_deeply(\@tokens, ["=", "f", "x", "^", "x", 2], "Ergebnis passt");
+};
+
+print <<"EOF";
+# ----------------------------------------
+# Testing assignment of function with multiple parameters
+# input: f(x,y)=x+y
+# expected tree:
+#             =
+#            / \\
+#           /   \\
+#          f     +
+#         / \\   / \\
+#        x   y x   y
+EOF
+
+subtest "function assignment" => sub {
+  my @tokens = getTokens("f(x,y)=x+y");
+
+  is_deeply(\@tokens, ["=", "f", "x", "y", "+", "x", "y"], "Ergebnis passt");
+};
+
+subtest "simple function call works" => sub {
+  my @tokens = getTokens("f(x)");
+
+  is_deeply(\@tokens, ["f", "x"], "Ergebnis passt");
+};
+
 done_testing();
