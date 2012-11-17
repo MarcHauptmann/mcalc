@@ -2,9 +2,26 @@ package Evaluator;
 
 use Moose;
 use Tree;
-use Math::Complex;
-use SimpleFunctions;
-use TrigonometricFunctions;
+
+use MCalc::Functions::Addition;
+use MCalc::Functions::Multiplication;
+use MCalc::Functions::Subtraction;
+use MCalc::Functions::Division;
+use MCalc::Functions::Power;
+use MCalc::Functions::Cosine;
+use MCalc::Functions::Sine;
+use MCalc::Functions::Tangent;
+use MCalc::Functions::Cotangent;
+use MCalc::Functions::Assignment;
+use MCalc::Functions::Sum;
+use MCalc::Functions::Absolute;
+use MCalc::Functions::Negation;
+use MCalc::Functions::Floor;
+use MCalc::Functions::Ceiling;
+use MCalc::Functions::Rounding;
+use MCalc::Functions::Sqrt;
+use MCalc::Functions::Log;
+use MCalc::Functions::Ln;
 
 has "variables" => (is => "rw",
                     isa => "HashRef",
@@ -24,25 +41,25 @@ sub BUILD {
   $this->setVariable("e", exp(1));
 
   # Funktionen definieren
-  $this->setFunction("+", \&SimpleFunctions::plus);
-  $this->setFunction("-", \&SimpleFunctions::minus);
-  $this->setFunction("/", \&SimpleFunctions::divide);
-  $this->setFunction("*", \&SimpleFunctions::multiplicate);
-  $this->setFunction("^", \&SimpleFunctions::potentiate);
-  $this->setFunction("abs", \&SimpleFunctions::absolute);
-  $this->setFunction("floor", \&SimpleFunctions::floor);
-  $this->setFunction("ceil", \&SimpleFunctions::ceil);
-  $this->setFunction("round", \&SimpleFunctions::round);
-  $this->setFunction("cot", \&TrigonometricFunctions::cotangent);
-  $this->setFunction("tan", \&TrigonometricFunctions::tangent);
-  $this->setFunction("cos", \&TrigonometricFunctions::cosine);
-  $this->setFunction("sin", \&TrigonometricFunctions::sine);
-  $this->setFunction("sqrt", \&ComplexFunctions::square_root);
-  $this->setFunction("ln", \&ComplexFunctions::natural_logarithm);
-  $this->setFunction("logn", \&ComplexFunctions::logarithm);
-  $this->setFunction("neg", \&SimpleFunctions::negate);
-  $this->setFunction("=", \&SimpleFunctions::assign);
-  $this->setFunction("sum", \&SimpleFunctions::sum);
+  $this->setFunction("+", MCalc::Functions::Addition->new());
+  $this->setFunction("*", MCalc::Functions::Multiplication->new());
+  $this->setFunction("-", MCalc::Functions::Subtraction->new());
+  $this->setFunction("/", MCalc::Functions::Division->new());
+  $this->setFunction("^", MCalc::Functions::Power->new());
+  $this->setFunction("=", MCalc::Functions::Assignment->new());
+  $this->setFunction("abs", MCalc::Functions::Absolute->new());
+  $this->setFunction("floor", MCalc::Functions::Floor->new());
+  $this->setFunction("ceil", MCalc::Functions::Ceiling->new());
+  $this->setFunction("round", MCalc::Functions::Rounding->new());
+  $this->setFunction("cos", MCalc::Functions::Cosine->new());
+  $this->setFunction("cot", MCalc::Functions::Cotangent->new());
+  $this->setFunction("tan", MCalc::Functions::Tangent->new());
+  $this->setFunction("sin", MCalc::Functions::Sine->new());
+  $this->setFunction("sqrt", MCalc::Functions::Sqrt->new());
+  $this->setFunction("ln", MCalc::Functions::Ln->new());
+  $this->setFunction("log", MCalc::Functions::Log->new());
+  $this->setFunction("neg", MCalc::Functions::Negation->new());
+  $this->setFunction("sum", MCalc::Functions::Sum->new());
 }
 
 sub getCompletions {
@@ -111,18 +128,23 @@ sub evaluate {
   my $tree = $$treeRef;
   my $val = $tree->value();
 
+  # wenn am Ende
   if ($tree->size() == 1) {
     if ($val =~ /[a-zA-Z]+/) {
+      # Variable
       return $this->getVariable($val);
     } else {
+      # Zahl
       return $val;
     }
   } else {
+    # Funktionsaufruf
     my $func = $this->getFunction($tree->value());
 
     my @args = map { \$_ } $tree->children();
 
-    return &{$func}(\$this, @args);
+    # return &{$func}(\$this, @args);
+    return $func->evaluate(\$this, @args);
   }
 }
 

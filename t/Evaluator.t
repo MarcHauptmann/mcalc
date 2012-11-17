@@ -140,7 +140,7 @@ subtest "Operatorrangfolge" => sub {
 
 print <<"EOF";
 # ----------------------------------------
-# Testet die Auswertung eines mehrstufigen Baums
+# Testet die Auswertung des Cosinus
 # Eingabe:
 #     cos
 #      |
