@@ -3,6 +3,7 @@
 use Test::More;
 use Test::Exception;
 use Evaluator;
+use MCalc::Context;
 
 print <<"EOF";
 # ----------------------------------------
@@ -11,10 +12,11 @@ print <<"EOF";
 EOF
 
 subtest "Zahl" => sub {
+  my $context = MCalc::Context->new();
   my $evaluator = Evaluator->new();
   my $tree = Tree->new("2");
 
-  is($evaluator->evaluate(\$tree), 2, "Ergebnis ist 2");
+  is($evaluator->evaluate(\$context, \$tree), 2, "Ergebnis ist 2");
 };
 
 print <<"EOF";
@@ -27,13 +29,16 @@ print <<"EOF";
 EOF
 
 subtest "Addition" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $tree = Tree->new("+");
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  my $evaluator = Evaluator->new();
+  my $result = $evaluator->evaluate(\$context, \$tree);
 
-  is($evaluator->evaluate(\$tree), 6, "Ergebnis ist 6");
+  is($result, 6, "Ergebnis ist 6");
 };
 
 print <<"EOF";
@@ -46,13 +51,14 @@ print <<"EOF";
 EOF
 
 subtest "Multiplikation" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $tree = Tree->new("*");
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  my $evaluator = Evaluator->new();
-
-  is($evaluator->evaluate(\$tree), 8, "Ergebnis ist 8");
+  is($evaluator->evaluate(\$context, \$tree), 8, "Ergebnis ist 8");
 };
 
 print <<"EOF";
@@ -65,13 +71,14 @@ print <<"EOF";
 EOF
 
 subtest "Subtraktion" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $tree = Tree->new("-");
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  my $evaluator = Evaluator->new();
-
-  is($evaluator->evaluate(\$tree), -2, "Ergebnis ist -2");
+  is($evaluator->evaluate(\$context, \$tree), -2, "Ergebnis ist -2");
 };
 
 print <<"EOF";
@@ -84,13 +91,14 @@ print <<"EOF";
 EOF
 
 subtest "Division" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $tree = Tree->new("/");
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  my $evaluator = Evaluator->new();
-
-  is($evaluator->evaluate(\$tree), .5, "Ergebnis ist 0.5");
+  is($evaluator->evaluate(\$context, \$tree), .5, "Ergebnis ist 0.5");
 };
 
 print <<"EOF";
@@ -103,13 +111,14 @@ print <<"EOF";
 EOF
 
 subtest "Potenz" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $tree = Tree->new("^");
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  my $evaluator = Evaluator->new();
-
-  is($evaluator->evaluate(\$tree), 16, "Ergebnis ist 16");
+  is($evaluator->evaluate(\$context, \$tree), 16, "Ergebnis ist 16");
 };
 
 print <<"EOF";
@@ -125,6 +134,9 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $mul = Tree->new("*");
   $mul->add_child(Tree->new("2"));
   $mul->add_child(Tree->new("4"));
@@ -133,9 +145,7 @@ subtest "Operatorrangfolge" => sub {
   $tree->add_child($mul);
   $tree->add_child(Tree->new("11"));
 
-  my $evaluator = Evaluator->new();
-
-  is($evaluator->evaluate(\$tree), 19, "Ergebnis ist 19");
+  is($evaluator->evaluate(\$context, \$tree), 19, "Ergebnis ist 19");
 };
 
 print <<"EOF";
@@ -148,12 +158,13 @@ print <<"EOF";
 EOF
 
 subtest "Cosine" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $cos = Tree->new("cos");
   $cos->add_child(Tree->new("0"));
 
-  my $evaluator = Evaluator->new();
-
-  is($evaluator->evaluate(\$cos), 1, "Ergebnis ist 1");
+  is($evaluator->evaluate(\$context, \$cos), 1, "Ergebnis ist 1");
 };
 
 print <<"EOF";
@@ -163,13 +174,14 @@ print <<"EOF";
 EOF
 
 subtest "Auswertung" => sub {
+  my $context = MCalc::Context->new();
   my $evaluator = Evaluator->new();
+
   my $val = Tree->new("pi");
 
-  $expected = $evaluator->getVariable("pi");
+  $expected = $context->getVariable("pi");
 
-
-  is($evaluator->evaluate(\$val), $expected, "pi geht");
+  is($evaluator->evaluate(\$context, \$val), $expected, "pi geht");
 };
 
 print <<"EOF";
@@ -182,89 +194,17 @@ print <<"EOF";
 EOF
 
 subtest "Zuweisung" => sub {
+  my $context = MCalc::Context->new();
+  my $evaluator = Evaluator->new();
+
   my $stmt = Tree->new("=");
   $stmt->add_child(Tree->new("var"));
   $stmt->add_child(Tree->new("1"));
 
-  my $evaluator = Evaluator->new();
+  $evaluator->evaluate(\$context, \$stmt);
 
-  $evaluator->evaluate(\$stmt);
-
-  isnt($evaluator->getVariable("var"), undef, "var ist definiert");
-  is($evaluator->getVariable("var"), 1, "var ist 1");
-};
-
-print <<"EOF";
-# ----------------------------------------
-# test completion
-EOF
-
-subtest "completion pi" => sub{
-  my $evaluator = Evaluator->new();
-
-  my @completions = $evaluator->getCompletions("p");
-
-  is(scalar(@completions), 1, "one completion");
-  is_deeply(\@completions, ["pi"], "pi wird komplettiert");
-};
-
-print <<"EOF";
-# ----------------------------------------
-# test completion
-EOF
-
-subtest "completion cos" => sub{
-  my $evaluator = Evaluator->new();
-
-  my @completions = $evaluator->getCompletions("co");
-
-  is(scalar(@completions), 2, "one completion");
-  is_deeply(\@completions, ["cos", "cot"], "'cos' and 'cot' works");
-};
-
-print <<"EOF";
-# ----------------------------------------
-# test sum function
-EOF
-
-subtest "sum function calculates sum" => sub {
-  my $evaluator = Evaluator->new();
-
-  my $tree = Tree->new("sum");
-  $tree->add_child(Tree->new("i"));
-  $tree->add_child(Tree->new("i"));
-  $tree->add_child(Tree->new("1"));
-  $tree->add_child(Tree->new("4"));
-
-  my $result = $evaluator->evaluate(\$tree);
-
-  is($result, 10, "result is 10");
-};
-
-subtest "sum function does not redefine variable" => sub {
-  my $evaluator = Evaluator->new();
-
-  $evaluator->setVariable("i", 100);
-
-  my $tree = Tree->new("sum");
-  $tree->add_child(Tree->new("i"));
-  $tree->add_child(Tree->new("i"));
-  $tree->add_child(Tree->new("1"));
-  $tree->add_child(Tree->new("4"));
-
-  is($evaluator->getVariable("i"), 100, "varable i may not change");
-};
-
-subtest "dies on unknown variable" => sub {
-  my $evaluator = Evaluator->new();
-
-  dies_ok { $evaluator->getVariable("unknownVar"); };
-};
-
-subtest "dies on unknown function" => sub {
-  my $evaluator = Evaluator->new();
-
-  dies_ok { $evaluator->getFunction("unknownFunction"); };
+  isnt($context->getVariable("var"), undef, "var ist definiert");
+  is($context->getVariable("var"), 1, "var ist 1");
 };
 
 done_testing();

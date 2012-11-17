@@ -6,10 +6,10 @@ use Math::Complex;
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $contextRef, @args) = @_;
+  my ($this, $evaluatorRef, $contextRef, @args) = @_;
 
-  my $arg = $$contextRef->evaluate($args[0]);
-  my $base = $$contextRef->evaluate($args[1]);
+  my $arg = $$evaluatorRef->evaluate($contextRef, $args[0]);
+  my $base = $$evaluatorRef->evaluate($contextRef, $args[1]);
 
   return logn($arg, $base);
 }

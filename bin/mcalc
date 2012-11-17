@@ -5,6 +5,7 @@ use Evaluator;
 use Term::ReadLine;
 use Getopt::Long;
 use Pod::Usage;
+use MCalc::Context;
 
 our $VERSION = "0.0.1";
 
@@ -17,6 +18,7 @@ our $version = 0;
 # Hier geht es los!
 our $term;
 our $evaluator = Evaluator->new();
+our $context = MCalc::Context->new();
 
 sub printWelcome {
   print "Welcome to mcalc v$VERSION\n"
@@ -49,7 +51,7 @@ sub calculate {
     my $tree = $parser->parse($input);
 
     # auswerten
-    my $result = $evaluator->evaluate(\$tree);
+    my $result = $evaluator->evaluate(\$context, \$tree);
 
     printf "$result\n";
   };
@@ -64,7 +66,7 @@ sub complete {
 
   $attribs->{completion_suppress_append} = 1;
 
-  @completions = $evaluator->getCompletions($line);
+  @completions = $context->getCompletions($line);
 
   foreach $val ("quit", "exit", "bye") {
     if($val =~ /^$line/) {
@@ -224,7 +226,7 @@ computes the tangent of a real number C<x>
 
 computes the natural logarithm of a real number C<x>
 
-=item B<logn>(x, n)
+=item B<log>(x, n)
 
 computes the logarithm to the base C<n> of a real number C<x>; same as C<ln(x)/ln(n)>
 

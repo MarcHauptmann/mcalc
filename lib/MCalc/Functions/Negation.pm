@@ -5,9 +5,9 @@ use Moose;
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $contextRef, @args) = @_;
+  my ($this, $evalatorRef, $contextRef, @args) = @_;
 
-  my $arg = $$contextRef->evaluate($args[0]);
+  my $arg = $$evalatorRef->evaluate($contextRef, $args[0]);
 
   return -$arg;
 }

@@ -5,7 +5,7 @@ my $builder = Module::Build->new
  module_name => "MCalc",
  dist_version_from => "bin/mcalc",
  dist_author => "Marc Hauptmann <marc.hauptmann@stud.uni-hannover.de",
- dist_abstract => "caclculator",
+ dist_abstract => "calculator",
  requires => {
 	      "Term::ReadLine" => 0,
 	      "Getopt::Long" => 0,
@@ -18,7 +18,8 @@ my $builder = Module::Build->new
  build_requires => {
 		    "Test::More" => 0,
 		    "Test::Exception" => 0
-		   }
+		   },
+ recursive_test_files => 1
 );
 
 $builder->create_build_script();
