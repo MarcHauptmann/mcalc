@@ -2,12 +2,6 @@ package ComplexFunctions;
 
 use Math::Complex;
 
-sub absolute {
-  my ($evaluatorRef, @args) = @_;
-
-  return abs($args[0]);
-}
-
 sub square_root {
   my ($evaluatorRef, @args) = @_;
 
