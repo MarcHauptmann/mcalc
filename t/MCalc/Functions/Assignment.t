@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use Test::More;
-use Evaluator;
+use MCalc::Evaluator;
 use MCalc::Context;
 use MCalc::Functions::UserFunction;
 
@@ -11,13 +11,12 @@ BEGIN {
 
 subtest "variable can be assigned" => sub {
   my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
 
   my $stmt = Tree->new("=");
   $stmt->add_child(Tree->new("var"));
   $stmt->add_child(Tree->new("1"));
 
-  $evaluator->evaluate(\$context, \$stmt);
+  evaluateTree(\$context, \$stmt);
 
   isnt($context->getVariable("var"), undef, "var ist definiert");
   is($context->getVariable("var"), 1, "var ist 1");
@@ -25,7 +24,6 @@ subtest "variable can be assigned" => sub {
 
 subtest "function can be assigned" => sub {
   my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
 
   my $funcTree = Tree->new("f");
   $funcTree->add_child(Tree->new("x"));
@@ -39,7 +37,7 @@ subtest "function can be assigned" => sub {
   $stmt->add_child($funcTree);
   $stmt->add_child($bodyTree);
 
-  $evaluator->evaluate(\$context, \$stmt);
+  evaluateTree(\$context, \$stmt);
 
   my $expected = MCalc::Functions::UserFunction->new(arguments => ["x", "y"],
                                                      body => $bodyTree,

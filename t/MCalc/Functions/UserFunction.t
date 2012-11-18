@@ -2,7 +2,7 @@
 
 use Test::More;
 use Test::Exception;
-use Evaluator;
+use MCalc::Evaluator;
 use MCalc::Context;
 use Tree;
 
@@ -12,21 +12,19 @@ BEGIN {
 
 subtest "function can be evaluated" => sub {
   my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x"],
                                                  body => Tree->new("x"));
 
   my $arg = Tree->new(2);
 
-  my $result = $func->evaluate(\$evaluator, \$context, \$arg);
+  my $result = $func->evaluate(\$context, \$arg);
 
   is($result, 2, "result is 2");
 };
 
 subtest "variables are not redefined" => sub {
   my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x"],
                                                  body => Tree->new("x"));
@@ -35,14 +33,13 @@ subtest "variables are not redefined" => sub {
 
   $context->setVariable("x", 5);
 
-  my $result = $func->evaluate(\$evaluator, \$context, \$arg);
+  my $result = $func->evaluate(\$context, \$arg);
 
   is($context->getVariable("x"), 5, "x is not redefined");
 };
 
 subtest "two parameters can be handled" => sub {
   my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
 
   my $body = Tree->new("+");
   $body->add_child(Tree->new("x"));
@@ -54,33 +51,31 @@ subtest "two parameters can be handled" => sub {
   my $arg1 = Tree->new(2);
   my $arg2 = Tree->new(3);
 
-  my $result = $func->evaluate(\$evaluator, \$context, \$arg1, \$arg2);
+  my $result = $func->evaluate(\$context, \$arg1, \$arg2);
 
   is($result, 5, "result is 5");
 };
 
 subtest "throws error with too few parameters" => sub {
   my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x", "y"],
                                                  body => Tree->new("x"));
 
   my $arg = Tree->new(2);
 
-  throws_ok { $func->evaluate(\$evaluator, \$context, \$arg) } "Error::Simple";
+  throws_ok { $func->evaluate(\$context, \$arg) } "Error::Simple";
 };
 
 subtest "throws error with too many parameters" => sub {
   my $context = MCalc::Context->new();
-  my $evaluator = Evaluator->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x"],
                                                  body => Tree->new("x"));
 
   my $arg = Tree->new(2);
 
-  throws_ok { $func->evaluate(\$evaluator, \$context, \$arg, \$arg) } "Error::Simple";
+  throws_ok { $func->evaluate(\$context, \$arg, \$arg) } "Error::Simple";
 };
 
 done_testing();

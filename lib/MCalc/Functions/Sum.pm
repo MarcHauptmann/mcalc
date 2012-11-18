@@ -1,15 +1,16 @@
 package MCalc::Functions::Sum;
 
+use MCalc::Evaluator;
 use Moose;
 
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $evaluatorRef, $contextRef, $exRef, $varRef, $fromRef, $toRef) = @_;
+  my ($this, $contextRef, $exRef, $varRef, $fromRef, $toRef) = @_;
 
   my $var = $$varRef->value();
-  my $from = $$evaluatorRef->evaluate($contextRef, $fromRef);
-  my $to = $$evaluatorRef->evaluate($contextRef, $toRef);
+  my $from = evaluateTree($contextRef, $fromRef);
+  my $to = evaluateTree($contextRef, $toRef);
 
   my $oldVar = undef;
   my $result = 0;
@@ -21,7 +22,7 @@ sub evaluate {
 
   for (my $i=$from; $i<=$to; $i++) {
     $$contextRef->setVariable($var, $i);
-    $result += $$evaluatorRef->evaluate($contextRef, $exRef);
+    $result += evaluateTree($contextRef, $exRef);
   }
 
   $$contextRef->setVariable($var, $oldVar);

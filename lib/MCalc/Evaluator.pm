@@ -1,10 +1,13 @@
-package Evaluator;
+package MCalc::Evaluator;
 
-use Moose;
+use Exporter;
 use Tree;
 
-sub evaluate {
-  my ($this, $contextRef, $treeRef) = @_;
+@ISA = qw(Exporter);
+@EXPORT= qw(evaluateTree);
+
+sub evaluateTree {
+  my ($contextRef, $treeRef) = @_;
   my $context = $$contextRef;
   my $tree = $$treeRef;
   my $val = $tree->value();
@@ -24,8 +27,7 @@ sub evaluate {
 
     my @args = map { \$_ } $tree->children();
 
-    # return &{$func}(\$this, @args);
-    return $func->evaluate(\$this, $contextRef, @args);
+    return $func->evaluate($contextRef, @args);
   }
 }
 

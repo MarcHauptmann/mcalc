@@ -1,19 +1,20 @@
 package MCalc::Functions::Assignment;
 
+use MCalc::Evaluator;
 use Moose;
 use MCalc::Functions::UserFunction;
 
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $evaluatorRef, $contextRef, $lhsRef, $rhsRef) = @_;
+  my ($this, $contextRef, $lhsRef, $rhsRef) = @_;
 
   my $lhs = $$lhsRef;
   my $rhs = $$rhsRef;
 
   if ($lhs->size() == 1) {
     my $var = $lhs->value();
-    my $value = $$evaluatorRef->evaluate($contextRef, $rhsRef);
+    my $value = evaluateTree($contextRef, $rhsRef);
 
     $$contextRef->setVariable($var, $value);
 

@@ -1,14 +1,15 @@
 package MCalc::Functions::Product;
 
+use MCalc::Evaluator;
 use Moose;
 
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $evaluatorRef, $contextRef, $expression, $varRef, $fromRef, $toRef) = @_;
+  my ($this, $contextRef, $expression, $varRef, $fromRef, $toRef) = @_;
 
-  my $from = $$evaluatorRef->evaluate($contextRef, $fromRef);
-  my $to = $$evaluatorRef->evaluate($contextRef, $toRef);
+  my $from = evaluateTree($contextRef, $fromRef);
+  my $to = evaluateTree($contextRef, $toRef);
   my $var = $$varRef->value;
 
   my $product = 1;
@@ -22,7 +23,7 @@ sub evaluate {
   for (my $value = $from; $value <= $to; $value++) {
     $$contextRef->setVariable($var, $value);
 
-    $product *= $$evaluatorRef->evaluate($contextRef, $expression);
+    $product *= evaluateTree($contextRef, $expression);
   }
 
   $$contextRef->setVariable($var, $oldVariable);

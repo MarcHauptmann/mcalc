@@ -1,5 +1,6 @@
 package MCalc::Functions::UserFunction;
 
+use MCalc::Evaluator;
 use Moose;
 use Error;
 
@@ -22,7 +23,7 @@ sub getArgumentCount {
 }
 
 sub evaluate {
-  my ($this, $evaluatorRef, $contextRef, @args) = @_;
+  my ($this, $contextRef, @args) = @_;
 
   if ($this->getArgumentCount() != scalar(@args)) {
     throw Error::Simple $this->name.": argument count does not match";
@@ -40,12 +41,12 @@ sub evaluate {
 
   for (my $i=0; $i<$this->getArgumentCount; $i++) {
     my $argName = ${$this->arguments}[$i];
-    my $argValue = $$evaluatorRef->evaluate($contextRef, $args[$i]);
+    my $argValue = evaluateTree($contextRef, $args[$i]);
 
     $$contextRef->setVariable($argName, $argValue);
   }
 
-  my $result = $$evaluatorRef->evaluate($contextRef, \$this->body);
+  my $result = evaluateTree($contextRef, \$this->body);
 
   foreach my $name (@{$this->arguments}) {
     $$contextRef->setVariable($name, $oldValues{$name});

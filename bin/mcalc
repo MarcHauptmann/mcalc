@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use Parser;
-use Evaluator;
+use MCalc::Evaluator;
 use Term::ReadLine;
 use Getopt::Long;
 use Pod::Usage;
@@ -20,7 +20,6 @@ our $version = 0;
 
 # Hier geht es los!
 our $term;
-our $evaluator = Evaluator->new();
 our $context = MCalc::Context->new();
 $context->setFunction("product", MCalc::Functions::Product->new());
 
@@ -55,7 +54,7 @@ sub calculate {
     my $tree = $parser->parse($input);
 
     # auswerten
-    my $result = $evaluator->evaluate(\$context, \$tree);
+    my $result = evaluateTree(\$context, \$tree);
 
     printf "$result\n";
   } catch Error with {
