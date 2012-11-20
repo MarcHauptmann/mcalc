@@ -8,19 +8,26 @@ use Exporter;
 sub tree {
   my @args = @_;
 
-  my $root = Tree->new(shift @args);
+  @values = split(/[ |\/\\]*/, $args[0]);
+
+  # print join(":", @values)."\n";
+
+  shift @values;
+
+  my $root = Tree->new(shift @values);
   my $parent = $root;
 
-  while (scalar(@args) > 0) {
-    my $value = shift(@args);
+  foreach my $elem (@values) {
+    if ($elem eq "\n") {
+      if ($parent->size() > 1) {
+        $parent = $parent->children(0);
+      }
 
-    if (defined($value)) {
-      my $child = Tree->new($value);
-      $parent->add_child($child);
-      $parent = $child;
-    } else {
-      $parent = $parent->parent();
+      next;
     }
+
+    my $child = Tree->new($elem);
+    $parent->add_child($child);
   }
 
   return $root;
