@@ -1,6 +1,6 @@
 package MCalc::Functions::Cotangent;
 
-use Evaluator;
+use MCalc::Evaluator;
 use Moose;
 use Math::Trig;
 
