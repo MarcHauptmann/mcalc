@@ -22,7 +22,7 @@ sub tree {
     if ($line =~ /\/.*\\|\|/) {
       my $parentIndex = 0;
 
-      foreach my $elem (split(/ */, $line)) {
+      foreach my $elem (split(/ +/, $line)) {
         if ($elem eq "") {
           next;
         } elsif ($elem eq "^") {
@@ -42,7 +42,7 @@ sub tree {
     } else {
       my $childIndex = 0;
 
-      foreach $elem (split(/[ \n]*/, $line)) {
+      foreach $elem (split(/[ \n]+/, $line)) {
         if ($elem ne "") {
           my $child = $children[$childIndex++];
           $child->set_value($elem)

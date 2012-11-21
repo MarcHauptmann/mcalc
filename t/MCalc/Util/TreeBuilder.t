@@ -14,7 +14,7 @@ subtest "a tree with one node can be built" => sub {
 EOF
                  );
 
-    is_deeply($tree, $expectedTree, "tree matches");
+  is_deeply($tree, $expectedTree, "tree matches");
 };
 
 subtest "a tree with one child can be built" => sub {
@@ -126,6 +126,21 @@ EOF
   is_deeply($tree, $expectedTree, "tree matches");
 };
 
+subtest "a tree for sum function can be built" => sub {
+  my $expectedTree = Tree->new("sum");
+  $expectedTree->add_child(Tree->new("i"));
+  $expectedTree->add_child(Tree->new("i"));
+  $expectedTree->add_child(Tree->new("1"));
+  $expectedTree->add_child(Tree->new("5"));
 
+  my $tree = tree(<<EOF
+          sum
+        / | | \\
+       i  i 1  5
+EOF
+                 );
+
+  is_deeply($tree, $expectedTree, "tree matches");
+};
 
 done_testing();
