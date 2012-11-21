@@ -6,28 +6,53 @@ use Exporter;
 @EXPORT = qw(tree);
 
 sub tree {
-  my @args = @_;
+  my ($str) = @_;
 
-  @values = split(/[ |\/\\]*/, $args[0]);
+  $str =~ s/( *\/.*\\ *\n)*( *\/.*\\ *\n)/\2/;
 
-  # print join(":", @values)."\n";
+  print "$str\n";
 
-  shift @values;
+  my @lines = split(/\n/, $str);
 
-  my $root = Tree->new(shift @values);
-  my $parent = $root;
+  my $root = Tree->new();
 
-  foreach my $elem (@values) {
-    if ($elem eq "\n") {
-      if ($parent->size() > 1) {
-        $parent = $parent->children(0);
+  my @parents = ();
+  my @children = ($root);
+
+  foreach my $line (@lines) {
+    # Linien
+    if ($line =~ /\/.*\\|\|/) {
+      my $parentIndex = 0;
+
+      foreach my $elem (split(/ */, $line)) {
+        if ($elem eq "") {
+          next;
+        }
+
+        my $child = Tree->new();
+        $parents[$parentIndex]->add_child($child);
+
+        push @children, $child;
+
+        if ($elem eq "\\") {
+          $parentIndex++;
+        }
+      }
+    } else {
+      # print "$line\n";
+
+      my $childIndex = 0;
+
+      foreach $elem (split(/[ \n]*/, $line)) {
+        if ($elem != "") {
+          my $child = $children[$childIndex++];
+          $child->set_value($elem)
+        }
       }
 
-      next;
+      @parents = @children;
+      @children = ();
     }
-
-    my $child = Tree->new($elem);
-    $parent->add_child($child);
   }
 
   return $root;
