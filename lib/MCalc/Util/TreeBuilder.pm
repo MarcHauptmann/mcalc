@@ -8,9 +8,7 @@ use Exporter;
 sub tree {
   my ($str) = @_;
 
-  $str =~ s/( *\/.*\\ *\n)*( *\/.*\\ *\n)/\2/;
-
-  print "$str\n";
+  $str =~ s/( *\/.*\\ *\n)*( *\/.*\\ *\n)/$2/;
 
   my @lines = split(/\n/, $str);
 
@@ -27,6 +25,9 @@ sub tree {
       foreach my $elem (split(/ */, $line)) {
         if ($elem eq "") {
           next;
+        } elsif ($elem eq "^") {
+	  $parentIndex++;
+	  next;
         }
 
         my $child = Tree->new();
@@ -39,12 +40,10 @@ sub tree {
         }
       }
     } else {
-      # print "$line\n";
-
       my $childIndex = 0;
 
       foreach $elem (split(/[ \n]*/, $line)) {
-        if ($elem != "") {
+        if ($elem ne "") {
           my $child = $children[$childIndex++];
           $child->set_value($elem)
         }
