@@ -3,14 +3,14 @@
 use Test::More;
 use Test::Exception;
 use MCalc::Util::TreeBuilder;
-use MCalc::Context;
+use MCalc::DefaultContext;
 
 BEGIN {
   use_ok("MCalc::Functions::SimpleFunction");
 }
 
 subtest "function code can be defined" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   my $function = MCalc::Functions::SimpleFunction->new( code => sub { 2*$_[0] });
 
   my $result = $function->evaluate(\$context, \tree("2"));
@@ -19,7 +19,7 @@ subtest "function code can be defined" => sub {
 };
 
 subtest "number of arguments can be validated" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   my $function = MCalc::Functions::SimpleFunction->new( code => sub { 2 },
                                                         argumentCount => 1);
 

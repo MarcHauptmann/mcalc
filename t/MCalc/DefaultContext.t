@@ -4,11 +4,11 @@ use Test::More;
 use Test::Exception;
 
 BEGIN {
-  use_ok("MCalc::Context");
+  use_ok("MCalc::DefaultContext");
 }
 
 subtest "Variable can be completed" => sub{
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   $context->setVariable("pi", 3);
 
   my @completions = $context->getCompletions("p");
@@ -18,7 +18,7 @@ subtest "Variable can be completed" => sub{
 };
 
 subtest "function can be completed" => sub{
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   $context->setFunction("cos", 1); # just a dummy
   $context->setFunction("cot", 1); # just a dummy
 
@@ -29,13 +29,13 @@ subtest "function can be completed" => sub{
 };
 
 subtest "dies on unknown variable" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   throws_ok { $context->getVariable("unknownVar"); } "Error::Simple";
 };
 
 subtest "dies on unknown function" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   throws_ok { $context->getFunction("unknownFunction"); } "Error::Simple";
 };

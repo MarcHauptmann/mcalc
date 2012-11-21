@@ -3,7 +3,7 @@
 use Test::More;
 use Test::Exception;
 use MCalc::Evaluator;
-use MCalc::Context;
+use MCalc::DefaultContext;
 use Tree;
 
 BEGIN {
@@ -11,7 +11,7 @@ BEGIN {
 }
 
 subtest "function can be evaluated" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x"],
                                                  body => Tree->new("x"));
@@ -24,7 +24,7 @@ subtest "function can be evaluated" => sub {
 };
 
 subtest "variables are not redefined" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x"],
                                                  body => Tree->new("x"));
@@ -39,7 +39,7 @@ subtest "variables are not redefined" => sub {
 };
 
 subtest "two parameters can be handled" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $body = Tree->new("+");
   $body->add_child(Tree->new("x"));
@@ -57,7 +57,7 @@ subtest "two parameters can be handled" => sub {
 };
 
 subtest "throws error with too few parameters" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x", "y"],
                                                  body => Tree->new("x"));
@@ -68,7 +68,7 @@ subtest "throws error with too few parameters" => sub {
 };
 
 subtest "throws error with too many parameters" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $func = MCalc::Functions::UserFunction->new(arguments => ["x"],
                                                  body => Tree->new("x"));

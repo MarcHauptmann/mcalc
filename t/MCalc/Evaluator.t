@@ -2,7 +2,7 @@
 
 use Test::More;
 use Test::Exception;
-use MCalc::Context;
+use MCalc::DefaultContext;
 
 BEGIN {
   use_ok("MCalc::Evaluator");
@@ -15,7 +15,7 @@ print <<"EOF";
 EOF
 
 subtest "Zahl" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   my $tree = Tree->new("2");
 
   is(evaluateTree(\$context, \$tree), 2, "Ergebnis ist 2");
@@ -31,7 +31,7 @@ print <<"EOF";
 EOF
 
 subtest "Addition" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $tree = Tree->new("+");
   $tree->add_child(Tree->new("2"));
@@ -52,7 +52,7 @@ print <<"EOF";
 EOF
 
 subtest "Multiplikation" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $tree = Tree->new("*");
   $tree->add_child(Tree->new("2"));
@@ -71,7 +71,7 @@ print <<"EOF";
 EOF
 
 subtest "Subtraktion" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $tree = Tree->new("-");
   $tree->add_child(Tree->new("2"));
@@ -90,7 +90,7 @@ print <<"EOF";
 EOF
 
 subtest "Division" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $tree = Tree->new("/");
   $tree->add_child(Tree->new("2"));
@@ -109,7 +109,7 @@ print <<"EOF";
 EOF
 
 subtest "Potenz" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $tree = Tree->new("^");
   $tree->add_child(Tree->new("2"));
@@ -131,7 +131,7 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $mul = Tree->new("*");
   $mul->add_child(Tree->new("2"));
@@ -154,7 +154,7 @@ print <<"EOF";
 EOF
 
 subtest "Cosine" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $cos = Tree->new("cos");
   $cos->add_child(Tree->new("0"));
@@ -169,7 +169,7 @@ print <<"EOF";
 EOF
 
 subtest "Auswertung" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $val = Tree->new("pi");
 

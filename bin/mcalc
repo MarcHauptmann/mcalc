@@ -5,7 +5,7 @@ use MCalc::Evaluator;
 use Term::ReadLine;
 use Getopt::Long;
 use Pod::Usage;
-use MCalc::Context;
+use MCalc::DefaultContext;
 use Error qw(:try);
 
 use MCalc::Functions::Product;
@@ -20,7 +20,7 @@ our $version = 0;
 
 # Hier geht es los!
 our $term;
-our $context = MCalc::Context->new();
+our $context = MCalc::DefaultContext->new();
 $context->setFunction("product", MCalc::Functions::Product->new());
 
 sub printWelcome {

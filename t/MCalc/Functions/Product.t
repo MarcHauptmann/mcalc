@@ -3,7 +3,7 @@
 use Test::More;
 
 use MCalc::Evaluator;
-use MCalc::Context;
+use MCalc::DefaultContext;
 use Tree;
 
 BEGIN {
@@ -11,7 +11,7 @@ BEGIN {
 }
 
 subtest "product can be calculated" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   $context->setFunction("prod", MCalc::Functions::Product->new());
 
@@ -27,7 +27,7 @@ subtest "product can be calculated" => sub {
 };
 
 subtest "parameters are evaluated" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   $context->setFunction("prod", MCalc::Functions::Product->new());
   $context->setVariable("n", 100);
@@ -52,7 +52,7 @@ subtest "parameters are evaluated" => sub {
 };
 
 subtest "variables are not redefined" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   $context->setFunction("prod", MCalc::Functions::Product->new());
   $context->setVariable("n", 100);

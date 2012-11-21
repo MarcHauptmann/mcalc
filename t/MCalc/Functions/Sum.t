@@ -3,11 +3,11 @@
 use Test::More;
 use Test::Exception;
 use MCalc::Evaluator;
-use MCalc::Context;
+use MCalc::DefaultContext;
 use MCalc::Util::TreeBuilder;
 
 subtest "sum function calculates sum" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $tree = <<EOF;
           sum
@@ -21,7 +21,7 @@ EOF
 };
 
 subtest "sum function does not redefine variable" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   $context->setVariable("i", 100);
 
   my $tree = <<EOF;
@@ -36,7 +36,7 @@ EOF
 };
 
 subtest "dies at too few parameters" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   my $sumFunction = MCalc::Functions::Sum->new();
 
   my $arg1 = Tree->new("i");
@@ -46,7 +46,7 @@ subtest "dies at too few parameters" => sub {
 };
 
 subtest "dies at too few parameters" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   my $sumFunction = MCalc::Functions::Sum->new();
 
   my $arg1 = Tree->new("i");
@@ -61,7 +61,7 @@ subtest "dies at too few parameters" => sub {
 };
 
 subtest "dies when second parameter is number" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   my $sumFunction = MCalc::Functions::Sum->new();
 
   my $arg1 = Tree->new("i");
@@ -75,7 +75,7 @@ subtest "dies when second parameter is number" => sub {
 };
 
 subtest "dies when second parameter is tree" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
   my $sumFunction = MCalc::Functions::Sum->new();
 
   my $arg1 = Tree->new("i");

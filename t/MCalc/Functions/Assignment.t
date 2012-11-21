@@ -2,7 +2,7 @@
 
 use Test::More;
 use MCalc::Evaluator;
-use MCalc::Context;
+use MCalc::DefaultContext;
 use MCalc::Functions::UserFunction;
 
 BEGIN {
@@ -10,7 +10,7 @@ BEGIN {
 }
 
 subtest "variable can be assigned" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $stmt = Tree->new("=");
   $stmt->add_child(Tree->new("var"));
@@ -23,7 +23,7 @@ subtest "variable can be assigned" => sub {
 };
 
 subtest "function can be assigned" => sub {
-  my $context = MCalc::Context->new();
+  my $context = MCalc::DefaultContext->new();
 
   my $funcTree = Tree->new("f");
   $funcTree->add_child(Tree->new("x"));
