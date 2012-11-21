@@ -1,6 +1,7 @@
 package MCalc::Util::TreeBuilder;
 
 use Exporter;
+use Tree;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(tree);
