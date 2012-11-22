@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Parser;
+use MCalc::Parser;
 use MCalc::Evaluator;
 use Term::ReadLine;
 use Getopt::Long;
@@ -50,7 +50,7 @@ sub calculate {
 
   try {
     # parsen
-    my $parser = Parser->new();
+    my $parser = MCalc::Parser->new();
     my $tree = $parser->parse($input);
 
     # auswerten

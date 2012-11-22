@@ -1,8 +1,9 @@
-package Parser;
+package MCalc::Parser;
 
 use Moose;
 use Tree;
 use Error;
+use MCalc::Language;
 
 has "operators" => (is => "rw",
                     isa => "ArrayRef",
@@ -39,15 +40,17 @@ sub top {
 
 sub weight {
   if ($_[0] eq "+" || $_[0] eq "-") {
-    return 1;
-  } elsif ($_[0] eq "*") {
     return 2;
-  } elsif ($_[0] eq "/") {
+  } elsif ($_[0] eq "*") {
     return 3;
-  } elsif ($_[0] eq "^") {
-    return 5;
-  } elsif ($_[0] eq "neg") {
+  } elsif ($_[0] eq "/") {
     return 4;
+  } elsif ($_[0] eq "^") {
+    return 6;
+  } elsif ($_[0] eq "neg") {
+    return 5;
+  } elsif ($_[0] eq "=") {
+    return 1;
   } else {
     return 0;
   }
@@ -92,7 +95,7 @@ sub expect {
 sub isOp {
   my $this = shift;
 
-  return $this->getNext() =~ /\+|\-|\*|\/|\^/;
+  return is_operator($this->getNext());
 }
 
 sub negation {
@@ -161,7 +164,7 @@ sub number() {
 sub identifier() {
   my $this = shift;
 
-  return $this->getNext() =~ /[a-zA-Z]+/;
+  return is_identifier($this->getNext());
 }
 
 sub term {
@@ -209,7 +212,7 @@ sub functionAssignment {
   if ($this->identifier() && ${$this->tokens}[1] eq "(") {
     my $index = 2;
 
-    while(${$this->tokens}[$index] =~ /[a-zA-Z]/ && ${$this->tokens}[$index + 1] eq ",") {
+    while (${$this->tokens}[$index] =~ /[a-zA-Z]/ && ${$this->tokens}[$index + 1] eq ",") {
       $index += 2;
     }
 
@@ -234,25 +237,6 @@ sub parse {
   }
 
   push @{$this->tokens}, ";";
-
-  # wenn Zuweisung
-  if ($this->varAssignment()) {
-    push @{$this->operands}, Tree->new($this->getNext());
-    $this->consume();
-    push @{$this->operators}, "=";
-    $this->consume();           # =
-  } elsif ($this->functionAssignment()) {
-    push @{$this->operators}, $this->getNext();
-    $this->consume();
-    $this->consume();           # (
-
-    $this->args();
-
-    $this->consume();           # )
-
-    $this->consume();           # =
-    push @{$this->operators}, "=";
-  }
 
   $this->expression();
 

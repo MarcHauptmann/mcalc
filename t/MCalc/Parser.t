@@ -1,11 +1,14 @@
 #!/usr/bin/perl
 
-use Parser;
 use Test::More;
 use Test::Exception;
 
+BEGIN {
+  use_ok("MCalc::Parser");
+}
+
 sub getTokens {
-  my $parser = Parser->new();
+  my $parser = MCalc::Parser->new();
   my $tree = $parser->parse($_[0]);
 
   my @preorder = map { $_->value() } $tree->traverse($tree->PRE_ORDER);
@@ -244,7 +247,7 @@ print <<"EOF";
 EOF
 
 subtest "Funktionen" => sub {
-  my $parser = Parser->new();
+  my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("cos(1-1)");
 
   is($tree->size(), 4, "Größe ist 4");
@@ -266,7 +269,7 @@ print <<"EOF";
 EOF
 
 subtest "Funktionen" => sub {
-  my $parser = Parser->new();
+  my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("cos(1,2,3)");
 
   is($tree->size(), 4, "Größe ist 3");
@@ -290,7 +293,7 @@ print <<"EOF";
 EOF
 
 subtest "Funktionen" => sub {
-  my $parser = Parser->new();
+  my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("sum(2,5,7)+cos(1,2)");
 
   map {print $_->value()." "} $tree->traverse($tree->PRE_ORDER);
