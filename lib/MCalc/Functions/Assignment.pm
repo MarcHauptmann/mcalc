@@ -1,8 +1,9 @@
 package MCalc::Functions::Assignment;
 
 use Moose;
-use MCalc::Language;
 use Error::Simple;
+use MCalc::Language;
+use MCalc::Printer;
 use MCalc::Evaluator;
 use MCalc::Functions::UserFunction;
 
@@ -47,7 +48,9 @@ sub evaluate {
 
     $$contextRef->setFunction($key, $function);
 
-    return "$key(".join(", ", @args).") defined";
+    my $printer = MCalc::Printer->new();
+
+    return "$key(".join(", ", @args).") = ".$printer->to_string($rhs);
   }
 }
 

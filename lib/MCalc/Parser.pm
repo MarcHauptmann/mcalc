@@ -39,21 +39,7 @@ sub top {
 }
 
 sub weight {
-  if ($_[0] eq "+" || $_[0] eq "-") {
-    return 2;
-  } elsif ($_[0] eq "*") {
-    return 3;
-  } elsif ($_[0] eq "/") {
-    return 4;
-  } elsif ($_[0] eq "^") {
-    return 6;
-  } elsif ($_[0] eq "neg") {
-    return 5;
-  } elsif ($_[0] eq "=") {
-    return 1;
-  } else {
-    return 0;
-  }
+  return operator_weight($_[0]);
 }
 
 sub popOperator {
