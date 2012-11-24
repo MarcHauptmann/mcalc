@@ -2,21 +2,23 @@
 
 use Test::More;
 use MCalc::Util::TreeBuilder;
-use MCalc::SimpleContext;
+use MCalc::DefaultContext;
 
 BEGIN {
   use_ok("MCalc::Functions::Simplification");
 }
 
 subtest "variable is not simplified" => sub {
+  my $context = MCalc::DefaultContext->new();
   my $simplification = MCalc::Functions::Simplification->new();
 
-  my $result = $simplification->simplify(tree("var"));
+  my $result = $simplification->simplify(\$context, tree("var"));
 
   is_deeply($result, tree("var"), "result is not modified");
 };
 
 subtest "multiplication with 1 is identity" => sub {
+  my $context = MCalc::DefaultContext->new();
   my $simplification = MCalc::Functions::Simplification->new();
 
   my $expression = <<EOF;
@@ -25,12 +27,13 @@ subtest "multiplication with 1 is identity" => sub {
      a   1
 EOF
 
-  my $result = $simplification->simplify(tree($expression));
+  my $result = $simplification->simplify(\$context, tree($expression));
 
   is_deeply($result, tree("a"), "result is a");
 };
 
 subtest "multiplication with 0 is 0" => sub {
+  my $context = MCalc::DefaultContext->new();
   my $simplification = MCalc::Functions::Simplification->new();
 
   my $expression = <<EOF;
@@ -39,12 +42,13 @@ subtest "multiplication with 0 is 0" => sub {
      a   0
 EOF
 
-  my $result = $simplification->simplify(tree($expression));
+  my $result = $simplification->simplify(\$context, tree($expression));
 
   is_deeply($result, tree("0"), "result is 0");
 };
 
 subtest "complex products with one 0-factor are 0" => sub {
+  my $context = MCalc::DefaultContext->new();
   my $simplification = MCalc::Functions::Simplification->new();
 
   my $expression = <<EOF;
@@ -59,12 +63,13 @@ subtest "complex products with one 0-factor are 0" => sub {
            c   d
 EOF
 
-  my $result = $simplification->simplify(tree($expression));
+  my $result = $simplification->simplify(\$context, tree($expression));
 
   is_deeply($result, tree("0"), "result is 0");
 };
 
 subtest "addition of 0 is identity" => sub {
+  my $context = MCalc::DefaultContext->new();
   my $simplification = MCalc::Functions::Simplification->new();
 
   my $expression = <<EOF;
@@ -73,12 +78,13 @@ subtest "addition of 0 is identity" => sub {
      a   0
 EOF
 
-  my $result = $simplification->simplify(tree($expression));
+  my $result = $simplification->simplify(\$context, tree($expression));
 
   is_deeply($result, tree("a"), "result is a");
 };
 
 subtest "addition and multiplication can be simplified together" => sub {
+  my $context = MCalc::DefaultContext->new();
   my $simplification = MCalc::Functions::Simplification->new();
 
   my $expression = <<EOF;
@@ -97,9 +103,67 @@ EOF
        a   c
 EOF
 
-  my $result = $simplification->simplify(tree($expression));
+  my $result = $simplification->simplify(\$context, tree($expression));
 
   is_deeply($result, tree($resultTree), "result is a + c");
+};
+
+subtest "calculations can be performed during simplification" => sub {
+  my $context = MCalc::DefaultContext->new();
+  my $simplification = MCalc::Functions::Simplification->new();
+
+  my $expression = <<EOF;
+            *
+          /   \\
+        /       \\
+       +         /
+      / \\      / \\
+     a   -     4   4
+     ^  / \\
+       1   1
+EOF
+
+  my $result = $simplification->simplify(\$context, tree($expression));
+
+  is_deeply($result, tree("a"), "result is a");
+};
+
+subtest "calculations use defined variables" => sub {
+  my $simplification = MCalc::Functions::Simplification->new();
+  my $context = MCalc::DefaultContext->new();
+  $context->setVariable("x", 2);
+
+  my $expression = <<EOF;
+        *
+       / \\
+      /   \\
+     a     /
+     ^    / \\
+         2   x
+EOF
+
+  my $result = $simplification->simplify(\$context, tree($expression));
+
+  is_deeply($result, tree("a"), "result is a");
+};
+
+subtest "calculations use defined variables" => sub {
+  my $simplification = MCalc::Functions::Simplification->new();
+  my $context = MCalc::DefaultContext->new();
+  $context->setVariable("x", 2);
+
+  my $expression = <<EOF;
+        *
+       / \\
+      /   \\
+     *     /
+    / \\  / \\
+   a   2 1   2
+EOF
+
+  my $result = $simplification->simplify(\$context, tree($expression));
+
+  is_deeply($result, tree("a"), "result is a");
 };
 
 done_testing();
