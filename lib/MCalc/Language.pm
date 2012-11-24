@@ -3,7 +3,7 @@ package MCalc::Language;
 use Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(is_operator is_identifier operator_weight);
+@EXPORT = qw(is_operator is_identifier operator_weight is_number);
 
 sub is_operator {
   my ($op) = @_;
@@ -19,6 +19,14 @@ sub is_identifier {
   my ($identifier) = @_;
 
   if($identifier  =~ /[a-zA-Z]+/) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+sub is_number {
+  if($_[0] =~ /\d+\.?\d*/) {
     return 1;
   } else {
     return 0;
