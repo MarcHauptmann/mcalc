@@ -6,27 +6,27 @@ use Moose;
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $contextRef, $expression, $varRef, $fromRef, $toRef) = @_;
+  my ($this, $context, $expression, $var, $from, $to) = @_;
 
-  my $from = evaluateTree($contextRef, $fromRef);
-  my $to = evaluateTree($contextRef, $toRef);
-  my $var = $$varRef->value;
+  my $fromValue = evaluateTree($context, $from);
+  my $toValue = evaluateTree($context, $to);
+  my $varName = $var->value;
 
   my $product = 1;
 
   my $oldVariable = undef;
 
-  if($$contextRef->variableIsDefined($var)) {
-    $oldVariable = $$contextRef->getVariable($var);
+  if($context->variableIsDefined($varName)) {
+    $oldVariable = $context->getVariable($varName);
   }
 
-  for (my $value = $from; $value <= $to; $value++) {
-    $$contextRef->setVariable($var, $value);
+  for (my $value = $fromValue; $value <= $toValue; $value++) {
+    $context->setVariable($varName, $value);
 
-    $product *= evaluateTree($contextRef, $expression);
+    $product *= evaluateTree($context, $expression);
   }
 
-  $$contextRef->setVariable($var, $oldVariable);
+  $context->setVariable($varName, $oldVariable);
 
   return $product;
 }

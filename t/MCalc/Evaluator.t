@@ -18,7 +18,7 @@ subtest "Zahl" => sub {
   my $context = MCalc::DefaultContext->new();
   my $tree = Tree->new("2");
 
-  is(evaluateTree(\$context, \$tree), 2, "Ergebnis ist 2");
+  is(evaluateTree($context, $tree), 2, "Ergebnis ist 2");
 };
 
 print <<"EOF";
@@ -37,7 +37,7 @@ subtest "Addition" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  my $result = evaluateTree(\$context, \$tree);
+  my $result = evaluateTree($context, $tree);
 
   is($result, 6, "Ergebnis ist 6");
 };
@@ -58,7 +58,7 @@ subtest "Multiplikation" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree(\$context, \$tree), 8, "Ergebnis ist 8");
+  is(evaluateTree($context, $tree), 8, "Ergebnis ist 8");
 };
 
 print <<"EOF";
@@ -77,7 +77,7 @@ subtest "Subtraktion" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree(\$context, \$tree), -2, "Ergebnis ist -2");
+  is(evaluateTree($context, $tree), -2, "Ergebnis ist -2");
 };
 
 print <<"EOF";
@@ -96,7 +96,7 @@ subtest "Division" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree(\$context, \$tree), .5, "Ergebnis ist 0.5");
+  is(evaluateTree($context, $tree), .5, "Ergebnis ist 0.5");
 };
 
 print <<"EOF";
@@ -115,7 +115,7 @@ subtest "Potenz" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree(\$context, \$tree), 16, "Ergebnis ist 16");
+  is(evaluateTree($context, $tree), 16, "Ergebnis ist 16");
 };
 
 print <<"EOF";
@@ -141,7 +141,7 @@ subtest "Operatorrangfolge" => sub {
   $tree->add_child($mul);
   $tree->add_child(Tree->new("11"));
 
-  is(evaluateTree(\$context, \$tree), 19, "Ergebnis ist 19");
+  is(evaluateTree($context, $tree), 19, "Ergebnis ist 19");
 };
 
 print <<"EOF";
@@ -159,7 +159,7 @@ subtest "Cosine" => sub {
   my $cos = Tree->new("cos");
   $cos->add_child(Tree->new("0"));
 
-  is(evaluateTree(\$context, \$cos), 1, "Ergebnis ist 1");
+  is(evaluateTree($context, $cos), 1, "Ergebnis ist 1");
 };
 
 print <<"EOF";
@@ -175,7 +175,7 @@ subtest "Auswertung" => sub {
 
   $expected = $context->getVariable("pi");
 
-  is(evaluateTree(\$context, \$val), $expected, "pi geht");
+  is(evaluateTree($context, $val), $expected, "pi geht");
 };
 
 done_testing();

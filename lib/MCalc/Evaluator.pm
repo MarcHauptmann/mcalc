@@ -7,9 +7,7 @@ use Tree;
 @EXPORT= qw(evaluateTree);
 
 sub evaluateTree {
-  my ($contextRef, $treeRef) = @_;
-  my $context = $$contextRef;
-  my $tree = $$treeRef;
+  my ($context, $tree) = @_;
   my $val = $tree->value();
 
   # wenn am Ende
@@ -25,9 +23,7 @@ sub evaluateTree {
     # Funktionsaufruf
     my $func = $context->getFunction($tree->value());
 
-    my @args = map { \$_ } $tree->children();
-
-    return $func->evaluate($contextRef, @args);
+    return $func->evaluate($context, $tree->children);
   }
 }
 

@@ -7,7 +7,7 @@ use Moose;
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $contextRef, @args) = @_;
+  my ($this, $context, @args) = @_;
 
   # validate parameter count
   if (scalar(@args) != 4) {
@@ -15,14 +15,14 @@ sub evaluate {
   }
 
   # parameters
-  my ($exRef, $varRef, $fromRef, $toRef) = @args;
+  my ($ex, $var, $from, $to) = @args;
 
-  my $var = $$varRef->value();
-  my $from = evaluateTree($contextRef, $fromRef);
-  my $to = evaluateTree($contextRef, $toRef);
+  my $varName = $var->value();
+  my $fromValue = evaluateTree($context, $from);
+  my $toValue = evaluateTree($context, $to);
 
   # validate size of second parameter tree (must be one) and is identifiert
-  if ($$varRef->size() != 1 || not($$varRef->value =~ /[a-zA-Z]+/)) {
+  if ($var->size() != 1 || not($varName =~ /[a-zA-Z]+/)) {
     throw Error::Simple "sum: second parameter must be single variable";
   }
 
@@ -30,16 +30,16 @@ sub evaluate {
   my $result = 0;
 
   # ggf. alten Wert von Laufvariable sichern
-  if ($$contextRef->variableIsDefined($var)) {
-    $oldVar = $$contextRef->getVariable($var);
+  if ($context->variableIsDefined($varName)) {
+    $oldVar = $context->getVariable($varName);
   }
 
-  for (my $i=$from; $i<=$to; $i++) {
-    $$contextRef->setVariable($var, $i);
-    $result += evaluateTree($contextRef, $exRef);
+  for (my $i=$fromValue; $i<=$toValue; $i++) {
+    $context->setVariable($varName, $i);
+    $result += evaluateTree($context, $ex);
   }
 
-  $$contextRef->setVariable($var, $oldVar);
+  $context->setVariable($varName, $oldVar);
 
   return $result;
 }

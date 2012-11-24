@@ -18,7 +18,7 @@ subtest "variable can be assigned" => sub {
   $stmt->add_child(Tree->new("var"));
   $stmt->add_child(Tree->new("1"));
 
-  $assignment->evaluate(\$context, \tree("var"), \tree("1"));
+  $assignment->evaluate($context, tree("var"), tree("1"));
 
   isnt($context->getVariable("var"), undef, "var ist definiert");
   is($context->getVariable("var"), 1, "var ist 1");
@@ -28,7 +28,7 @@ subtest "variable name must be string" => sub {
   my $context = MCalc::SimpleContext->new();
   my $assignment = MCalc::Functions::Assignment->new();
 
-  throws_ok { $assignment->evaluate(\$context, \tree("3"), \tree("5")) }
+  throws_ok { $assignment->evaluate($context, tree("3"), tree("5")) }
     "Error::Simple";
 };
 
@@ -51,7 +51,7 @@ EOF
   my $lhsTree = tree($lhs);
   my $rhsTree = tree($rhs);
 
-  $assignment->evaluate(\$context, \$lhsTree, \$rhsTree);
+  $assignment->evaluate($context, $lhsTree, $rhsTree);
 
   my $expected = MCalc::Functions::UserFunction->new(arguments => ["x", "y"],
                                                      body => $rhsTree,
@@ -75,7 +75,7 @@ EOF
 
   my $lhsTree = tree($lhs);
 
-  throws_ok { $assignment->evaluate(\$context, \$lhsTree, \tree("x")) }
+  throws_ok { $assignment->evaluate($context, $lhsTree, tree("x")) }
     "Error::Simple";
 };
 
@@ -91,7 +91,7 @@ EOF
 
   my $lhsTree = tree($lhs);
 
-  throws_ok { $assignment->evaluate(\$context, \$lhsTree, \tree("x")) }
+  throws_ok { $assignment->evaluate($context, $lhsTree, tree("x")) }
     "Error::Simple";
 };
 
