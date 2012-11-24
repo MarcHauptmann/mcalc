@@ -2,6 +2,7 @@
 
 use Test::More;
 use Test::Exception;
+use MCalc::Util::TreeBuilder;
 
 BEGIN {
   use_ok("MCalc::Parser");
@@ -16,7 +17,8 @@ sub getTokens {
   print "# Rückgabe: ";
   foreach (@preorder) {
     print $_." ";
-  } print "\n";
+  }
+  print "\n";
 
   return @preorder;
 }
@@ -25,11 +27,11 @@ print <<"EOF";
 # ----------------------------------------
 # Teste parsen einer Zahl
 EOF
-    
-subtest "eine Zahl" => sub {
-    my @tokens = getTokens("1");
 
-    is_deeply(\@tokens, [1], "Ergebnis stimmt");
+subtest "eine Zahl" => sub {
+  my @tokens = getTokens("1");
+
+  is_deeply(\@tokens, [1], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -44,9 +46,9 @@ print <<"EOF";
 EOF
 
 subtest "Addition" => sub {
-    my @tokens = getTokens("1+2");
+  my @tokens = getTokens("1+2");
 
-    is_deeply(\@tokens, ["+", 1, 2], "Ergebnis stimmt");
+  is_deeply(\@tokens, ["+", 1, 2], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -73,7 +75,7 @@ print <<"EOF";
 # Teste Parsen einer Addition von drei Zahlen
 # Eingabe: 1+2+3
 # erwarteter Baum:
-#        +    
+#        +
 #       / \\
 #      1   +
 #         / \\
@@ -83,9 +85,9 @@ print <<"EOF";
 EOF
 
 subtest "3-er Addition" => sub {
-    my @tokens = getTokens("1+2+3");
+  my @tokens = getTokens("1+2+3");
 
-    is_deeply(\@tokens, ["+", 1, "+", 2, 3], "Ergebnis stimmt");
+  is_deeply(\@tokens, ["+", 1, "+", 2, 3], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -103,9 +105,9 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my @tokens = getTokens("2*3+4");
+  my @tokens = getTokens("2*3+4");
 
-    is_deeply(\@tokens, ["+", "*", 2, 3, 4], "Ergebnis stimmt");
+  is_deeply(\@tokens, ["+", "*", 2, 3, 4], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -123,9 +125,9 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my @tokens = getTokens("2+3*4");
+  my @tokens = getTokens("2+3*4");
 
-    is_deeply(\@tokens, ["+", 2, "*", 3, 4]);
+  is_deeply(\@tokens, ["+", 2, "*", 3, 4]);
 };
 
 
@@ -144,12 +146,12 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my @tokens = getTokens("2^3*4");
+  my @tokens = getTokens("2^3*4");
 
-    is_deeply(\@tokens, ["*", "^", 2, 3, 4]);
+  is_deeply(\@tokens, ["*", "^", 2, 3, 4]);
 };
 
-    print <<"EOF";
+print <<"EOF";
 # ----------------------------------------
 # Teste Addition von zwei Multiplikationen
 # Eingabe: 2*3+4*5
@@ -188,9 +190,9 @@ print<<"EOF";
 EOF
 
 subtest "großer Ausdruck" => sub {
-    my @tokens = getTokens("2*3+4*5+6");
+  my @tokens = getTokens("2*3+4*5+6");
 
-    is_deeply(\@tokens, ["+", "*", 2, 3, "+", "*", 4, 5, 6], "Ergebnis stimmt");
+  is_deeply(\@tokens, ["+", "*", 2, 3, "+", "*", 4, 5, 6], "Ergebnis stimmt");
 };
 
 print <<"EOF";
@@ -229,9 +231,9 @@ print <<"EOF";
 EOF
 
 subtest "Operatorrangfolge" => sub {
-    my @tokens = getTokens("(3+4)*2");
+  my @tokens = getTokens("(3+4)*2");
 
-    is_deeply(\@tokens, ["*", "+", 3, 4, 2], "Ergebnis passt");
+  is_deeply(\@tokens, ["*", "+", 3, 4, 2], "Ergebnis passt");
 };
 
 print <<"EOF";
@@ -471,6 +473,22 @@ subtest "dies on invalid function definition" => sub {
 
 subtest "dies on invalid term" => sub {
   throws_ok { getTokens("(a+b") } "Error::Simple";
+};
+
+subtest "int(x,x,-1,1) can be parsed" => sub {
+  my $parser = MCalc::Parser->new();
+  my $tree = $parser->parse("int(x,x,-1,1)");
+
+  my $expectedTree = <<EOF;
+          int
+         /|  |\\
+       /  |  |  \\
+      x   x neg  1
+      ^   ^  |   ^
+             1
+EOF
+
+  is_deeply($tree, tree($expectedTree), "tree matches");
 };
 
 done_testing();
