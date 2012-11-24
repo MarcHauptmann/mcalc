@@ -1,6 +1,7 @@
 package MCalc::Functions::Sum;
 
 use MCalc::Evaluator;
+use MCalc::CompoundContext;
 use Error::Simple;
 use Moose;
 
@@ -26,20 +27,15 @@ sub evaluate {
     throw Error::Simple "sum: second parameter must be single variable";
   }
 
-  my $oldVar = undef;
+  my $sumContext = MCalc::CompoundContext->new();
+  $sumContext->addContext($context);
+
   my $result = 0;
 
-  # ggf. alten Wert von Laufvariable sichern
-  if ($context->variableIsDefined($varName)) {
-    $oldVar = $context->getVariable($varName);
-  }
-
   for (my $i=$fromValue; $i<=$toValue; $i++) {
-    $context->setVariable($varName, $i);
-    $result += evaluateTree($context, $ex);
+    $sumContext->setVariable($varName, $i);
+    $result += evaluateTree($sumContext, $ex);
   }
-
-  $context->setVariable($varName, $oldVar);
 
   return $result;
 }

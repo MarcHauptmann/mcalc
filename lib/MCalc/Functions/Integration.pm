@@ -2,6 +2,7 @@ package MCalc::Functions::Integration;
 
 use Moose;
 use MCalc::Evaluator;
+use MCalc::CompoundContext;
 use Math::Complex;
 
 with "MCalc::Evaluateable";
@@ -32,15 +33,18 @@ sub evaluate {
   my $a = evaluateTree($context, $from);
   my $b = evaluateTree($context, $to);
 
+  my $integrationContext = MCalc::CompoundContext->new();
+  $integrationContext->addContext($context);
+
   my $int = 0;
 
   for (my $i=0; $i < scalar(@{$this->weights}); $i++) {
     my $x = ($b + $a)/2 + ${$this->samplingPoints}[$i] * ($b - $a)/2;
     my $alpha = ${$this->weights}[$i];
 
-    $context->setVariable($var->value, $x);
+    $integrationContext->setVariable($var->value, $x);
 
-    $int += $alpha * evaluateTree($context, $expression);
+    $int += $alpha * evaluateTree($integrationContext, $expression);
   }
 
   return ($b-$a) * $int / 2;

@@ -1,6 +1,7 @@
 package MCalc::Functions::Product;
 
 use MCalc::Evaluator;
+use MCalc::CompoundContext;
 use Moose;
 
 with "MCalc::Evaluateable";
@@ -14,19 +15,14 @@ sub evaluate {
 
   my $product = 1;
 
-  my $oldVariable = undef;
-
-  if($context->variableIsDefined($varName)) {
-    $oldVariable = $context->getVariable($varName);
-  }
+  my $productContext = MCalc::CompoundContext->new();
+  $productContext->addContext($context);
 
   for (my $value = $fromValue; $value <= $toValue; $value++) {
-    $context->setVariable($varName, $value);
+    $productContext->setVariable($varName, $value);
 
-    $product *= evaluateTree($context, $expression);
+    $product *= evaluateTree($productContext, $expression);
   }
-
-  $context->setVariable($varName, $oldVariable);
 
   return $product;
 }
