@@ -144,7 +144,7 @@ sub args {
 sub number() {
   my $this = shift;
 
-  return $this->getNext() =~ /\d+\.?\d*/;
+  return is_number($this->getNext());
 }
 
 sub identifier() {

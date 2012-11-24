@@ -17,6 +17,11 @@ subtest "an identifiert can be checked" => sub {
   is(is_identifier("+"), 0, "operator is no identifier");
 };
 
+subtest "an number can be checked" => sub {
+  is(is_number("123.1"), 1, "123.1 is number");
+  is(is_number("test"), 0, "'test' is no number");
+};
+
 subtest "operator weights can be checked" => sub {
   cmp_ok(operator_weight("+"), "<", operator_weight("*"));
   cmp_ok(operator_weight("*"), "<", operator_weight("^"));
