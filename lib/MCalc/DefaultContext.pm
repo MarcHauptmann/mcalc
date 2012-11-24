@@ -22,6 +22,7 @@ use MCalc::Functions::Rounding;
 use MCalc::Functions::Sqrt;
 use MCalc::Functions::Log;
 use MCalc::Functions::Ln;
+use MCalc::Functions::Integration;
 
 extends "MCalc::SimpleContext";
 
@@ -52,6 +53,7 @@ sub BUILD {
   $this->setFunction("log", MCalc::Functions::Log->new());
   $this->setFunction("neg", MCalc::Functions::Negation->new());
   $this->setFunction("sum", MCalc::Functions::Sum->new());
+  $this->setFunction("int", MCalc::Functions::Integration->new());
 }
 
 1;
