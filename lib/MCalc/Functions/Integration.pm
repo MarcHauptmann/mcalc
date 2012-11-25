@@ -4,6 +4,7 @@ use Moose;
 use MCalc::Evaluator;
 use MCalc::CompoundContext;
 use Math::Complex;
+use POSIX;
 
 with "MCalc::Evaluateable";
 
@@ -27,6 +28,23 @@ has "weights" => (isa => "ArrayRef",
                              (322-13*sqrt(70))/900 ];
                   });
 
+sub integrate {
+  my ($this, $context, $function, $var, $a, $b) = @_;
+
+  my $int = 0;
+
+  for (my $i=0; $i < scalar(@{$this->weights}); $i++) {
+    my $x = ($b + $a)/2 + ${$this->samplingPoints}[$i] * ($b - $a)/2;
+    my $alpha = ${$this->weights}[$i];
+
+    $context->setVariable($var->value, $x);
+
+    $int += $alpha * evaluateTree($context, $function);
+  }
+
+  return ($b-$a) * $int / 2;
+}
+
 sub evaluate {
   my ($this, $context, $expression, $var, $from, $to) = @_;
 
@@ -36,18 +54,18 @@ sub evaluate {
   my $integrationContext = MCalc::CompoundContext->new();
   $integrationContext->addContext($context);
 
+  my $num = POSIX::ceil($b - $a);
+  my $delta = ($b - $a) / $num;
   my $int = 0;
 
-  for (my $i=0; $i < scalar(@{$this->weights}); $i++) {
-    my $x = ($b + $a)/2 + ${$this->samplingPoints}[$i] * ($b - $a)/2;
-    my $alpha = ${$this->weights}[$i];
+  for (my $i = 0; $i<$num; $i++) {
+    my $from = $a + $i * $delta;
+    my $to = $a + ($i + 1) * $delta;
 
-    $integrationContext->setVariable($var->value, $x);
-
-    $int += $alpha * evaluateTree($integrationContext, $expression);
+    $int += $this->integrate($integrationContext, $expression, $var, $from, $to);
   }
 
-  return ($b-$a) * $int / 2;
+  return $int;
 }
 
 1;

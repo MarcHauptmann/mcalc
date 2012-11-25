@@ -42,7 +42,7 @@ EOF
   my $result = $integration->evaluate($context, tree($expression), tree("x"),
                                       tree("0"), tree("pi"));
 
-  cmp_ok(abs($result-2), "<", 1e-6, "result is near 2");
+  cmp_ok(abs($result-2), "<", 1e-8, "result is near 2");
 };
 
 subtest "int(x^3, x, -1, 1) must be nearly 0" => sub {
