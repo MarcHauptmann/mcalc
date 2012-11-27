@@ -3,7 +3,7 @@ package MCalc::Functions::Integration;
 use Moose;
 use MCalc::Evaluator;
 use MCalc::CompoundContext;
-use Math::Complex;
+use Math::Complex qw(sqrt);
 use POSIX;
 
 with "MCalc::Evaluateable";

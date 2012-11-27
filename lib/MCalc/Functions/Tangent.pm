@@ -2,7 +2,7 @@ package MCalc::Functions::Tangent;
 
 use MCalc::Evaluator;
 use Moose;
-use Math::Trig;
+use Math::Trig qw(tan);
 
 with "MCalc::Evaluateable";
 

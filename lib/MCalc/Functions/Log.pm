@@ -2,7 +2,7 @@ package MCalc::Functions::Log;
 
 use MCalc::Evaluator;
 use Moose;
-use Math::Complex;
+use Math::Complex qw(logn);
 
 with "MCalc::Evaluateable";
 

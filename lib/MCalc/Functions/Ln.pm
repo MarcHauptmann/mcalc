@@ -2,7 +2,6 @@ package MCalc::Functions::Ln;
 
 use MCalc::Evaluator;
 use Moose;
-use Math::Complex;
 
 with "MCalc::Evaluateable";
 

@@ -2,7 +2,6 @@ package MCalc::Functions::Sine;
 
 use MCalc::Evaluator;
 use Moose;
-use Math::Trig;
 
 with "MCalc::Evaluateable";
 

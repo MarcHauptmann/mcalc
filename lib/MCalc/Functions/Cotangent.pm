@@ -2,7 +2,7 @@ package MCalc::Functions::Cotangent;
 
 use MCalc::Evaluator;
 use Moose;
-use Math::Trig;
+use Math::Trig qw(cot);
 
 with "MCalc::Evaluateable";
 
