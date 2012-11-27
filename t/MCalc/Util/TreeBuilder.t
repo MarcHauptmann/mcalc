@@ -143,4 +143,26 @@ EOF
   is_deeply($tree, $expectedTree, "tree matches");
 };
 
+subtest "tree with linear left side can be parsed" => sub {
+  my $expectedTree = Tree->new("=");
+  my $rightTree = Tree->new("+");
+  $rightTree->add_child(Tree->new("x"));
+  $rightTree->add_child(Tree->new("5"));
+  my $leftTree = Tree->new("f");
+  $leftTree->add_child(Tree->new("x"));
+  $expectedTree->add_child($leftTree);
+  $expectedTree->add_child($rightTree);
+
+  my $tree = tree(<<EOF
+           =
+          / \\
+         f   +
+         |  / \\
+         x x   5
+EOF
+                 );
+
+  is_deeply($tree, $expectedTree, "tree matches");
+};
+
 done_testing();

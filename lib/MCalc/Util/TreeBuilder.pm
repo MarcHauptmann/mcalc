@@ -36,7 +36,7 @@ sub tree {
 
         push @children, $child;
 
-        if ($elem eq "\\") {
+        if ($elem eq "\\" || ($elem eq "|" && $parents[$parentIndex]->size() == 2)) {
           $parentIndex++;
         }
       }
