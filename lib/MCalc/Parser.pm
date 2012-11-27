@@ -45,15 +45,24 @@ sub weight {
 sub popOperator {
   my $this = shift;
 
-  my $node1 = pop @{$this->operands};
-  my $node2 = pop @{$this->operands};
   my $operator = pop @{$this->operators};
 
-  my $newNode = Tree->new($operator);
-  $newNode->add_child($node2);
-  $newNode->add_child($node1);
+  if ($operator ne "neg") {
+    my $node1 = pop @{$this->operands};
+    my $node2 = pop @{$this->operands};
 
-  push @{$this->operands}, $newNode;
+    my $newNode = Tree->new($operator);
+    $newNode->add_child($node2);
+    $newNode->add_child($node1);
+
+    push @{$this->operands}, $newNode;
+  } else {
+    my $node = pop @{$this->operands};
+    my $newNode = Tree->new($operator);
+    $newNode->add_child($node);
+
+    push @{$this->operands}, $newNode;
+  }
 }
 
 sub pushOperator {

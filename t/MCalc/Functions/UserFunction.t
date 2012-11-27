@@ -18,7 +18,7 @@ subtest "function can be evaluated" => sub {
 
   my $arg = Tree->new(2);
 
-  my $result = $func->evaluate(\$context, \$arg);
+  my $result = $func->evaluate($context, $arg);
 
   is($result, 2, "result is 2");
 };
@@ -33,7 +33,7 @@ subtest "variables are not redefined" => sub {
 
   $context->setVariable("x", 5);
 
-  my $result = $func->evaluate(\$context, \$arg);
+  my $result = $func->evaluate($context, $arg);
 
   is($context->getVariable("x"), 5, "x is not redefined");
 };
@@ -51,7 +51,7 @@ subtest "two parameters can be handled" => sub {
   my $arg1 = Tree->new(2);
   my $arg2 = Tree->new(3);
 
-  my $result = $func->evaluate(\$context, \$arg1, \$arg2);
+  my $result = $func->evaluate($context, $arg1, $arg2);
 
   is($result, 5, "result is 5");
 };
@@ -64,7 +64,7 @@ subtest "throws error with too few parameters" => sub {
 
   my $arg = Tree->new(2);
 
-  throws_ok { $func->evaluate(\$context, \$arg) } "Error::Simple";
+  throws_ok { $func->evaluate($context, $arg) } "Error::Simple";
 };
 
 subtest "throws error with too many parameters" => sub {
@@ -75,7 +75,7 @@ subtest "throws error with too many parameters" => sub {
 
   my $arg = Tree->new(2);
 
-  throws_ok { $func->evaluate(\$context, \$arg, \$arg) } "Error::Simple";
+  throws_ok { $func->evaluate($context, $arg, $arg) } "Error::Simple";
 };
 
 done_testing();

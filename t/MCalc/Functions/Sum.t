@@ -15,7 +15,7 @@ subtest "sum function calculates sum" => sub {
        i  i 1  4
 EOF
 
-  my $result = evaluateTree(\$context, \tree($tree));
+  my $result = evaluateTree($context, tree($tree));
 
   is($result, 10, "result is 10");
 };
@@ -30,7 +30,7 @@ subtest "sum function does not redefine variable" => sub {
     i  i 1  4
 EOF
 
-  my $result = evaluateTree(\$context, \tree($tree));
+  my $result = evaluateTree($context, tree($tree));
 
   is($context->getVariable("i"), 100, "varable i may not change");
 };
@@ -42,7 +42,7 @@ subtest "dies at too few parameters" => sub {
   my $arg1 = Tree->new("i");
   my $arg2 = Tree->new("i");
 
-  throws_ok { $sumFunction->evaluate(\$context, \$arg1, \$arg2) } "Error::Simple";
+  throws_ok { $sumFunction->evaluate($context, $arg1, $arg2) } "Error::Simple";
 };
 
 subtest "dies at too few parameters" => sub {
@@ -56,7 +56,7 @@ subtest "dies at too few parameters" => sub {
   my $arg5 = Tree->new("");
 
   throws_ok {
-    $sumFunction->evaluate(\$context, \$arg1, \$arg2, \$arg3, \$arg4, \$arg5);
+    $sumFunction->evaluate($context, $arg1, $arg2, $arg3, $arg4, $arg5);
   } "Error::Simple";
 };
 
@@ -70,7 +70,7 @@ subtest "dies when second parameter is number" => sub {
   my $arg4 = Tree->new("3");
 
   throws_ok {
-    $sumFunction->evaluate(\$context, \$arg1, \$arg2, \$arg3, \$arg4);
+    $sumFunction->evaluate($context, $arg1, $arg2, $arg3, $arg4);
   } "Error::Simple";
 };
 
@@ -86,7 +86,7 @@ subtest "dies when second parameter is tree" => sub {
   my $arg4 = Tree->new("3");
 
   throws_ok {
-    $sumFunction->evaluate(\$context, \$arg1, \$arg2, \$arg3, \$arg4);
+    $sumFunction->evaluate($context, $arg1, $arg2, $arg3, $arg4);
   } "Error::Simple";
 };
 

@@ -1,32 +1,28 @@
 package MCalc::Functions::Product;
 
 use MCalc::Evaluator;
+use MCalc::CompoundContext;
 use Moose;
 
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $contextRef, $expression, $varRef, $fromRef, $toRef) = @_;
+  my ($this, $context, $expression, $var, $from, $to) = @_;
 
-  my $from = evaluateTree($contextRef, $fromRef);
-  my $to = evaluateTree($contextRef, $toRef);
-  my $var = $$varRef->value;
+  my $fromValue = evaluateTree($context, $from);
+  my $toValue = evaluateTree($context, $to);
+  my $varName = $var->value;
 
   my $product = 1;
 
-  my $oldVariable = undef;
+  my $productContext = MCalc::CompoundContext->new();
+  $productContext->addContext($context);
 
-  if($$contextRef->variableIsDefined($var)) {
-    $oldVariable = $$contextRef->getVariable($var);
+  for (my $value = $fromValue; $value <= $toValue; $value++) {
+    $productContext->setVariable($varName, $value);
+
+    $product *= evaluateTree($productContext, $expression);
   }
-
-  for (my $value = $from; $value <= $to; $value++) {
-    $$contextRef->setVariable($var, $value);
-
-    $product *= evaluateTree($contextRef, $expression);
-  }
-
-  $$contextRef->setVariable($var, $oldVariable);
 
   return $product;
 }

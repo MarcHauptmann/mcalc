@@ -10,19 +10,16 @@ use MCalc::Functions::UserFunction;
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $contextRef, $lhsRef, $rhsRef) = @_;
-
-  my $lhs = $$lhsRef;
-  my $rhs = $$rhsRef;
+  my ($this, $context, $lhs, $rhs) = @_;
 
   if ($lhs->size() == 1) {
     my $var = $lhs->value();
-    my $value = evaluateTree($contextRef, $rhsRef);
+    my $value = evaluateTree($context, $rhs);
 
     if (not($var =~ /[a-zA-Z]\w*+/)) {
       throw Error::Simple "variable name must be string";
     } else {
-      $$contextRef->setVariable($var, $value);
+      $context->setVariable($var, $value);
 
       return "$var = $value";
     }
@@ -46,7 +43,7 @@ sub evaluate {
                                                        body => $rhs,
                                                        name => $key);
 
-    $$contextRef->setFunction($key, $function);
+    $context->setFunction($key, $function);
 
     my $printer = MCalc::Printer->new();
 

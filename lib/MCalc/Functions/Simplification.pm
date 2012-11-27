@@ -9,12 +9,12 @@ use MCalc::Evaluator;
 with "MCalc::Evaluateable";
 
 sub evaluate {
-  my ($this, $contextRef, $treeRef) = @_;
+  my ($this, $context, $tree) = @_;
   my $printer = MCalc::Printer->new();
 
-  my $tree = $this->simplify($contextRef, $$treeRef);
+  my $simplifiedTree = $this->simplify($context, $tree);
 
-  return $printer->to_string($tree);
+  return $printer->to_string($simplifiedTree);
 }
 
 sub is_numeric_tree {
@@ -66,18 +66,18 @@ sub simplify_sum {
 }
 
 sub simplify {
-  my ($this, $contextRef, $tree) = @_;
+  my ($this, $context, $tree) = @_;
 
   # print "simplifying ".join(", ", map { $_->value } $tree->traverse($tree->LEVEL_ORDER))."\n";
 
-  if ($this->is_numeric_tree($$contextRef, $tree)) {
-    return Tree->new(evaluateTree($contextRef, \$tree));
+  if ($this->is_numeric_tree($context, $tree)) {
+    return Tree->new(evaluateTree($context, $tree));
   }
 
   if (is_operator($tree->value)) {
     my $op = $tree->value;
-    my $child1 = $this->simplify($contextRef, $tree->children(0));
-    my $child2 = $this->simplify($contextRef, $tree->children(1));
+    my $child1 = $this->simplify($context, $tree->children(0));
+    my $child2 = $this->simplify($context, $tree->children(1));
 
     # print $op." child1: ".join(", ", map { $_->value } $child1->traverse($child1->LEVEL_ORDER))."\n";
     # print $op." child2: ".join(", ", map { $_->value } $child2->traverse($child2->LEVEL_ORDER))."\n";

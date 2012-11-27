@@ -18,13 +18,13 @@ has argumentNames => (isa => "ArrayRef",
                       default => sub { ["x"] });
 
 sub evaluate {
-  my ($this, $contextRef, @argTreeRefs) = @_;
+  my ($this, $context, @argTrees) = @_;
 
-  if (scalar(@argTreeRefs) != $this->argumentCount()) {
+  if (scalar(@argTrees) != $this->argumentCount()) {
     throw Error::Simple "argument count does not match";
   }
 
-  my @args = map {evaluateTree($contextRef, $_)} @argTreeRefs;
+  my @args = map {evaluateTree($context, $_)} @argTrees;
 
   return &{$this->code}(@args);
 }

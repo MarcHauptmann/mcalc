@@ -23,7 +23,7 @@ sub getArgumentCount {
 }
 
 sub evaluate {
-  my ($this, $contextRef, @args) = @_;
+  my ($this, $context, @args) = @_;
 
   if ($this->getArgumentCount() != scalar(@args)) {
     throw Error::Simple $this->name.": argument count does not match";
@@ -32,8 +32,8 @@ sub evaluate {
   my %oldValues = ();
 
   foreach my $name (@{$this->arguments}) {
-    if ($$contextRef->variableIsDefined($name)) {
-      $oldValues{$name} = $$contextRef->getVariable($name);
+    if ($context->variableIsDefined($name)) {
+      $oldValues{$name} = $context->getVariable($name);
     } else {
       $oldValues{$name} = undef;
     }
@@ -41,15 +41,15 @@ sub evaluate {
 
   for (my $i=0; $i<$this->getArgumentCount; $i++) {
     my $argName = ${$this->arguments}[$i];
-    my $argValue = evaluateTree($contextRef, $args[$i]);
+    my $argValue = evaluateTree($context, $args[$i]);
 
-    $$contextRef->setVariable($argName, $argValue);
+    $context->setVariable($argName, $argValue);
   }
 
-  my $result = evaluateTree($contextRef, \$this->body);
+  my $result = evaluateTree($context, $this->body);
 
   foreach my $name (@{$this->arguments}) {
-    $$contextRef->setVariable($name, $oldValues{$name});
+    $context->setVariable($name, $oldValues{$name});
   }
 
   return $result;

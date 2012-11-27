@@ -54,7 +54,7 @@ sub calculate {
     my $tree = $parser->parse($input);
 
     # auswerten
-    my $result = evaluateTree(\$context, \$tree);
+    my $result = evaluateTree($context, $tree);
 
     printf "$result\n";
   } catch Error with {
