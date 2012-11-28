@@ -3,6 +3,8 @@ package MCalc::DefaultContext;
 use Moose;
 use Error;
 
+use Math::Trig ':pi';
+
 use MCalc::Functions::Addition;
 use MCalc::Functions::Multiplication;
 use MCalc::Functions::Subtraction;
@@ -23,6 +25,9 @@ use MCalc::Functions::Sqrt;
 use MCalc::Functions::Log;
 use MCalc::Functions::Ln;
 use MCalc::Functions::Integration;
+use MCalc::Functions::ArcSine;
+use MCalc::Functions::ArcCosine;
+use MCalc::Functions::ArcTangent;
 
 extends "MCalc::SimpleContext";
 
@@ -30,7 +35,7 @@ sub BUILD {
   my $this = shift;
 
   # Variablen definieren
-  $this->setVariable("pi", 3.1415);
+  $this->setVariable("pi", pi);
   $this->setVariable("e", exp(1));
 
   # Funktionen definieren
@@ -45,9 +50,12 @@ sub BUILD {
   $this->setFunction("ceil", MCalc::Functions::Ceiling->new());
   $this->setFunction("round", MCalc::Functions::Rounding->new());
   $this->setFunction("cos", MCalc::Functions::Cosine->new());
+  $this->setFunction("acos", MCalc::Functions::ArcCosine->new());
   $this->setFunction("cot", MCalc::Functions::Cotangent->new());
   $this->setFunction("tan", MCalc::Functions::Tangent->new());
+  $this->setFunction("atan", MCalc::Functions::ArcTangent->new());
   $this->setFunction("sin", MCalc::Functions::Sine->new());
+  $this->setFunction("asin", MCalc::Functions::ArcSine->new());
   $this->setFunction("sqrt", MCalc::Functions::Sqrt->new());
   $this->setFunction("ln", MCalc::Functions::Ln->new());
   $this->setFunction("log", MCalc::Functions::Log->new());
