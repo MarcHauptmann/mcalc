@@ -286,6 +286,10 @@ computes the logarithm to the base C<n> of a real number C<x>; same as C<ln(x)/l
 
 This function calculates a sum expression. C<var> takes the values from the expression C<from> to C<to>.
 
+=item B<product>(expr, var, from, to)
+
+Calculates the product of an expression. Use it like the C<sum> function.
+
 =back
 
 =head2 Special commands
@@ -300,6 +304,8 @@ Exits the program
 
 =head2 Assignments
 
+=head3 Variables
+
 You can assign values to variables by using the assignment operator C<=>. For example you can use
 
     alpha = pi/2
@@ -309,6 +315,17 @@ to declare the new variable C<alpha>. After that you can use the following expre
     sin(alpha)
 
 which will evaulate to 1 (well, nearly).
+
+=head3 Functions
+
+It is also possible to define new functions. You can define a new function with
+
+   > f(x)=x^2
+
+and evaluate it:
+
+   > f(2) 
+   4
 
 =head1 SYNTAX
 
@@ -326,7 +343,7 @@ I<identifier>   := regex([a-zA-Z]+)
 
 I<number>       := regex(\d+\.?\d*)
 
-I<operator>     := + | - | * | / | ^
+I<operator>     := + | - | * | / | ^ | =
 
 =back
 
