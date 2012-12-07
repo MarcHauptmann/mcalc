@@ -11,6 +11,7 @@ use Term::ANSIColor;
 
 use MCalc::Colorizer;
 use MCalc::Functions::Product;
+use MCalc::Language;
 
 our $VERSION = "0.0.2";
 
@@ -76,15 +77,26 @@ sub complete {
 
   $attribs->{completion_suppress_append} = 1;
 
-  @completions = $context->getCompletions($line);
+  # split input and retrieve last string
+  my @tokens = split(/([\(\)\+\-\*\/,\^=])/, $line);
+  my $str = pop @tokens;
 
-  foreach $val ("quit", "exit", "bye") {
-    if ($val =~ /^$line/) {
-      push @completions, $val;
+  # only completion for identifiers
+  if ($str =~ /[a-zA-Z]+/) {
+    # get completions from context
+    @completions = $context->getCompletions($str);
+
+    # completions for keywords
+    foreach $val ("quit", "exit", "bye") {
+      if ($val =~ /^$str/) {
+        push @completions, $val;
+      }
     }
-  }
 
-  return @completions;
+    return @completions;
+  } else {
+    return ();
+  }
 }
 
 GetOptions(
@@ -120,7 +132,7 @@ $attribs->{redisplay_function} = sub {
 
   print " \b";
 
-  for(my $i=0; $i<$attribs->{end} - $attribs->{point}; $i++) {
+  for (my $i=0; $i<$attribs->{end} - $attribs->{point}; $i++) {
     print "\b";
   }
 };
