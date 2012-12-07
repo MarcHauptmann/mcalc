@@ -7,7 +7,9 @@ use Getopt::Long;
 use Pod::Usage;
 use MCalc::DefaultContext;
 use Error qw(:try);
+use Term::ANSIColor;
 
+use MCalc::Colorizer;
 use MCalc::Functions::Product;
 
 our $VERSION = "0.0.2";
@@ -99,6 +101,30 @@ if (!$silent) {
 
 $term = Term::ReadLine->new("mcalc");
 my $attribs = $term->Attribs;
+
+
+$attribs->{redisplay_function} = sub {
+  my $colorizer = MCalc::Colorizer->new();
+  $colorizer->setContext($context);
+
+  my $attribs = $term->Attribs;
+  my $string = $attribs->{line_buffer};
+  $| = 1;
+
+  my @tokens = split(/([\(\)\+\-\*\/,\^=])/, $string);
+
+  print "\r";
+  print "$promt> ";
+
+  print $colorizer->colorize($string);
+
+  print " \b";
+
+  for(my $i=0; $i<$attribs->{end} - $attribs->{point}; $i++) {
+    print "\b";
+  }
+};
+
 
 $attribs->{completion_function} = \&complete;
 $attribs->{completer_word_break_characters} = "+-*/^()";
