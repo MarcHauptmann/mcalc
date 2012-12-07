@@ -13,10 +13,13 @@ To install **mcalc** you need to run the following commands from inside the *mca
 ## Features
 
 * evaluation of mathematical expressions
+* definition of own variables and functions
 * build in functions like
   * trigonometric functions
   * logarithm functions
   * sum and product functions
-* definition of own variables and functions
-* auto-completion for variables and functions
-* command line history
+  * numerical integration
+* interface
+  * command line history
+  * syntax highlighting
+  * auto-completion for variables and functions
