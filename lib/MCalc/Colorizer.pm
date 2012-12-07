@@ -2,12 +2,13 @@ package MCalc::Colorizer;
 
 use Moose;
 use Term::ANSIColor;
+use MCalc::Language;
 
 has baceColors => (isa => "ArrayRef",
                    is => "rw",
                    reader => "getBraceColors",
                    writer => "setBraceColors",
-		  default => sub { ["green", "yellow", "blue", "magenta", "cyan"] });
+                   default => sub { ["green", "yellow", "blue", "magenta", "cyan"] });
 
 has functionStyle => (isa => "Str",
                       is => "rw",
@@ -26,6 +27,12 @@ has variableStyle => (isa => "Str",
                       reader => "getVariableStyle",
                       writer => "setVariableStyle",
                       default => sub { "bold" });
+
+has keywordStyle => (isa => "Str",
+                     is => "rw",
+                     reader => "getKeywordStyle",
+                     writer => "setKeywordStyle",
+                     default => sub { "bold blue" });
 
 has context => (isa => "MCalc::Context",
                 is => "rw",
@@ -56,6 +63,8 @@ sub colorize {
         $output .= colored($token, $this->getFunctionStyle());
       } elsif ($this->getContext->variableIsDefined($token)) {
         $output .= colored($token, $this->getVariableStyle());
+      } elsif (is_keyword($token)) {
+	$output .= colored($token, $this->getKeywordStyle());
       } else {
         $output .= colored($token, $this->getUnknownStyle());
       }

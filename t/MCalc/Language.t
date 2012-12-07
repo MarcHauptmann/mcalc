@@ -27,4 +27,10 @@ subtest "operator weights can be checked" => sub {
   cmp_ok(operator_weight("*"), "<", operator_weight("^"));
 };
 
+subtest "keywords can be checked" => sub {
+  ok(is_keyword("bye"), "'bye' is keyword");
+  ok(is_keyword("quit"), "'quit' is keyword");
+  ok(is_keyword("exit"), "'exit' is keyword");
+};
+
 done_testing();

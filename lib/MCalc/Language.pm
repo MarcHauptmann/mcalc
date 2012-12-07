@@ -3,7 +3,7 @@ package MCalc::Language;
 use Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(is_operator is_identifier operator_weight is_number);
+@EXPORT = qw(is_operator is_identifier operator_weight is_number is_keyword);
 
 sub is_operator {
   my ($op) = @_;
@@ -49,6 +49,12 @@ sub operator_weight {
   } else {
     return 0;
   }
+}
+
+sub is_keyword {
+  my ($word) = @_;
+
+  return $word =~ /bye|exit|quit/;
 }
 
 1;

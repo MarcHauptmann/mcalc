@@ -56,5 +56,17 @@ sub variables_are_bold_by_default : Tests {
   is($colorizer->colorize("pi"), $expected, "variable is bold");
 }
 
+sub keyword_can_be_colored : Tests {
+  my $context = MCalc::SimpleContext->new();
+
+  my $colorizer = MCalc::Colorizer->new();
+  $colorizer->setContext($context);
+  $colorizer->setKeywordStyle("blue bold");
+
+  my $expected = colored("quit", "blue bold");
+
+  is($colorizer->colorize("quit"), $expected, "keyword is bold blue");
+}
+
 Test::Class->runtests;
 
