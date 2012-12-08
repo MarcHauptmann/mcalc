@@ -10,3 +10,5 @@ MANIFEST*
 Build
 MYMETA*
 cover_db
+*.deb
+MCalc-*
