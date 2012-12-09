@@ -6,7 +6,7 @@ my $class = Module::Build->subclass(clazz => "Module::Build::Custom",
 sub ACTION_deb {
   my ($self) = @_;
 
-  my @libs = ("llibterm-readline-gnu-perl",
+  my @libs = ("libterm-readline-gnu-perl",
               "perl-base", "libtree-perl",
               "perl-modules");
 
