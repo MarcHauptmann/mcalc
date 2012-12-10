@@ -5,6 +5,7 @@ use MCalc::SimplePrinter;
 use MCalc::Language;
 use List::Util qw(max);
 use POSIX;
+use Encode;
 
 with "MCalc::Printer";
 
@@ -13,16 +14,59 @@ has "simplePrinter" => (isa => "Ref",
                         default => sub { MCalc::SimplePrinter->new() });
 
 sub to_string {
-  my ($this, $tree) = @_;
+  my ($this, $tree, $weight) = @_;
 
   if ($tree->value() eq "/") {
     return $this->handle_division($tree);
   } elsif (is_operator($tree->value())) {
-    return $this->handle_operator($tree);
+    my $operator = $tree->value();
+
+    my $result = $this->handle_operator($tree);
+
+    if (defined($weight) && $weight > operator_weight($operator)) {
+      $result = $this->brace($result);
+    }
+
+    return $result;
   } elsif ($tree->value() eq "sqrt") {
     return $this->handle_sqrt($tree);
   } else {
     return $this->simplePrinter->to_string($tree);
+  }
+}
+
+sub brace {
+  my ($this, $string) = @_;
+
+  my $lineCount = $this->count_lines($string);
+
+  if ($lineCount == 1) {
+    return "( ".$string." )";
+  } else {
+    my $lbrace = "";
+    my $rbrace = "";
+
+    for (my $i = 0; $i<$lineCount; $i++) {
+      if ($i == 0) {
+        $lbrace .= "\n⎛ ";
+        $rbrace .= "\n ⎞";
+      } elsif ($i == $lineCount - 1) {
+	$lbrace .= "\n⎝ ";
+	$rbrace .= "\n ⎠";
+      } else {
+        $lbrace .= "\n⎜ ";
+        $rbrace .= "\n ⎟";
+      }
+    }
+
+    $lbrace = substr($lbrace, 1);
+    $rbrace = substr($rbrace, 1);
+
+    $string = $this->append($lbrace, $string);
+    $string = $this->justify($string);
+    $string = $this->append($string, $rbrace);
+
+    return $string;
   }
 }
 
@@ -32,15 +76,15 @@ sub handle_sqrt {
   my $radiant = $this->to_string($tree->children(0));
   my $width = $this->max_line_length($radiant);
 
-  my $string = "  ".$this->str("-", $width + 2)."\n";
+  my $string = " ┌".$this->str("─", $width + 2)."\n";
 
   my @lines = split(/\n/, $radiant);
 
   for (my $i = 1; $i <= scalar(@lines); $i++) {
     if ($i == scalar(@lines)) {
-      $string .= "\\| ".$lines[$i-1];
+      $string .= "╲│ ".$lines[$i-1];
     } else {
-      $string .= " | ".$lines[$i-1]."\n";
+      $string .= " │ ".$lines[$i-1]."\n";
     }
   }
 
@@ -57,7 +101,7 @@ sub handle_division {
 
   my $string = $this->offset($nominator, ($l - $this->max_line_length($nominator))/2 + 1);
 
-  $string .= sprintf "\n%s\n", $this->str("-", $l + 2);
+  $string .= sprintf "\n%s\n", $this->str("‒", $l + 2);
   $string .= $this->offset($denominator, ($l - $this->max_line_length($denominator))/2 + 1);
 
   return $string;
@@ -66,11 +110,14 @@ sub handle_division {
 sub handle_operator {
   my ($this, $tree) = @_;
 
-  my $lhs = $this->to_string($tree->children(0));
-  my $rhs = $this->to_string($tree->children(1));
+  my $weight = operator_weight($tree->value());
+  my $lhs = $this->to_string($tree->children(0), $weight);
+  my $rhs = $this->to_string($tree->children(1), $weight);
 
   if ($this->count_lines($lhs) < $this->count_lines($rhs)) {
     $lhs = $this->justify_height($lhs, $this->count_lines($rhs));
+  } elsif ($this->count_lines($lhs) > $this->count_lines($rhs)) {
+    $rhs = $this->justify_height($rhs, $this->count_lines($lhs));
   }
 
   $lhs = $this->justify($lhs);
@@ -128,7 +175,7 @@ sub justify_height {
   my @lines = split(/\n/, $string);
 
   while (scalar(@lines) < $count) {
-    if(scalar(@lines) % 2 == 0) {
+    if (scalar(@lines) % 2 == 0) {
       push @lines, " ";
     } else {
       @lines = (" ", @lines);
@@ -151,7 +198,7 @@ sub justify {
   my $string = "";
 
   foreach my $line (split(/\n/, $lines)) {
-    my $l = length($line);
+    my $l = length(Encode::decode_utf8($line));
 
     $string .= "\n".$line.$this->str(" ", $length - $l);
   }
@@ -176,7 +223,7 @@ sub max_line_length {
 
   my @lines = map { split(/\n/, $_) } @strings;
 
-  return max( map { length($_) } @lines );
+  return max( map { length(Encode::decode_utf8($_)) } @lines );
 }
 
 sub str {

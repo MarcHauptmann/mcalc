@@ -25,7 +25,7 @@ EOF
 
   my $expected = <<EOF;
  1
----
+‒‒‒
  2
 EOF
 
@@ -46,7 +46,7 @@ EOF
 
   my $expected = <<EOF;
  1 + 2
--------
+‒‒‒‒‒‒‒
    3
 EOF
 
@@ -65,11 +65,11 @@ subtest "double fraction can be printed" => sub {
              2   3
 EOF
 
-  my $expected = <<EOF;
+  my $expected = <<'EOF';
   1
------
+‒‒‒‒‒
   2
- ---
+ ‒‒‒
   3
 EOF
 
@@ -88,9 +88,9 @@ subtest "sum of fractions can be printed" => sub {
          1   2   3   4
 EOF
 
-  my $expected = <<EOF;
+  my $expected = <<'EOF';
  1     3
---- + ---
+‒‒‒ + ‒‒‒
  2     4
 EOF
 
@@ -108,8 +108,8 @@ subtest "square root can be printed" => sub {
 EOF
 
   my $expected = <<'EOF';
-  ---
-\| 2
+ ┌───
+╲│ 2
 EOF
 
   my $result = $printer->to_string(tree($tree));
@@ -128,10 +128,10 @@ subtest "square root of fraction can be printed" => sub {
 EOF
 
   my $expected = <<'EOF';
-  -----
- |  1
- | ---
-\|  2
+ ┌─────
+ │  1
+ │ ‒‒‒
+╲│  2
 EOF
 
   my $result = $printer->to_string(tree($tree));
@@ -151,7 +151,7 @@ EOF
 
   my $expected = <<'EOF';
      1
-a = ---
+a = ‒‒‒
      2
 EOF
 
@@ -160,25 +160,47 @@ EOF
   is($result."\n", $expected);
 };
 
-subtest "function assignment can be printed" => sub {
+subtest "braces can be printed" => sub {
     my $printer = MCalc::PrettyPrinter->new();
   my $tree = <<'EOF';
-            =
+            *
           /   \
-        f      /
-       / \    / \
-      x   y  x   y
+        3      +
+        ^     / \
+             x   y
 EOF
 
   my $expected = <<'EOF';
-           x
-f(x, y) = ---
-           y
+3 * ( x + y )
 EOF
 
   my $result = $printer->to_string(tree($tree));
 
   is($result."\n", $expected);
 };
+
+subtest "braces can be printed" => sub {
+    my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+            *
+          /   \
+        3      +
+        ^     / \
+             /   y
+            / \
+           1   2
+EOF
+
+  my $expected = <<'EOF';
+    ⎛  1      ⎞
+3 * ⎜ ‒‒‒ + y ⎟
+    ⎝  2      ⎠
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
+
 
 done_testing();
