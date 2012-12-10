@@ -20,6 +20,8 @@ sub to_string {
     return $this->handle_division($tree, $weight);
   } elsif ($tree->value() eq "^") {
     $this->handle_power($tree);
+  } elsif ($tree->value() eq "neg") {
+    $this->handle_negation($tree);
   } elsif (is_operator($tree->value())) {
     my $operator = $tree->value();
 
@@ -70,6 +72,15 @@ sub brace {
 
     return $string;
   }
+}
+
+sub handle_negation {
+  my ($this, $tree) = @_;
+
+  my $expression = $this->to_string($tree->children(0));
+  my $negation = $this->justify_height("-", $this->count_lines($expression));
+
+  return $this->append($negation, $expression);
 }
 
 sub handle_power {
