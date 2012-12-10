@@ -139,4 +139,25 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "variable assignment can be printed" => sub {
+    my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+          =
+         / \
+        a   /
+        ^  / \
+          1   2
+EOF
+
+  my $expected = <<'EOF';
+     1
+a = ---
+     2
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
+
 done_testing();

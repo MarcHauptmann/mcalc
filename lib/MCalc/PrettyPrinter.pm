@@ -69,6 +69,10 @@ sub handle_operator {
   my $lhs = $this->to_string($tree->children(0));
   my $rhs = $this->to_string($tree->children(1));
 
+  if ($this->count_lines($lhs) < $this->count_lines($rhs)) {
+    $lhs = $this->justify_height($lhs, $this->count_lines($rhs));
+  }
+
   $lhs = $this->justify($lhs);
 
   my $opString = "";
@@ -116,6 +120,28 @@ sub append {
   }
 
   return substr($result, 1);
+}
+
+sub justify_height {
+  my ($this, $string, $count) = @_;
+
+  my @lines = split(/\n/, $string);
+
+  while (scalar(@lines) < $count) {
+    if(scalar(@lines) % 2 == 0) {
+      push @lines, " ";
+    } else {
+      @lines = (" ", @lines);
+    }
+  }
+
+  $string = "";
+
+  foreach my $line (@lines) {
+    $string .= "\n".$line;
+  }
+
+  return substr($string, 1);
 }
 
 sub justify {
