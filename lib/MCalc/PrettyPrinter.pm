@@ -16,50 +16,81 @@ sub to_string {
   my ($this, $tree) = @_;
 
   if ($tree->value() eq "/") {
-    my $nominator = $this->to_string($tree->children(0));
-    my $denominator = $this->to_string($tree->children(1));
-
-    my $l = $this->max_line_length($nominator, $denominator);
-
-    my $string = $this->offset($nominator, ($l - $this->max_line_length($nominator))/2 + 1);
-
-    $string .= sprintf "\n%s\n", $this->str("-", $l + 2);
-    $string .= $this->offset($denominator, ($l - $this->max_line_length($denominator))/2 + 1);
-
-    # if (not($string =~ /.*\n$/)) {
-    # $string .= "\n";
-    # }
-
-    return $string;
+    return $this->handle_division($tree);
   } elsif (is_operator($tree->value())) {
-    my $lhs = $this->to_string($tree->children(0));
-    my $rhs = $this->to_string($tree->children(1));
-
-    $lhs = $this->justify($lhs);
-
-    my $opString = "";
-    my $lineCount = $this->count_lines($lhs);
-
-    for (my $i=0; $i<$lineCount; $i++) {
-      $opString .= "\n";
-
-      if ($i == POSIX::floor($lineCount / 2)) {
-        $opString .= " ".$tree->value()." ";
-      } else {
-        $opString .= " ";
-      }
-    }
-
-    $opString = substr($opString, 1);
-
-    my $result =  $this->append($lhs, $opString);
-    $result = $this->justify($result);
-    $result = $this->append($result, $rhs);
-
-    return $result;
+    return $this->handle_operator($tree);
+  } elsif ($tree->value() eq "sqrt") {
+    return $this->handle_sqrt($tree);
   } else {
     return $this->simplePrinter->to_string($tree);
   }
+}
+
+sub handle_sqrt {
+  my ($this, $tree) = @_;
+
+  my $radiant = $this->to_string($tree->children(0));
+  my $width = $this->max_line_length($radiant);
+
+  my $string = "  ".$this->str("-", $width + 2)."\n";
+
+  my @lines = split(/\n/, $radiant);
+
+  for (my $i = 1; $i <= scalar(@lines); $i++) {
+    if ($i == scalar(@lines)) {
+      $string .= "\\| ".$lines[$i-1];
+    } else {
+      $string .= " | ".$lines[$i-1]."\n";
+    }
+  }
+
+  return $string;
+}
+
+sub handle_division {
+  my ($this, $tree) = @_;
+
+  my $nominator = $this->to_string($tree->children(0));
+  my $denominator = $this->to_string($tree->children(1));
+
+  my $l = $this->max_line_length($nominator, $denominator);
+
+  my $string = $this->offset($nominator, ($l - $this->max_line_length($nominator))/2 + 1);
+
+  $string .= sprintf "\n%s\n", $this->str("-", $l + 2);
+  $string .= $this->offset($denominator, ($l - $this->max_line_length($denominator))/2 + 1);
+
+  return $string;
+}
+
+sub handle_operator {
+  my ($this, $tree) = @_;
+
+  my $lhs = $this->to_string($tree->children(0));
+  my $rhs = $this->to_string($tree->children(1));
+
+  $lhs = $this->justify($lhs);
+
+  my $opString = "";
+  my $lineCount = $this->count_lines($lhs);
+
+  for (my $i=0; $i<$lineCount; $i++) {
+    $opString .= "\n";
+
+    if ($i == POSIX::floor($lineCount / 2)) {
+      $opString .= " ".$tree->value()." ";
+    } else {
+      $opString .= " ";
+    }
+  }
+
+  $opString = substr($opString, 1);
+
+  my $result =  $this->append($lhs, $opString);
+  $result = $this->justify($result);
+  $result = $this->append($result, $rhs);
+
+  return $result;
 }
 
 sub count_lines {

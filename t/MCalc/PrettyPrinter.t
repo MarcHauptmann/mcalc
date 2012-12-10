@@ -99,4 +99,44 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "square root can be printed" => sub {
+    my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+         sqrt
+          |
+          2
+EOF
+
+  my $expected = <<'EOF';
+  ---
+\| 2
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
+
+subtest "square root of fraction can be printed" => sub {
+    my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+         sqrt
+          |
+          /
+         / \
+        1   2
+EOF
+
+  my $expected = <<'EOF';
+  -----
+ |  1
+ | ---
+\|  2
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
+
 done_testing();
