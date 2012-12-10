@@ -79,7 +79,7 @@ EOF
 };
 
 subtest "sum of fractions can be printed" => sub {
-    my $printer = MCalc::PrettyPrinter->new();
+  my $printer = MCalc::PrettyPrinter->new();
   my $tree = <<'EOF';
                +
              /   \
@@ -100,7 +100,7 @@ EOF
 };
 
 subtest "square root can be printed" => sub {
-    my $printer = MCalc::PrettyPrinter->new();
+  my $printer = MCalc::PrettyPrinter->new();
   my $tree = <<'EOF';
          sqrt
           |
@@ -118,7 +118,7 @@ EOF
 };
 
 subtest "square root of fraction can be printed" => sub {
-    my $printer = MCalc::PrettyPrinter->new();
+  my $printer = MCalc::PrettyPrinter->new();
   my $tree = <<'EOF';
          sqrt
           |
@@ -140,7 +140,7 @@ EOF
 };
 
 subtest "variable assignment can be printed" => sub {
-    my $printer = MCalc::PrettyPrinter->new();
+  my $printer = MCalc::PrettyPrinter->new();
   my $tree = <<'EOF';
           =
          / \
@@ -161,7 +161,7 @@ EOF
 };
 
 subtest "braces can be printed" => sub {
-    my $printer = MCalc::PrettyPrinter->new();
+  my $printer = MCalc::PrettyPrinter->new();
   my $tree = <<'EOF';
             *
           /   \
@@ -179,8 +179,8 @@ EOF
   is($result."\n", $expected);
 };
 
-subtest "braces can be printed" => sub {
-    my $printer = MCalc::PrettyPrinter->new();
+subtest "braces in complex expressions can be printed" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
   my $tree = <<'EOF';
             *
           /   \
@@ -202,5 +202,44 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "powers can be printed" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+          ^
+         / \
+        3   2
+EOF
+
+  my $expected = <<'EOF';
+ 2
+3
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
+
+subtest "powers with braces can be printed" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+          ^
+         / \
+        /   2
+       / \
+      1   x
+EOF
+
+  my $expected = <<'EOF';
+       2
+⎛  1  ⎞
+⎜ ‒‒‒ ⎟
+⎝  x  ⎠
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
 
 done_testing();

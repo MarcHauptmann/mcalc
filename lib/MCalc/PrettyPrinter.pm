@@ -17,7 +17,9 @@ sub to_string {
   my ($this, $tree, $weight) = @_;
 
   if ($tree->value() eq "/") {
-    return $this->handle_division($tree);
+    return $this->handle_division($tree, $weight);
+  } elsif ($tree->value() eq "^") {
+    $this->handle_power($tree);
   } elsif (is_operator($tree->value())) {
     my $operator = $tree->value();
 
@@ -51,8 +53,8 @@ sub brace {
         $lbrace .= "\n⎛ ";
         $rbrace .= "\n ⎞";
       } elsif ($i == $lineCount - 1) {
-	$lbrace .= "\n⎝ ";
-	$rbrace .= "\n ⎠";
+        $lbrace .= "\n⎝ ";
+        $rbrace .= "\n ⎠";
       } else {
         $lbrace .= "\n⎜ ";
         $rbrace .= "\n ⎟";
@@ -68,6 +70,20 @@ sub brace {
 
     return $string;
   }
+}
+
+sub handle_power {
+  my ($this, $tree) = @_;
+
+  my $base = $this->to_string($tree->children(0), operator_weight("^"));
+  $base = $this->justify($base);
+  my $width = $this->max_line_length($base);
+
+  my $exponent = $this->to_string($tree->children(1), operator_weight("^"));
+
+  my $result = $this->str(" ", $width).$exponent."\n".$base;
+
+  return $result;
 }
 
 sub handle_sqrt {
@@ -92,7 +108,7 @@ sub handle_sqrt {
 }
 
 sub handle_division {
-  my ($this, $tree) = @_;
+  my ($this, $tree, $parent_weight) = @_;
 
   my $nominator = $this->to_string($tree->children(0));
   my $denominator = $this->to_string($tree->children(1));
@@ -104,11 +120,15 @@ sub handle_division {
   $string .= sprintf "\n%s\n", $this->str("‒", $l + 2);
   $string .= $this->offset($denominator, ($l - $this->max_line_length($denominator))/2 + 1);
 
-  return $string;
+  if (defined($parent_weight) && $parent_weight > operator_weight("/")) {
+    return $this->brace($string);
+  } else {
+    return $string;
+  }
 }
 
 sub handle_operator {
-  my ($this, $tree) = @_;
+  my ($this, $tree, $parent_weight) = @_;
 
   my $weight = operator_weight($tree->value());
   my $lhs = $this->to_string($tree->children(0), $weight);
