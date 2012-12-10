@@ -110,10 +110,18 @@ sub expression {
   $this->term();
 
   while ($this->isOp()) {
+    my $operator = $this->getNext();
+
     $this->pushOperator($this->getNext());
     $this->consume();
 
-    $this->term();
+    if ($operator eq "=") {
+      push @{$this->operators}, ";";
+      $this->expression();
+      pop @{$this->operators}
+    } else {
+      $this->term();
+    }
   }
 
   while (top(@{$this->operators}) ne ";") {

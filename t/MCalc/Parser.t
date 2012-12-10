@@ -318,6 +318,22 @@ EOF
   is_deeply($tree, tree($expectedTree), "result matches");
 };
 
+subtest "function definition with negation" => sub {
+  my $parser = MCalc::Parser->new();
+  my $tree = $parser->parse("f(x)=-x");
+
+  my $expectedTree = <<'EOF';
+             =
+            / \
+           /   \
+          f    neg
+          |     |
+          x     x
+EOF
+
+  is_deeply($tree, tree($expectedTree), "result matches");
+};
+
 subtest "simple function call works" => sub {
   my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("f(x)");
