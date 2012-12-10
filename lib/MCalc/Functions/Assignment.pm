@@ -3,7 +3,7 @@ package MCalc::Functions::Assignment;
 use Moose;
 use Error::Simple;
 use MCalc::Language;
-use MCalc::Printer;
+use MCalc::SimplePrinter;
 use MCalc::Evaluator;
 use MCalc::Functions::UserFunction;
 
@@ -45,7 +45,7 @@ sub evaluate {
 
     $context->setFunction($key, $function);
 
-    my $printer = MCalc::Printer->new();
+    my $printer = MCalc::SimplePrinter->new();
 
     return "$key(".join(", ", @args).") = ".$printer->to_string($rhs);
   }

@@ -4,11 +4,11 @@ use Test::More;
 use MCalc::Util::TreeBuilder;
 
 BEGIN {
-  use_ok("MCalc::Printer");
+  use_ok("MCalc::SimplePrinter");
 }
 
 subtest "an addition can be printed" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<EOF;
      +
@@ -22,7 +22,7 @@ EOF
 };
 
 subtest "a function call can be printed" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<EOF;
      f
@@ -36,7 +36,7 @@ EOF
 };
 
 subtest "a complex expression can be printed" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<EOF;
      +
@@ -52,7 +52,7 @@ EOF
 };
 
 subtest "braces are printed correctly" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<EOF;
         *
@@ -68,7 +68,7 @@ EOF
 };
 
 subtest "'neg' prints minus sign" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<EOF;
         neg
@@ -82,7 +82,7 @@ EOF
 };
 
 subtest "negation of complex expression" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<'EOF';
          +
@@ -98,7 +98,7 @@ EOF
 };
 
 subtest "negation of first operand has no braces" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<'EOF';
          +
@@ -114,7 +114,7 @@ EOF
 };
 
 subtest "negation in functions calls does not create braces" => sub {
-  my $printer = MCalc::Printer->new();
+  my $printer = MCalc::SimplePrinter->new();
 
   my $tree = <<'EOF';
         func
