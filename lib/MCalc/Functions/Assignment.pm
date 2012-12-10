@@ -3,9 +3,10 @@ package MCalc::Functions::Assignment;
 use Moose;
 use Error::Simple;
 use MCalc::Language;
-use MCalc::SimplePrinter;
+use MCalc::PrettyPrinter;
 use MCalc::Evaluator;
 use MCalc::Functions::UserFunction;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -45,9 +46,15 @@ sub evaluate {
 
     $context->setFunction($key, $function);
 
-    my $printer = MCalc::SimplePrinter->new();
+    my $printer = MCalc::PrettyPrinter->new();
 
-    return "$key(".join(", ", @args).") = ".$printer->to_string($rhs);
+    # return "$key(".join(", ", @args).") = ".$printer->to_string($rhs);
+
+    my $tree = Tree->new("=");
+    $tree->add_child($lhs->clone());
+    $tree->add_child($rhs->clone());
+
+    return $printer->to_string($tree);
   }
 }
 

@@ -160,4 +160,25 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "function assignment can be printed" => sub {
+    my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+            =
+          /   \
+        f      /
+       / \    / \
+      x   y  x   y
+EOF
+
+  my $expected = <<'EOF';
+           x
+f(x, y) = ---
+           y
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
+
 done_testing();
