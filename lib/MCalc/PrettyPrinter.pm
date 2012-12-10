@@ -75,13 +75,18 @@ sub brace {
 sub handle_power {
   my ($this, $tree) = @_;
 
+  my $exponent = $this->to_string($tree->children(1));
   my $base = $this->to_string($tree->children(0), operator_weight("^"));
   $base = $this->justify($base);
+
   my $width = $this->max_line_length($base);
+  my $height = $this->count_lines($exponent);
 
-  my $exponent = $this->to_string($tree->children(1), operator_weight("^"));
+  my $space = $this->str(" ", $width);
+  $space = $this->justify_height($space, $height);
+  $space = $this->justify($space);
 
-  my $result = $this->str(" ", $width).$exponent."\n".$base;
+  my $result = $this->append($space, $exponent)."\n".$base;
 
   return $result;
 }
