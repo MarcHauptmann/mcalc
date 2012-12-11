@@ -28,7 +28,7 @@ sub to_string {
     my $result = $this->handle_operator($tree);
 
     if (defined($weight) && $weight > operator_weight($operator)) {
-      $result = $this->_brace($result);
+      $result = brace($result);
     }
 
     return $result;
@@ -39,28 +39,32 @@ sub to_string {
   }
 }
 
-sub _brace {
-  my ($this, $string) = @_;
+sub brace {
+  my ($string, $padding) = @_;
 
-  my $lineCount = $this->count_lines($string);
+  if(not(defined($padding))) {
+    $padding = 1;
+  }
+
+  my $lineCount = count_lines($string);
 
   if ($lineCount == 1) {
-    return "( ".$string." )";
+    return "(".str(" ", $padding).$string.str(" ", $padding).")";
   } else {
-    my $lbrace = $this->_createLeftBrace($lineCount);
-    my $rbrace = $this->_createRightBrace($lineCount);
+    my $lbrace = createLeftBrace($lineCount);
+    my $rbrace = createRightBrace($lineCount);
 
-    $string = $this->offset($string, 1);
-    $string = $this->append($lbrace, $string);
-    $string = $this->justify($string);
-    $string = $this->append($string, $this->offset($rbrace, 1));
+    $string = offset($string, $padding);
+    $string = append($lbrace, $string);
+    $string = justify($string);
+    $string = append($string, offset($rbrace, $padding));
 
     return $string;
   }
 }
 
-sub _createRightBrace {
-  my ($this, $height) = @_;
+sub createRightBrace {
+  my ($height) = @_;
 
   my $brace = "";
 
@@ -77,8 +81,8 @@ sub _createRightBrace {
   return substr($brace, 1);
 }
 
-sub _createLeftBrace {
-  my ($this, $height) = @_;
+sub createLeftBrace {
+  my ($height) = @_;
 
   my $brace = "";
 
@@ -95,32 +99,13 @@ sub _createLeftBrace {
   return substr($brace, 1);
 }
 
-sub _negation_brace {
-    my ($this, $string) = @_;
-
-  my $lineCount = $this->count_lines($string);
-
-  if ($lineCount == 1) {
-    return "(".$string.")";
-  } else {
-    my $lbrace = $this->_createLeftBrace($lineCount);
-    my $rbrace = $this->_createRightBrace($lineCount);
-
-    $string = $this->append($lbrace, $string);
-    $string = $this->justify($string);
-    $string = $this->append($string, $rbrace);
-
-    return $string;
-  }
-}
-
 sub handle_negation {
   my ($this, $tree) = @_;
 
   my $expression = $this->to_string($tree->children(0));
-  my $negation = $this->justify_height("-", $this->count_lines($expression));
+  my $negation = justify_height("-", count_lines($expression));
 
-  return $this->append($negation, $expression);
+  return append($negation, $expression);
 }
 
 sub handle_power {
@@ -128,16 +113,16 @@ sub handle_power {
 
   my $exponent = $this->to_string($tree->children(1));
   my $base = $this->to_string($tree->children(0), operator_weight("^"));
-  $base = $this->justify($base);
+  $base = justify($base);
 
-  my $width = $this->max_line_length($base);
-  my $height = $this->count_lines($exponent);
+  my $width = max_line_length($base);
+  my $height = count_lines($exponent);
 
-  my $space = $this->str(" ", $width);
-  $space = $this->justify_height($space, $height);
-  $space = $this->justify($space);
+  my $space = str(" ", $width);
+  $space = justify_height($space, $height);
+  $space = justify($space);
 
-  my $result = $this->append($space, $exponent)."\n".$base;
+  my $result = append($space, $exponent)."\n".$base;
 
   return $result;
 }
@@ -146,9 +131,9 @@ sub handle_sqrt {
   my ($this, $tree) = @_;
 
   my $radiant = $this->to_string($tree->children(0));
-  my $width = $this->max_line_length($radiant);
+  my $width = max_line_length($radiant);
 
-  my $string = " ┌".$this->str("─", $width + 2)."\n";
+  my $string = " ┌".str("─", $width + 2)."\n";
 
   my @lines = split(/\n/, $radiant);
 
@@ -169,15 +154,15 @@ sub handle_division {
   my $nominator = $this->to_string($tree->children(0));
   my $denominator = $this->to_string($tree->children(1));
 
-  my $l = $this->max_line_length($nominator, $denominator);
+  my $l = max_line_length($nominator, $denominator);
 
-  my $string = $this->offset($nominator, ($l - $this->max_line_length($nominator))/2 + 1);
+  my $string = offset($nominator, ($l - max_line_length($nominator))/2 + 1);
 
-  $string .= sprintf "\n%s\n", $this->str("‒", $l + 2);
-  $string .= $this->offset($denominator, ($l - $this->max_line_length($denominator))/2 + 1);
+  $string .= sprintf "\n%s\n", str("‒", $l + 2);
+  $string .= offset($denominator, ($l - max_line_length($denominator))/2 + 1);
 
   if (defined($parent_weight) && $parent_weight > operator_weight("/")) {
-    return $this->_brace($string);
+    return brace($string);
   } else {
     return $string;
   }
@@ -190,16 +175,16 @@ sub handle_operator {
   my $lhs = $this->to_string($tree->children(0), $weight);
   my $rhs = $this->to_string($tree->children(1), $weight);
 
-  if ($this->count_lines($lhs) < $this->count_lines($rhs)) {
-    $lhs = $this->justify_height($lhs, $this->count_lines($rhs));
-  } elsif ($this->count_lines($lhs) > $this->count_lines($rhs)) {
-    $rhs = $this->justify_height($rhs, $this->count_lines($lhs));
+  if (count_lines($lhs) < count_lines($rhs)) {
+    $lhs = justify_height($lhs, count_lines($rhs));
+  } elsif (count_lines($lhs) > count_lines($rhs)) {
+    $rhs = justify_height($rhs, count_lines($lhs));
   }
 
-  $lhs = $this->justify($lhs);
+  $lhs = justify($lhs);
 
   my $opString = "";
-  my $lineCount = $this->count_lines($lhs);
+  my $lineCount = count_lines($lhs);
 
   for (my $i=0; $i<$lineCount; $i++) {
     $opString .= "\n";
@@ -213,26 +198,26 @@ sub handle_operator {
 
   $opString = substr($opString, 1);
 
-  my $result =  $this->append($lhs, $opString);
-  $result = $this->justify($result);
+  my $result =  append($lhs, $opString);
+  $result = justify($result);
 
   if ($tree->children(1)->value() eq "neg") {
-    $result = $this->append($result, $this->_negation_brace($rhs));
+    $result = append($result, brace($rhs, 0));
   } else {
-    $result = $this->append($result, $rhs);
+    $result = append($result, $rhs);
   }
 
   return $result;
 }
 
 sub count_lines {
-  my ($this, $string) = @_;
+  my ($string) = @_;
 
   return scalar(split(/\n/, $string));
 }
 
 sub append {
-  my ($this, $lhs, $rhs) = @_;
+  my ($lhs, $rhs) = @_;
 
   my @llines = split(/\n/, $lhs);
   my @rlines = split(/\n/, $rhs);
@@ -251,7 +236,7 @@ sub append {
 }
 
 sub justify_height {
-  my ($this, $string, $count) = @_;
+  my ($string, $count) = @_;
 
   my @lines = split(/\n/, $string);
 
@@ -273,42 +258,45 @@ sub justify_height {
 }
 
 sub justify {
-  my ($this, $lines) = @_;
+  my ($lines) = @_;
 
-  my $length = $this->max_line_length($lines);
+  my $length = max_line_length($lines);
   my $string = "";
 
   foreach my $line (split(/\n/, $lines)) {
     my $l = length(Encode::decode_utf8($line));
 
-    $string .= "\n".$line.$this->str(" ", $length - $l);
+    $string .= "\n".$line.str(" ", $length - $l);
   }
 
   return substr($string, 1);
 }
 
+# puts n whitespaces in front of every line of a given string
 sub offset {
-  my ($this, $lines, $offset) = @_;
+  my ($lines, $offset) = @_;
 
   my $string = "";
 
   foreach my $line (split(/\n+/, $lines)) {
-    $string .= "\n".$this->str(" ", $offset).$line;
+    $string .= "\n".str(" ", $offset).$line;
   }
 
   return substr $string, 1;
 }
 
+# returns the maximum line length of a given string
 sub max_line_length {
-  my ($this, @strings) = @_;
+  my (@strings) = @_;
 
   my @lines = map { split(/\n/, $_) } @strings;
 
   return max( map { length(Encode::decode_utf8($_)) } @lines );
 }
 
+# repeats a given string n-times
 sub str {
-  my ($this, $str, $times) = @_;
+  my ($str, $times) = @_;
 
   my $string = "";
 
