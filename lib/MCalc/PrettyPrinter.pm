@@ -16,33 +16,37 @@ has "simplePrinter" => (isa => "Ref",
 sub to_string {
   my ($this, $tree, $weight) = @_;
 
+  my $result;
+
   if ($tree->value() eq "/") {
-    return $this->handle_division($tree, $weight);
+    $result = $this->handle_division($tree, $weight);
   } elsif ($tree->value() eq "^") {
-    $this->handle_power($tree);
+    $result = $this->handle_power($tree);
   } elsif ($tree->value() eq "neg") {
-    $this->handle_negation($tree);
+    $result = $this->handle_negation($tree);
   } elsif (is_operator($tree->value())) {
     my $operator = $tree->value();
 
-    my $result = $this->handle_operator($tree);
+    my $string = $this->handle_operator($tree);
 
     if (defined($weight) && $weight > operator_weight($operator)) {
-      $result = brace($result);
+      $string = brace($string);
     }
 
-    return $result;
+    $result = $string;
   } elsif ($tree->value() eq "sqrt") {
-    return $this->handle_sqrt($tree);
+    $result = $this->handle_sqrt($tree);
   } else {
-    return $this->simplePrinter->to_string($tree);
+    $result = $this->simplePrinter->to_string($tree);
   }
+
+  return removeTrailingSpaces($result);
 }
 
 sub brace {
   my ($string, $padding) = @_;
 
-  if(not(defined($padding))) {
+  if (not(defined($padding))) {
     $padding = 1;
   }
 
@@ -52,14 +56,9 @@ sub brace {
     return "(".str(" ", $padding).$string.str(" ", $padding).")";
   } else {
     my $lbrace = createLeftBrace($lineCount);
-    my $rbrace = createRightBrace($lineCount);
+    my $rbrace = offset(createRightBrace($lineCount), $padding);
 
-    $string = offset($string, $padding);
-    $string = append($lbrace, $string);
-    $string = justify($string);
-    $string = append($string, offset($rbrace, $padding));
-
-    return $string;
+    return append($lbrace, offset(justify($string), $padding), $rbrace);
   }
 }
 
@@ -112,19 +111,22 @@ sub handle_power {
   my ($this, $tree) = @_;
 
   my $exponent = $this->to_string($tree->children(1));
-  my $base = $this->to_string($tree->children(0), operator_weight("^"));
-  $base = justify($base);
+  my $base = justify($this->to_string($tree->children(0), operator_weight("^")));
 
   my $width = max_line_length($base);
   my $height = count_lines($exponent);
+
+  return append(whitespaces($width, $height), $exponent)."\n".$base;
+}
+
+sub whitespaces {
+  my ($width, $height) = @_;
 
   my $space = str(" ", $width);
   $space = justify_height($space, $height);
   $space = justify($space);
 
-  my $result = append($space, $exponent)."\n".$base;
-
-  return $result;
+  return $space;
 }
 
 sub handle_sqrt {
@@ -172,8 +174,8 @@ sub handle_operator {
   my ($this, $tree, $parent_weight) = @_;
 
   my $weight = operator_weight($tree->value());
-  my $lhs = $this->to_string($tree->children(0), $weight);
-  my $rhs = $this->to_string($tree->children(1), $weight);
+  my $lhs = justify($this->to_string($tree->children(0), $weight));
+  my $rhs = justify($this->to_string($tree->children(1), $weight));
 
   if (count_lines($lhs) < count_lines($rhs)) {
     $lhs = justify_height($lhs, count_lines($rhs));
@@ -181,33 +183,38 @@ sub handle_operator {
     $rhs = justify_height($rhs, count_lines($lhs));
   }
 
-  $lhs = justify($lhs);
+  my $height = count_lines($lhs);
+  my $opString = operator($tree->value(), $height);
+
+  if (isNegated($tree->children(1))) {
+    return append($lhs, $opString, brace($rhs, 0));
+  } else {
+    return append($lhs, $opString, $rhs);
+  }
+}
+
+sub operator {
+  my ($operator, $height) = @_;
 
   my $opString = "";
-  my $lineCount = count_lines($lhs);
 
-  for (my $i=0; $i<$lineCount; $i++) {
+  for (my $i=0; $i<$height; $i++) {
     $opString .= "\n";
 
-    if ($i == POSIX::floor($lineCount / 2)) {
-      $opString .= " ".$tree->value()." ";
+    if ($i == POSIX::floor($height / 2)) {
+      $opString .= " ".$operator." ";
     } else {
       $opString .= " ";
     }
   }
 
-  $opString = substr($opString, 1);
+  return justify(substr($opString, 1));
+}
 
-  my $result =  append($lhs, $opString);
-  $result = justify($result);
+sub isNegated {
+  my ($tree) = @_;
 
-  if ($tree->children(1)->value() eq "neg") {
-    $result = append($result, brace($rhs, 0));
-  } else {
-    $result = append($result, $rhs);
-  }
-
-  return $result;
+  return $tree->value() eq "neg";
 }
 
 sub count_lines {
@@ -217,22 +224,30 @@ sub count_lines {
 }
 
 sub append {
-  my ($lhs, $rhs) = @_;
+  my @args = @_;
 
-  my @llines = split(/\n/, $lhs);
-  my @rlines = split(/\n/, $rhs);
+  if (scalar(@args) == 2) {
+    my ($lhs, $rhs) = @args;
 
-  if (scalar(@llines) != scalar(@rlines)) {
-    die sprintf "line count is not equal: lhs = '%s'; rhs = '%s'\n", $lhs, $rhs;
+    my @llines = split(/\n/, $lhs);
+    my @rlines = split(/\n/, $rhs);
+
+    if (scalar(@llines) != scalar(@rlines)) {
+      die sprintf "line count is not equal: lhs = '%s'; rhs = '%s'\n", $lhs, $rhs;
+    }
+
+    my $result = "";
+
+    for (my $i = 0; $i<scalar(@llines); $i++) {
+      $result .= "\n".$llines[$i].$rlines[$i];
+    }
+
+    return substr($result, 1);
+  } else {
+    my $first = shift @args;
+
+    return append($first, append(@args));
   }
-
-  my $result = "";
-
-  for (my $i = 0; $i<scalar(@llines); $i++) {
-    $result .= "\n".$llines[$i].$rlines[$i];
-  }
-
-  return substr($result, 1);
 }
 
 sub justify_height {
@@ -303,6 +318,15 @@ sub str {
   for (my $i = 0; $i < $times; $i++) {
     $string .= $str;
   }
+
+  return $string;
+}
+
+sub removeTrailingSpaces {
+  my ($string) = @_;
+
+  $string =~ s/( *\n)/\n/g;
+  $string =~ s/( *$)//g;
 
   return $string;
 }
