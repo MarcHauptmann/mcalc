@@ -16,18 +16,26 @@ has "simplePrinter" => (isa => "Ref",
 sub to_string {
   my ($this, $tree, $weight) = @_;
 
+  return removeTrailingSpaces($this->handle_internal($tree, $weight));
+}
+
+sub handle_internal {
+  my ($this, $tree, $weight) = @_;
+
   my $result;
+  my $base = 0;
 
   if ($tree->value() eq "/") {
-    $result = $this->handle_division($tree, $weight);
+    ($result, $base) = $this->handle_division($tree, $weight);
   } elsif ($tree->value() eq "^") {
-    $result = $this->handle_power($tree);
+    ($result, $base) = $this->handle_power($tree);
   } elsif ($tree->value() eq "neg") {
-    $result = $this->handle_negation($tree);
+    ($result, $base) = $this->handle_negation($tree);
   } elsif (is_operator($tree->value())) {
     my $operator = $tree->value();
+    my $string;
 
-    my $string = $this->handle_operator($tree);
+    ($string, $base) = $this->handle_operator($tree);
 
     if (defined($weight) && $weight > operator_weight($operator)) {
       $string = brace($string);
@@ -35,12 +43,12 @@ sub to_string {
 
     $result = $string;
   } elsif ($tree->value() eq "sqrt") {
-    $result = $this->handle_sqrt($tree);
+    ($result, $base) = $this->handle_sqrt($tree);
   } else {
     $result = $this->simplePrinter->to_string($tree);
   }
 
-  return removeTrailingSpaces($result);
+  return (justify($result), $base);
 }
 
 sub brace {
@@ -101,22 +109,24 @@ sub createLeftBrace {
 sub handle_negation {
   my ($this, $tree) = @_;
 
-  my $expression = $this->to_string($tree->children(0));
+  my ($expression, $base) = $this->handle_internal($tree->children(0));
   my $negation = justify_height("-", count_lines($expression));
 
-  return append($negation, $expression);
+  return append($negation, $expression), $base;
 }
 
 sub handle_power {
   my ($this, $tree) = @_;
 
-  my $exponent = $this->to_string($tree->children(1));
-  my $base = justify($this->to_string($tree->children(0), operator_weight("^")));
+  my ($exponent, $t) = $this->handle_internal($tree->children(1));
+  my ($base, $bbase) = $this->handle_internal($tree->children(0), operator_weight("^"));
 
   my $width = max_line_length($base);
   my $height = count_lines($exponent);
 
-  return append(whitespaces($width, $height), $exponent)."\n".$base;
+  my $powerBase = $bbase + count_lines($exponent);
+
+  return (append(whitespaces($width, $height), $exponent)."\n".$base, $powerBase);
 }
 
 sub whitespaces {
@@ -132,7 +142,7 @@ sub whitespaces {
 sub handle_sqrt {
   my ($this, $tree) = @_;
 
-  my $radiant = $this->to_string($tree->children(0));
+  my ($radiant, $base) = $this->handle_internal($tree->children(0));
   my $width = max_line_length($radiant);
 
   my $string = " ┌".str("─", $width + 2)."\n";
@@ -147,14 +157,14 @@ sub handle_sqrt {
     }
   }
 
-  return $string;
+  return ($string, $base+1);
 }
 
 sub handle_division {
   my ($this, $tree, $parent_weight) = @_;
 
-  my $nominator = $this->to_string($tree->children(0));
-  my $denominator = $this->to_string($tree->children(1));
+  my ($nominator, $t1) = $this->handle_internal($tree->children(0));
+  my ($denominator, $t2) = $this->handle_internal($tree->children(1));
 
   my $l = max_line_length($nominator, $denominator);
 
@@ -163,10 +173,12 @@ sub handle_division {
   $string .= sprintf "\n%s\n", str("‒", $l + 2);
   $string .= offset($denominator, ($l - max_line_length($denominator))/2 + 1);
 
+  my $base = count_lines($nominator);
+
   if (defined($parent_weight) && $parent_weight > operator_weight("/")) {
-    return brace($string);
+    return (brace($string), $base);
   } else {
-    return $string;
+    return ($string, $base);
   }
 }
 
@@ -174,34 +186,48 @@ sub handle_operator {
   my ($this, $tree, $parent_weight) = @_;
 
   my $weight = operator_weight($tree->value());
-  my $lhs = justify($this->to_string($tree->children(0), $weight));
-  my $rhs = justify($this->to_string($tree->children(1), $weight));
+  my ($lhs, $lbase) = $this->handle_internal($tree->children(0), $weight);
+  my ($rhs, $rbase) = $this->handle_internal($tree->children(1), $weight);
 
-  if (count_lines($lhs) < count_lines($rhs)) {
-    $lhs = justify_height($lhs, count_lines($rhs));
-  } elsif (count_lines($lhs) > count_lines($rhs)) {
-    $rhs = justify_height($rhs, count_lines($lhs));
+  while($lbase > $rbase) {
+    $rbase++;
+    $rhs = " \n".$rhs;
   }
 
+  while($lbase < $rbase) {
+    $lbase++;
+    $lhs = " \n".$lhs;
+  }
+
+  while(count_lines($rhs) < count_lines($lhs)) {
+    $rhs = $rhs."\n ";
+  }
+
+  while(count_lines($rhs) > count_lines($lhs)) {
+    $lhs = $lhs."\n ";
+  }
+
+  my $base = max($lbase, $rbase);
   my $height = count_lines($lhs);
-  my $opString = operator($tree->value(), $height);
+  my $opString = operator($tree->value(), $height, $base);
 
   if (isNegated($tree->children(1))) {
-    return append($lhs, $opString, brace($rhs, 0));
+    return (append(justify($lhs), $opString, brace(justify($rhs), 0)), $base);
   } else {
-    return append($lhs, $opString, $rhs);
+    return (append(justify($lhs), $opString, justify($rhs)), $base);
   }
 }
 
 sub operator {
-  my ($operator, $height) = @_;
+  my ($operator, $height, $base) = @_;
 
   my $opString = "";
 
   for (my $i=0; $i<$height; $i++) {
     $opString .= "\n";
 
-    if ($i == POSIX::floor($height / 2)) {
+    # if ($i == POSIX::floor($height / 2)) {
+    if ($i == $base) {
       $opString .= " ".$operator." ";
     } else {
       $opString .= " ";
