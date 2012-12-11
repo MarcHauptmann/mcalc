@@ -12,6 +12,7 @@ use Term::ANSIColor;
 use MCalc::Colorizer;
 use MCalc::Functions::Product;
 use MCalc::Language;
+use MCalc::PrettyPrinter;
 
 our $VERSION = "0.2";
 
@@ -24,6 +25,7 @@ our $version = 0;
 # Hier geht es los!
 our $term;
 our $context = MCalc::DefaultContext->new();
+our $printer = MCalc::PrettyPrinter->new();
 $context->setFunction("product", MCalc::Functions::Product->new());
 
 sub printWelcome {
@@ -59,7 +61,11 @@ sub calculate {
     # auswerten
     my $result = evaluateTree($context, $tree);
 
-    printf "$result\n";
+    my $outputTree = Tree->new("=");
+    $outputTree->add_child($tree);
+    $outputTree->add_child(Tree->new($result));
+
+    printf "%s\n", $printer->to_string($outputTree);
   } catch Error with {
     my $error = shift;
 
@@ -324,7 +330,7 @@ It is also possible to define new functions. You can define a new function with
 
 and evaluate it:
 
-   > f(2) 
+   > f(2)
    4
 
 =head1 SYNTAX

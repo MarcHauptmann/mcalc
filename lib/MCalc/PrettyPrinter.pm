@@ -74,6 +74,41 @@ sub brace {
   }
 }
 
+sub negation_brace {
+  my ($this, $string) = @_;
+
+  my $lineCount = $this->count_lines($string);
+
+  if ($lineCount == 1) {
+    return "(".$string.")";
+  } else {
+    my $lbrace = "";
+    my $rbrace = "";
+
+    for (my $i = 0; $i<$lineCount; $i++) {
+      if ($i == 0) {
+        $lbrace .= "\n⎛";
+        $rbrace .= "\n⎞";
+      } elsif ($i == $lineCount - 1) {
+        $lbrace .= "\n⎝";
+        $rbrace .= "\n⎠";
+      } else {
+        $lbrace .= "\n⎜";
+        $rbrace .= "\n⎟";
+      }
+    }
+
+    $lbrace = substr($lbrace, 1);
+    $rbrace = substr($rbrace, 1);
+
+    $string = $this->append($lbrace, $string);
+    $string = $this->justify($string);
+    $string = $this->append($string, $rbrace);
+
+    return $string;
+  }
+}
+
 sub handle_negation {
   my ($this, $tree) = @_;
 
@@ -175,7 +210,12 @@ sub handle_operator {
 
   my $result =  $this->append($lhs, $opString);
   $result = $this->justify($result);
-  $result = $this->append($result, $rhs);
+
+  if ($tree->children(1)->value() eq "neg") {
+    $result = $this->append($result, $this->negation_brace($rhs));
+  } else {
+    $result = $this->append($result, $rhs);
+  }
 
   return $result;
 }

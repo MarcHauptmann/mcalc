@@ -285,5 +285,23 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "negation in addition can be printed" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+        +
+       / \
+      1  neg
+      ^   |
+          2
+EOF
+
+  my $expected = <<'EOF';
+1 + (-2)
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
 
 done_testing();
