@@ -28,7 +28,7 @@ sub to_string {
     my $result = $this->handle_operator($tree);
 
     if (defined($weight) && $weight > operator_weight($operator)) {
-      $result = $this->brace($result);
+      $result = $this->_brace($result);
     }
 
     return $result;
@@ -39,7 +39,7 @@ sub to_string {
   }
 }
 
-sub brace {
+sub _brace {
   my ($this, $string) = @_;
 
   my $lineCount = $this->count_lines($string);
@@ -47,59 +47,64 @@ sub brace {
   if ($lineCount == 1) {
     return "( ".$string." )";
   } else {
-    my $lbrace = "";
-    my $rbrace = "";
+    my $lbrace = $this->_createLeftBrace($lineCount);
+    my $rbrace = $this->_createRightBrace($lineCount);
 
-    for (my $i = 0; $i<$lineCount; $i++) {
-      if ($i == 0) {
-        $lbrace .= "\n⎛ ";
-        $rbrace .= "\n ⎞";
-      } elsif ($i == $lineCount - 1) {
-        $lbrace .= "\n⎝ ";
-        $rbrace .= "\n ⎠";
-      } else {
-        $lbrace .= "\n⎜ ";
-        $rbrace .= "\n ⎟";
-      }
-    }
-
-    $lbrace = substr($lbrace, 1);
-    $rbrace = substr($rbrace, 1);
-
+    $string = $this->offset($string, 1);
     $string = $this->append($lbrace, $string);
     $string = $this->justify($string);
-    $string = $this->append($string, $rbrace);
+    $string = $this->append($string, $this->offset($rbrace, 1));
 
     return $string;
   }
 }
 
-sub negation_brace {
-  my ($this, $string) = @_;
+sub _createRightBrace {
+  my ($this, $height) = @_;
+
+  my $brace = "";
+
+  for (my $i = 0; $i<$height; $i++) {
+    if ($i == 0) {
+      $brace .= "\n⎞";
+    } elsif ($i == $height - 1) {
+      $brace .= "\n⎠";
+    } else {
+      $brace .= "\n⎟";
+    }
+  }
+
+  return substr($brace, 1);
+}
+
+sub _createLeftBrace {
+  my ($this, $height) = @_;
+
+  my $brace = "";
+
+  for (my $i = 0; $i<$height; $i++) {
+    if ($i == 0) {
+      $brace .= "\n⎛";
+    } elsif ($i == $height - 1) {
+      $brace .= "\n⎝";
+    } else {
+      $brace .= "\n⎜";
+    }
+  }
+
+  return substr($brace, 1);
+}
+
+sub _negation_brace {
+    my ($this, $string) = @_;
 
   my $lineCount = $this->count_lines($string);
 
   if ($lineCount == 1) {
     return "(".$string.")";
   } else {
-    my $lbrace = "";
-    my $rbrace = "";
-
-    for (my $i = 0; $i<$lineCount; $i++) {
-      if ($i == 0) {
-        $lbrace .= "\n⎛";
-        $rbrace .= "\n⎞";
-      } elsif ($i == $lineCount - 1) {
-        $lbrace .= "\n⎝";
-        $rbrace .= "\n⎠";
-      } else {
-        $lbrace .= "\n⎜";
-        $rbrace .= "\n⎟";
-      }
-    }
-
-    $lbrace = substr($lbrace, 1);
-    $rbrace = substr($rbrace, 1);
+    my $lbrace = $this->_createLeftBrace($lineCount);
+    my $rbrace = $this->_createRightBrace($lineCount);
 
     $string = $this->append($lbrace, $string);
     $string = $this->justify($string);
@@ -172,7 +177,7 @@ sub handle_division {
   $string .= $this->offset($denominator, ($l - $this->max_line_length($denominator))/2 + 1);
 
   if (defined($parent_weight) && $parent_weight > operator_weight("/")) {
-    return $this->brace($string);
+    return $this->_brace($string);
   } else {
     return $string;
   }
@@ -212,7 +217,7 @@ sub handle_operator {
   $result = $this->justify($result);
 
   if ($tree->children(1)->value() eq "neg") {
-    $result = $this->append($result, $this->negation_brace($rhs));
+    $result = $this->append($result, $this->_negation_brace($rhs));
   } else {
     $result = $this->append($result, $rhs);
   }
