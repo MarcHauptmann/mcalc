@@ -332,4 +332,25 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "function call can be printed" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $tree = <<'EOF';
+             f
+            / \
+           /  sqrt
+          / \   |
+         1   n  2
+EOF
+
+  my $expected = <<'EOF';
+  ⎛  1     ┌─── ⎞
+f ⎜ ‒‒‒ , ╲│ 2  ⎟
+  ⎝  n          ⎠
+EOF
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result."\n", $expected);
+};
+
 done_testing();

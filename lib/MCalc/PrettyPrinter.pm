@@ -44,6 +44,8 @@ sub handle_internal {
     $result = $string;
   } elsif ($tree->value() eq "sqrt") {
     ($result, $base) = $this->handle_sqrt($tree);
+  } elsif (is_identifier($tree->value()) && $tree->size() > 1) {
+    ($result, $base) = $this->handle_function_call($tree);
   } else {
     $result = $this->simplePrinter->to_string($tree);
   }
@@ -53,6 +55,36 @@ sub handle_internal {
   } else {
     return justify($result);
   }
+}
+
+sub handle_function_call {
+  my ($this, $tree) = @_;
+
+  my $callStr = "";
+  my $callBase = 0;
+
+  my $count = 0;
+
+  foreach my $arg ($tree->children()) {
+    my ($result, $base) = $this->handle_internal($arg);
+
+    if ($count == 0) {
+      $callStr = $result;
+      $callBase = $base;
+    } else {
+      ($callStr, $result, $callBase) = equalize($callStr, $result, $callBase, $base);
+
+      my $comma = operator(",", count_lines($result), $callBase);
+
+      $callStr = append($callStr, $comma, $result);
+    }
+
+    $count++;
+  }
+
+  my $funcName = operator($tree->value(), count_lines($callStr), $callBase, 0);
+
+  return (append($funcName, offset(brace($callStr), 1)), $callBase);
 }
 
 sub brace {
@@ -182,6 +214,23 @@ sub handle_operator {
   my ($lhs, $lbase) = $this->handle_internal($tree->children(0), $weight);
   my ($rhs, $rbase) = $this->handle_internal($tree->children(1), $weight);
 
+  my $base;
+
+  ($lhs, $rhs, $base) = equalize($lhs, $rhs, $lbase, $rbase);
+
+  my $height = count_lines($lhs);
+  my $opString = operator($tree->value(), $height, $base);
+
+  if (isNegated($tree->children(1))) {
+    return (append(justify($lhs), $opString, brace(justify($rhs), 0)), $base);
+  } else {
+    return (append(justify($lhs), $opString, justify($rhs)), $base);
+  }
+}
+
+sub equalize {
+  my ($lhs, $rhs, $lbase, $rbase) = @_;
+
   while ($lbase > $rbase) {
     $rbase++;
     $rhs = " \n".$rhs;
@@ -200,21 +249,14 @@ sub handle_operator {
     $lhs = $lhs."\n ";
   }
 
-  my $base = max($lbase, $rbase);
-  my $height = count_lines($lhs);
-  my $opString = operator($tree->value(), $height, $base);
-
-  if (isNegated($tree->children(1))) {
-    return (append(justify($lhs), $opString, brace(justify($rhs), 0)), $base);
-  } else {
-    return (append(justify($lhs), $opString, justify($rhs)), $base);
-  }
+  # lbase and rbase are equal now
+  return (justify($lhs), justify($rhs), $lbase);
 }
 
 sub operator {
   my ($operator, $height, $base, $padding) = @_;
 
-  if(not(defined($padding))) {
+  if (not(defined($padding))) {
     $padding = 1;
   }
 
