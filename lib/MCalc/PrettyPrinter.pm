@@ -48,7 +48,11 @@ sub handle_internal {
     $result = $this->simplePrinter->to_string($tree);
   }
 
-  return (justify($result), $base);
+  if (wantarray()) {
+    return (justify($result), $base);
+  } else {
+    return justify($result);
+  }
 }
 
 sub brace {
@@ -110,7 +114,7 @@ sub handle_negation {
   my ($this, $tree) = @_;
 
   my ($expression, $base) = $this->handle_internal($tree->children(0));
-  my $negation = justify_height("-", count_lines($expression));
+  my $negation = operator("-", count_lines($expression), $base, 0);
 
   return append($negation, $expression), $base;
 }
@@ -118,25 +122,14 @@ sub handle_negation {
 sub handle_power {
   my ($this, $tree) = @_;
 
-  my ($exponent, $t) = $this->handle_internal($tree->children(1));
+  my $exponent = $this->handle_internal($tree->children(1));
   my ($base, $bbase) = $this->handle_internal($tree->children(0), operator_weight("^"));
 
   my $width = max_line_length($base);
-  my $height = count_lines($exponent);
 
   my $powerBase = $bbase + count_lines($exponent);
 
-  return (append(whitespaces($width, $height), $exponent)."\n".$base, $powerBase);
-}
-
-sub whitespaces {
-  my ($width, $height) = @_;
-
-  my $space = str(" ", $width);
-  $space = justify_height($space, $height);
-  $space = justify($space);
-
-  return $space;
+  return (offset($exponent, $width)."\n".$base, $powerBase);
 }
 
 sub handle_sqrt {
@@ -163,8 +156,8 @@ sub handle_sqrt {
 sub handle_division {
   my ($this, $tree, $parent_weight) = @_;
 
-  my ($nominator, $t1) = $this->handle_internal($tree->children(0));
-  my ($denominator, $t2) = $this->handle_internal($tree->children(1));
+  my $nominator = $this->handle_internal($tree->children(0));
+  my $denominator = $this->handle_internal($tree->children(1));
 
   my $l = max_line_length($nominator, $denominator);
 
@@ -189,21 +182,21 @@ sub handle_operator {
   my ($lhs, $lbase) = $this->handle_internal($tree->children(0), $weight);
   my ($rhs, $rbase) = $this->handle_internal($tree->children(1), $weight);
 
-  while($lbase > $rbase) {
+  while ($lbase > $rbase) {
     $rbase++;
     $rhs = " \n".$rhs;
   }
 
-  while($lbase < $rbase) {
+  while ($lbase < $rbase) {
     $lbase++;
     $lhs = " \n".$lhs;
   }
 
-  while(count_lines($rhs) < count_lines($lhs)) {
+  while (count_lines($rhs) < count_lines($lhs)) {
     $rhs = $rhs."\n ";
   }
 
-  while(count_lines($rhs) > count_lines($lhs)) {
+  while (count_lines($rhs) > count_lines($lhs)) {
     $lhs = $lhs."\n ";
   }
 
@@ -219,18 +212,21 @@ sub handle_operator {
 }
 
 sub operator {
-  my ($operator, $height, $base) = @_;
+  my ($operator, $height, $base, $padding) = @_;
+
+  if(not(defined($padding))) {
+    $padding = 1;
+  }
 
   my $opString = "";
 
   for (my $i=0; $i<$height; $i++) {
     $opString .= "\n";
 
-    # if ($i == POSIX::floor($height / 2)) {
     if ($i == $base) {
-      $opString .= " ".$operator." ";
+      $opString .= str(" ", $padding).$operator.str(" ", $padding);
     } else {
-      $opString .= " ";
+      $opString .= str(" ", $padding)." ".str(" ", $padding);
     }
   }
 
@@ -274,28 +270,6 @@ sub append {
 
     return append($first, append(@args));
   }
-}
-
-sub justify_height {
-  my ($string, $count) = @_;
-
-  my @lines = split(/\n/, $string);
-
-  while (scalar(@lines) < $count) {
-    if (scalar(@lines) % 2 == 0) {
-      push @lines, " ";
-    } else {
-      @lines = (" ", @lines);
-    }
-  }
-
-  $string = "";
-
-  foreach my $line (@lines) {
-    $string .= "\n".$line;
-  }
-
-  return substr($string, 1);
 }
 
 sub justify {
