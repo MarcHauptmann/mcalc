@@ -61,13 +61,15 @@ sub calculate {
     # auswerten
     my $result = evaluateTree($context, $tree);
 
-    # my $outputTree = Tree->new("=");
-    # $outputTree->add_child($tree);
-    # $outputTree->add_child(Tree->new($result));
+    if (defined($result)) {
+      my $outputTree = Tree->new("=");
+      $outputTree->add_child($tree);
+      $outputTree->add_child($result);
 
-    # printf "%s\n", $printer->to_string($outputTree);
-
-    printf "%s\n", $result;
+      printf "%s\n", $printer->to_string($outputTree);
+    } else {
+      printf "%s\n", $printer->to_string($tree);
+    }
   } catch Error with {
     my $error = shift;
 

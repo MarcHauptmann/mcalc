@@ -24,7 +24,7 @@ sub evaluate {
     throw Error::Simple "argument count does not match";
   }
 
-  my @args = map {evaluateTree($context, $_)} @argTrees;
+  my @args = map { evaluateTree($context, $_)->value() } @argTrees;
 
   return &{$this->code}(@args);
 }

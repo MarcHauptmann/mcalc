@@ -41,12 +41,12 @@ sub evaluate {
 
   for (my $i=0; $i<$this->getArgumentCount; $i++) {
     my $argName = ${$this->arguments}[$i];
-    my $argValue = evaluateTree($context, $args[$i]);
+    my $argValue = evaluateTree($context, $args[$i])->value();
 
     $context->setVariable($argName, $argValue);
   }
 
-  my $result = evaluateTree($context, $this->body);
+  my $result = evaluateTree($context, $this->body)->value();
 
   foreach my $name (@{$this->arguments}) {
     $context->setVariable($name, $oldValues{$name});

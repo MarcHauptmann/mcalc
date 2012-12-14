@@ -39,7 +39,7 @@ sub integrate {
 
     $context->setVariable($var->value, $x);
 
-    $int += $alpha * evaluateTree($context, $function);
+    $int += $alpha * evaluateTree($context, $function)->value();
   }
 
   return ($b-$a) * $int / 2;
@@ -48,8 +48,8 @@ sub integrate {
 sub evaluate {
   my ($this, $context, $expression, $var, $from, $to) = @_;
 
-  my $a = evaluateTree($context, $from);
-  my $b = evaluateTree($context, $to);
+  my $a = evaluateTree($context, $from)->value();
+  my $b = evaluateTree($context, $to)->value();
 
   my $integrationContext = MCalc::CompoundContext->new();
   $integrationContext->addContext($context);
