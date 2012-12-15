@@ -9,8 +9,8 @@ with "MCalc::Evaluateable";
 sub evaluate {
   my ($this, $context, @args) = @_;
 
-  my $arg = evaluateTree($context, $args[0]);
-  my $base = evaluateTree($context, $args[1]);
+  my $arg = evaluateTree($context, $args[0])->value();
+  my $base = evaluateTree($context, $args[1])->value();
 
   return logn($arg, $base);
 }

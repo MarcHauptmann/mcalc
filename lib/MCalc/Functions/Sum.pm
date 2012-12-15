@@ -19,8 +19,8 @@ sub evaluate {
   my ($ex, $var, $from, $to) = @args;
 
   my $varName = $var->value();
-  my $fromValue = evaluateTree($context, $from);
-  my $toValue = evaluateTree($context, $to);
+  my $fromValue = evaluateTree($context, $from)->value();
+  my $toValue = evaluateTree($context, $to)->value();
 
   # validate size of second parameter tree (must be one) and is identifiert
   if ($var->size() != 1 || not($varName =~ /[a-zA-Z]+/)) {
@@ -34,7 +34,7 @@ sub evaluate {
 
   for (my $i=$fromValue; $i<=$toValue; $i++) {
     $sumContext->setVariable($varName, $i);
-    $result += evaluateTree($sumContext, $ex);
+    $result += evaluateTree($sumContext, $ex)->value();
   }
 
   return $result;

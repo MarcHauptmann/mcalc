@@ -1,0 +1,139 @@
+---
+abstract: calculator
+author:
+  - 'Marc Hauptmann <marc.hauptmann.uni-hannover.de>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MCalc
+provides:
+  MCalc::Colorizer:
+    file: lib/MCalc/Colorizer.pm
+    version: 0
+  MCalc::CompoundContext:
+    file: lib/MCalc/CompoundContext.pm
+    version: 0
+  MCalc::Context:
+    file: lib/MCalc/Context.pm
+    version: 0
+  MCalc::DefaultContext:
+    file: lib/MCalc/DefaultContext.pm
+    version: 0
+  MCalc::Evaluateable:
+    file: lib/MCalc/Evaluateable.pm
+    version: 0
+  MCalc::Evaluator:
+    file: lib/MCalc/Evaluator.pm
+    version: 0
+  MCalc::Functions::Absolute:
+    file: lib/MCalc/Functions/Absolute.pm
+    version: 0
+  MCalc::Functions::Addition:
+    file: lib/MCalc/Functions/Addition.pm
+    version: 0
+  MCalc::Functions::ArcCosine:
+    file: lib/MCalc/Functions/ArcCosine.pm
+    version: 0
+  MCalc::Functions::ArcSine:
+    file: lib/MCalc/Functions/ArcSine.pm
+    version: 0
+  MCalc::Functions::ArcTangent:
+    file: lib/MCalc/Functions/ArcTangent.pm
+    version: 0
+  MCalc::Functions::Assignment:
+    file: lib/MCalc/Functions/Assignment.pm
+    version: 0
+  MCalc::Functions::Ceiling:
+    file: lib/MCalc/Functions/Ceiling.pm
+    version: 0
+  MCalc::Functions::Cosine:
+    file: lib/MCalc/Functions/Cosine.pm
+    version: 0
+  MCalc::Functions::Cotangent:
+    file: lib/MCalc/Functions/Cotangent.pm
+    version: 0
+  MCalc::Functions::Division:
+    file: lib/MCalc/Functions/Division.pm
+    version: 0
+  MCalc::Functions::Floor:
+    file: lib/MCalc/Functions/Floor.pm
+    version: 0
+  MCalc::Functions::Integration:
+    file: lib/MCalc/Functions/Integration.pm
+    version: 0
+  MCalc::Functions::Ln:
+    file: lib/MCalc/Functions/Ln.pm
+    version: 0
+  MCalc::Functions::Log:
+    file: lib/MCalc/Functions/Log.pm
+    version: 0
+  MCalc::Functions::Multiplication:
+    file: lib/MCalc/Functions/Multiplication.pm
+    version: 0
+  MCalc::Functions::Negation:
+    file: lib/MCalc/Functions/Negation.pm
+    version: 0
+  MCalc::Functions::Power:
+    file: lib/MCalc/Functions/Power.pm
+    version: 0
+  MCalc::Functions::Product:
+    file: lib/MCalc/Functions/Product.pm
+    version: 0
+  MCalc::Functions::Rounding:
+    file: lib/MCalc/Functions/Rounding.pm
+    version: 0
+  MCalc::Functions::SimpleFunction:
+    file: lib/MCalc/Functions/SimpleFunction.pm
+    version: 0
+  MCalc::Functions::Sine:
+    file: lib/MCalc/Functions/Sine.pm
+    version: 0
+  MCalc::Functions::Sqrt:
+    file: lib/MCalc/Functions/Sqrt.pm
+    version: 0
+  MCalc::Functions::Subtraction:
+    file: lib/MCalc/Functions/Subtraction.pm
+    version: 0
+  MCalc::Functions::Sum:
+    file: lib/MCalc/Functions/Sum.pm
+    version: 0
+  MCalc::Functions::Tangent:
+    file: lib/MCalc/Functions/Tangent.pm
+    version: 0
+  MCalc::Functions::UserFunction:
+    file: lib/MCalc/Functions/UserFunction.pm
+    version: 0
+  MCalc::Language:
+    file: lib/MCalc/Language.pm
+    version: 0
+  MCalc::Parser:
+    file: lib/MCalc/Parser.pm
+    version: 0
+  MCalc::Printer:
+    file: lib/MCalc/Printer.pm
+    version: 0
+  MCalc::SimpleContext:
+    file: lib/MCalc/SimpleContext.pm
+    version: 0
+  MCalc::Util::TreeBuilder:
+    file: lib/MCalc/Util/TreeBuilder.pm
+    version: 0
+requires:
+  Getopt::Long: 0
+  Math::Complex: 0
+  Math::Trig: 0
+  Moose: 0
+  Pod::Usage: 0
+  Term::ReadLine::Gnu: 0
+  Tree: 0
+resources:
+  license: http://www.apache.org/licenses/LICENSE-2.0.txt
+version: 0.2

@@ -9,7 +9,7 @@ with "MCalc::Evaluateable";
 sub evaluate {
   my ($this, $contextRef, @args) = @_;
 
-  my $arg = evaluateTree($contextRef, $args[0]);
+  my $arg = evaluateTree($contextRef, $args[0])->value();
 
   return POSIX::ceil($arg);
 }

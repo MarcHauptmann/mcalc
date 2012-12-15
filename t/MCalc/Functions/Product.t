@@ -21,7 +21,7 @@ subtest "product can be calculated" => sub {
   $tree->add_child(Tree->new("1"));
   $tree->add_child(Tree->new("3"));
 
-  my $result = evaluateTree($context, $tree);
+  my $result = evaluateTree($context, $tree)->value();
 
   is($result, 6, "result is 6");
 };
@@ -46,7 +46,7 @@ subtest "parameters are evaluated" => sub {
   $tree->add_child($fromTree);
   $tree->add_child($toTree);
 
-  my $result = evaluateTree($context, $tree);
+  my $result = evaluateTree($context, $tree)->value();
 
   is($result, 60, "'from' and 'to' are evaluated");
 };

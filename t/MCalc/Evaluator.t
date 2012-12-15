@@ -3,6 +3,8 @@
 use Test::More;
 use Test::Exception;
 use MCalc::DefaultContext;
+use MCalc::Util::TreeBuilder;
+use Tree;
 
 BEGIN {
   use_ok("MCalc::Evaluator");
@@ -18,7 +20,7 @@ subtest "Zahl" => sub {
   my $context = MCalc::DefaultContext->new();
   my $tree = Tree->new("2");
 
-  is(evaluateTree($context, $tree), 2, "Ergebnis ist 2");
+  is_deeply(evaluateTree($context, $tree), tree(2), "Ergebnis ist 2");
 };
 
 print <<"EOF";
@@ -39,7 +41,7 @@ subtest "Addition" => sub {
 
   my $result = evaluateTree($context, $tree);
 
-  is($result, 6, "Ergebnis ist 6");
+  is_deeply($result, tree("6"), "Ergebnis ist 6");
 };
 
 print <<"EOF";
@@ -58,7 +60,7 @@ subtest "Multiplikation" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree($context, $tree), 8, "Ergebnis ist 8");
+  is_deeply(evaluateTree($context, $tree), tree(8), "Ergebnis ist 8");
 };
 
 print <<"EOF";
@@ -77,7 +79,7 @@ subtest "Subtraktion" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree($context, $tree), -2, "Ergebnis ist -2");
+  is_deeply(evaluateTree($context, $tree), tree(-2), "Ergebnis ist -2");
 };
 
 print <<"EOF";
@@ -96,7 +98,7 @@ subtest "Division" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree($context, $tree), .5, "Ergebnis ist 0.5");
+  is_deeply(evaluateTree($context, $tree), tree(.5), "Ergebnis ist 0.5");
 };
 
 print <<"EOF";
@@ -115,7 +117,7 @@ subtest "Potenz" => sub {
   $tree->add_child(Tree->new("2"));
   $tree->add_child(Tree->new("4"));
 
-  is(evaluateTree($context, $tree), 16, "Ergebnis ist 16");
+  is_deeply(evaluateTree($context, $tree), tree(16), "Ergebnis ist 16");
 };
 
 print <<"EOF";
@@ -141,7 +143,7 @@ subtest "Operatorrangfolge" => sub {
   $tree->add_child($mul);
   $tree->add_child(Tree->new("11"));
 
-  is(evaluateTree($context, $tree), 19, "Ergebnis ist 19");
+  is_deeply(evaluateTree($context, $tree), tree(19), "Ergebnis ist 19");
 };
 
 print <<"EOF";
@@ -159,7 +161,7 @@ subtest "Cosine" => sub {
   my $cos = Tree->new("cos");
   $cos->add_child(Tree->new("0"));
 
-  is(evaluateTree($context, $cos), 1, "Ergebnis ist 1");
+  is_deeply(evaluateTree($context, $cos), tree(1), "Ergebnis ist 1");
 };
 
 print <<"EOF";
@@ -175,7 +177,7 @@ subtest "Auswertung" => sub {
 
   $expected = $context->getVariable("pi");
 
-  is(evaluateTree($context, $val), $expected, "pi geht");
+  is_deeply(evaluateTree($context, $val), tree($expected), "pi geht");
 };
 
 done_testing();

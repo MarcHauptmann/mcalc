@@ -9,9 +9,9 @@ with "MCalc::Evaluateable";
 sub evaluate {
   my ($this, $context, $expression, $var, $from, $to) = @_;
 
-  my $fromValue = evaluateTree($context, $from);
-  my $toValue = evaluateTree($context, $to);
-  my $varName = $var->value;
+  my $fromValue = evaluateTree($context, $from)->value();
+  my $toValue = evaluateTree($context, $to)->value();
+  my $varName = $var->value();
 
   my $product = 1;
 
@@ -21,7 +21,7 @@ sub evaluate {
   for (my $value = $fromValue; $value <= $toValue; $value++) {
     $productContext->setVariable($varName, $value);
 
-    $product *= evaluateTree($productContext, $expression);
+    $product *= evaluateTree($productContext, $expression)->value();
   }
 
   return $product;

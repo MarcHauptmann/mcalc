@@ -4,11 +4,11 @@ use Moose::Role;
 
 =pod
 
-=head 1 Name
+=head1 Name
 
 MCalc::Context
 
-=head 1 Description
+=head1 Description
 
 A Context is a store for variables and functions.
 

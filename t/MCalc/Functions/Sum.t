@@ -15,7 +15,7 @@ subtest "sum function calculates sum" => sub {
        i  i 1  4
 EOF
 
-  my $result = evaluateTree($context, tree($tree));
+  my $result = evaluateTree($context, tree($tree))->value();
 
   is($result, 10, "result is 10");
 };

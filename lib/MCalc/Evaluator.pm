@@ -14,16 +14,22 @@ sub evaluateTree {
   if ($tree->size() == 1) {
     if ($val =~ /[a-zA-Z]+/) {
       # Variable
-      return $context->getVariable($val);
+      return Tree->new($context->getVariable($val));
     } else {
       # Zahl
-      return $val;
+      return Tree->new($val);
     }
   } else {
     # Funktionsaufruf
     my $func = $context->getFunction($tree->value());
 
-    return $func->evaluate($context, $tree->children);
+    my $result = $func->evaluate($context, $tree->children);
+
+    if (defined($result)) {
+      return Tree->new($result);
+    } else {
+      return undef;
+    }
   }
 }
 

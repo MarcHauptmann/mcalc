@@ -3,9 +3,9 @@ package MCalc::Functions::Assignment;
 use Moose;
 use Error::Simple;
 use MCalc::Language;
-use MCalc::Printer;
 use MCalc::Evaluator;
 use MCalc::Functions::UserFunction;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -14,7 +14,7 @@ sub evaluate {
 
   if ($lhs->size() == 1) {
     my $var = $lhs->value();
-    my $value = evaluateTree($context, $rhs);
+    my $value = evaluateTree($context, $rhs)->value();
 
     if (not($var =~ /[a-zA-Z]\w*+/)) {
       throw Error::Simple "variable name must be string";
@@ -45,9 +45,7 @@ sub evaluate {
 
     $context->setFunction($key, $function);
 
-    my $printer = MCalc::Printer->new();
-
-    return "$key(".join(", ", @args).") = ".$printer->to_string($rhs);
+    return undef;
   }
 }
 
