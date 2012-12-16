@@ -53,7 +53,7 @@ sub merge_values {
       my $val = $newValueRef->{$key};
 
       if (defined($valRef->{$key}) && not(trees_equal($valRef->{$key}, $val))) {
-        die;
+        die "redefinition of variable ".$key;
       }
 
       $valRef->{$key} = $val;
