@@ -5,7 +5,7 @@ use Test::Exception;
 use MCalc::Util::TreeBuilder;
 
 BEGIN {
-  use_ok("MCalc::Util::Simplification", qw(rule_matches extract_values trees_equal));
+  use_ok("MCalc::Util::Simplification", qw(rule_matches extract_values trees_equal substitute));
 }
 
 use MCalc::Util::Simplification qw(trees_equal);
@@ -183,9 +183,9 @@ subtest "value for variable can be extracted" => sub {
 
   my %expected = (a => tree(1));
 
-  my $result = extract_values(tree($rule), tree($expression));
+  my %result = extract_values(tree($rule), tree($expression));
 
-  is_deeply($result, \%expected);
+  is_deeply(\%result, \%expected);
 };
 
 subtest "variable on right side in addition can be extracted" => sub {
@@ -201,9 +201,9 @@ EOF
 EOF
   my %expected = (a => tree(2));
 
-  my $result = extract_values(tree($rule), tree($expression));
+  my %result = extract_values(tree($rule), tree($expression));
 
-  is_deeply($result, \%expected);
+  is_deeply(\%result, \%expected);
 };
 
 subtest "variable on left side in addition can be extracted" => sub {
@@ -219,9 +219,9 @@ EOF
 EOF
   my %expected = (a => tree(1));
 
-  my $result = extract_values(tree($rule), tree($expression));
+  my %result = extract_values(tree($rule), tree($expression));
 
-  is_deeply($result, \%expected);
+  is_deeply(\%result, \%expected);
 };
 
 subtest "different variable values throw exception" => sub {
@@ -252,6 +252,47 @@ EOF
 EOF
 
   lives_ok( sub { extract_values(tree($rule), tree($expression)) } );
+};
+
+################################################################################
+
+subtest "simple value is not substituted" => sub {
+  my $expression = "1";
+  my %values = (a => tree("1"), b => tree("2"));
+
+  my $result = substitute(tree($expression), %values);
+
+  is_deeply($result, tree($expression));
+};
+
+subtest "variable is substituted" => sub {
+  my $expression = "a";
+  my %values = (a => tree("1"), b => tree("2"));
+
+  my $result = substitute(tree($expression), %values);
+  my $expected = tree("1");
+
+  is_deeply($result, $expected);
+};
+
+subtest "variable in complex expression can be substituted" => sub {
+  my $expression = <<'EOF';
+    +
+   / \
+  1   a
+EOF
+
+  my %values = (a => tree("3"), b => tree("2"));
+
+  my $result = substitute(tree($expression), %values);
+
+  my $expected = <<'EOF';
+    +
+   / \
+  1   3
+EOF
+
+  is_deeply($result, tree($expected));
 };
 
 done_testing();

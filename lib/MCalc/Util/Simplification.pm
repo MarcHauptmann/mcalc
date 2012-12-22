@@ -4,7 +4,7 @@ use Exporter;
 use MCalc::Language;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(rule_matches extract_values);
+@EXPORT = qw(rule_matches extract_values substitute);
 @EXPORT_OK = qw(trees_equal);
 
 sub rule_matches {
@@ -36,28 +36,49 @@ sub extract_values {
   if (is_identifier($rule->value())) {
     $values{$rule->value()} = $expression->clone();
   } elsif ($rule->size() > 1) {
-    my $leftValues = extract_values($rule->children(0), $expression->children(0));
-    my $rightValues = extract_values($rule->children(1), $expression->children(1));
+    my %leftValues = extract_values($rule->children(0), $expression->children(0));
+    my %rightValues = extract_values($rule->children(1), $expression->children(1));
 
-    merge_values(\%values, $leftValues);
-    merge_values(\%values, $rightValues);
+    merge_values(\%values, \%leftValues);
+    merge_values(\%values, \%rightValues);
   }
 
-  return \%values;
+  return %values;
 }
 
 sub merge_values {
   my ($valRef, $newValueRef) = @_;
 
   foreach my $key (keys %$newValueRef) {
-      my $val = $newValueRef->{$key};
+    my $val = $newValueRef->{$key};
 
-      if (defined($valRef->{$key}) && not(trees_equal($valRef->{$key}, $val))) {
-        die "redefinition of variable ".$key;
-      }
-
-      $valRef->{$key} = $val;
+    if (defined($valRef->{$key}) && not(trees_equal($valRef->{$key}, $val))) {
+      die "redefinition of variable ".$key;
     }
+
+    $valRef->{$key} = $val;
+  }
+}
+
+sub substitute {
+  my ($expression, %values) = @_;
+
+  if ($expression->size() == 1) {
+    foreach my $variable (keys %values) {
+      if ($variable eq $expression->value()) {
+        return $values{$variable};
+      }
+    }
+  } else {
+    for (my $i = 0; $i<scalar($expression->children); $i++) {
+      my $newChild = substitute($expression->children($i), %values);
+
+      $expression->remove_child($i);
+      $expression->add_child({ at => $i }, $newChild);
+    }
+  }
+
+  return $expression;
 }
 
 sub trees_equal {
