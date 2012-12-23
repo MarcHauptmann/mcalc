@@ -36,25 +36,22 @@ sub addRule {
 sub evaluate {
   my ($this, $context, $tree) = @_;
 
-  my $newTree = $this->simplify($tree);
+  my $newTree = $this->simplify($context, $tree);
 
   return $newTree;
 }
 
 sub simplify {
-  my ($this, $tree) = @_;
-
-  # print "simplifying ".join(" ", map {$_->value} $tree->traverse($tree->PRE_ORDER))."\n";
+  my ($this, $context, $tree) = @_;
 
   for (my $i = 0; $i < scalar($tree->children()); $i++) {
-    my $newChild = $this->simplify($tree->children($i));
+    my $newChild = $this->simplify($context, $tree->children($i));
 
     $tree->remove_child($i);
-    $tree->add_child({ at => $i }, $newChild->clone);
-
-    # print $i.": ".join(" ", map {$_->value} $tree->traverse($tree->PRE_ORDER))."\n";
+    $tree->add_child({ at => $i }, evaluateTree($context, $newChild));
   }
 
+  # apply first matching rule (must be optimized)
   foreach my $rule (@{$this->rules}) {
     if ($rule->matches($tree)) {
       # printf "applied '%s'\n", $rule->getDescription;
@@ -63,9 +60,9 @@ sub simplify {
     }
   }
 
-  # print "result: ".join(" ", map {$_->value} $tree->traverse($tree->PRE_ORDER))."\n";
+  my $result = evaluateTree($context, $tree);
 
-  return $tree->clone;
+  return $result;
 }
 
 1;

@@ -56,9 +56,6 @@ sub apply {
 
   my %values = extract_values($lhs, $tree);
 
-  # print $values{var}->value."\n";
-  # print $rhs->value."\n";
-
   return substitute($rhs, %values);
 }
 

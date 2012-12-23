@@ -1,4 +1,4 @@
-#/usr/bin/perl
+#!/usr/bin/perl
 
 use Test::More;
 use Test::Exception;
@@ -96,6 +96,21 @@ EOF
 EOF
 
   ok(rule_matches(tree($rule), tree($expression)));
+};
+
+subtest "rule only with unique values" => sub {
+  my $rule = <<'EOF';
+    +
+   / \
+  a   a
+EOF
+  my $expression = <<'EOF';
+    +
+   / \
+  1   2
+EOF
+
+  not_ok(rule_matches(tree($rule), tree($expression)));
 };
 
 ################################################################################

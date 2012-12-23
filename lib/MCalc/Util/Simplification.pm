@@ -1,6 +1,7 @@
 package MCalc::Util::Simplification;
 
 use Exporter;
+use Error::Simple;
 use MCalc::Language;
 
 @ISA = qw(Exporter);
@@ -8,10 +9,23 @@ use MCalc::Language;
 @EXPORT_OK = qw(trees_equal);
 
 sub rule_matches {
-  my ($rule, $expression) = @_;
+  my ($rule, $expression, $valRef) = @_;
 
-  if ($expression->size() == 1) {
-    if (is_identifier($rule->value()) || $rule->value() eq $expression->value) {
+  if (not(defined($valRef))) {
+    $valRef = {};
+  }
+
+  if ($expression->is_leaf()) {
+    # check whether a variable is set
+    if (is_identifier($rule->value())) {
+      if (defined($valRef->{$rule->value()})) {
+        return trees_equal($valRef->{$rule->value()}, $expression);
+      } else {
+	$valRef->{$rule->value()} = $expression->clone();
+      }
+
+      return 1;
+    } elsif ($rule->value() eq $expression->value) {
       return 1;
     } else {
       return 0;
@@ -20,8 +34,8 @@ sub rule_matches {
     if (is_identifier($rule->value())) {
       return 1;
     } elsif ($rule->value() eq $expression->value) {
-      return rule_matches($rule->children(0), $expression->children(0))
-        && rule_matches($rule->children(1), $expression->children(1));
+      return rule_matches($rule->children(0), $expression->children(0), $valRef)
+        && rule_matches($rule->children(1), $expression->children(1), $valRef);
     } else {
       return 0;
     }
@@ -53,7 +67,7 @@ sub merge_values {
     my $val = $newValueRef->{$key};
 
     if (defined($valRef->{$key}) && not(trees_equal($valRef->{$key}, $val))) {
-      die "redefinition of variable ".$key;
+      throw Error::Simple "redefinition of variable ".$key;
     }
 
     $valRef->{$key} = $val;

@@ -28,7 +28,7 @@ sub evaluate {
     $result = Tree->new(reduce { $this->doCalculation($a, $b) } @plainValues);
   } else {
     $result = Tree->new($this->getSign());
-    $result->add_child(@args);
+    $result->add_child(@vals);
   }
 
   return $result;

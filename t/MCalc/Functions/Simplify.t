@@ -129,15 +129,35 @@ EOF
   is_deeply($result, tree("a"), "result is a");
 };
 
-SKIP: {
-  skip "not implemented yet", 1;
+subtest "calculations can be performed during simplification" => sub {
+  my $context = MCalc::DefaultContext->new();
+  my $simplify = MCalc::Functions::Simplify->new();
 
-  subtest "calculations use defined variables" => sub {
-    my $simplify = MCalc::Functions::Simplify->new();
-    my $context = MCalc::DefaultContext->new();
-    $context->setVariable("x", 2);
+  my $expression = <<'EOF';
+            *
+           / \
+          *   x
+         / \
+        3   5
+EOF
 
-    my $expression = <<'EOF';
+  my $expected = <<'EOF';
+     *
+    / \
+   15  x
+EOF
+
+  my $result = $simplify->evaluate($context, tree($expression));
+
+  is_deeply($result, tree($expected), "result is a");
+};
+
+subtest "calculations use defined variables" => sub {
+  my $simplify = MCalc::Functions::Simplify->new();
+  my $context = MCalc::DefaultContext->new();
+  $context->setVariable("x", 2);
+
+  my $expression = <<'EOF';
         *
        / \
       /   \
@@ -146,29 +166,27 @@ SKIP: {
          2   x
 EOF
 
-    my $result = $simplify->evaluate($context, tree($expression));
+  my $result = $simplify->evaluate($context, tree($expression));
 
-    is_deeply($result, tree("a"), "result is a");
-  };
+  is_deeply($result, tree("a"), "result is a");
+};
 
-  subtest "calculations use defined variables" => sub {
-    my $simplification = MCalc::Functions::Simplify->new();
-    my $context = MCalc::DefaultContext->new();
-    $context->setVariable("x", 2);
+subtest "calculations use defined variables" => sub {
+  my $simplification = MCalc::Functions::Simplify->new();
+  my $context = MCalc::DefaultContext->new();
+  $context->setVariable("x", 2);
 
-    my $expression = <<EOF;
-        *
-       / \\
-      /   \\
-     *     /
-    / \\  / \\
-   a   2 1   2
+  my $expression = <<'EOF';
+         *
+       /   \
+     *       /
+    / \     / \
+   a   2   1   2
 EOF
 
-    my $result = $simplification->simplify($context, tree($expression));
+  my $result = $simplification->simplify($context, tree($expression));
 
-    is_deeply($result, tree("a"), "result is a");
-  };
-}
-;
+  is_deeply($result, tree("a"), "result is a");
+};
+
 done_testing();
