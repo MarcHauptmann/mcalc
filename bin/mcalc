@@ -14,6 +14,8 @@ use MCalc::Functions::Product;
 use MCalc::Language;
 use MCalc::PrettyPrinter;
 
+use Data::Dumper;
+
 our $VERSION = "0.2";
 
 our $help = 0;

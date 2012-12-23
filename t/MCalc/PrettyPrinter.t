@@ -353,4 +353,15 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "number in scientific notation can be printed" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $tree = "0.1e-15";
+
+  my $expected = "0.1e-15";
+
+  my $result = $printer->to_string(tree($tree));
+
+  is($result, $expected);
+};
+
 done_testing();
