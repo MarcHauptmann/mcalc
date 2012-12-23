@@ -61,6 +61,7 @@ sub calculate {
     # auswerten
     my $result = evaluateTree($context, $tree);
 
+
     if (defined($result)) {
       my $outputTree = Tree->new("=");
       $outputTree->add_child($tree);

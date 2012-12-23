@@ -5,6 +5,7 @@ use MCalc::Evaluator;
 use MCalc::CompoundContext;
 use Math::Complex qw(sqrt);
 use POSIX;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -65,7 +66,7 @@ sub evaluate {
     $int += $this->integrate($integrationContext, $expression, $var, $from, $to);
   }
 
-  return $int;
+  return Tree->new($int);
 }
 
 1;

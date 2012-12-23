@@ -1,17 +1,17 @@
 package MCalc::Functions::Multiplication;
 
-use MCalc::Evaluator;
 use Moose;
 
-with "MCalc::Evaluateable";
+with "MCalc::Functions::ArithmeticFunction";
 
-sub evaluate {
-  my ($this, $context, @args) = @_;
+sub BUILDARGS {
+  return { sign => "*" };
+}
 
-  my $v1 = evaluateTree($context, $args[0])->value();
-  my $v2 = evaluateTree($context, $args[1])->value();
+sub doCalculation {
+  my ($this, $a, $b) = @_;
 
-  return $v1 * $v2;
+  return $a * $b;
 }
 
 1;

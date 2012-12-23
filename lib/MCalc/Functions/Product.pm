@@ -3,6 +3,7 @@ package MCalc::Functions::Product;
 use MCalc::Evaluator;
 use MCalc::CompoundContext;
 use Moose;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -24,5 +25,5 @@ sub evaluate {
     $product *= evaluateTree($productContext, $expression)->value();
   }
 
-  return $product;
+  return Tree->new($product);
 }

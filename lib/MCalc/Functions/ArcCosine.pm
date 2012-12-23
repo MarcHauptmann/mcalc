@@ -2,6 +2,7 @@ package MCalc::Functions::ArcCosine;
 
 use MCalc::Evaluator;
 use Math::Trig;
+use Tree;
 use Moose;
 
 with "MCalc::Evaluateable";
@@ -11,5 +12,5 @@ sub evaluate {
 
   my $arg =  evaluateTree($context, $args[0])->value();
 
-  return acos($arg);
+  return Tree->new(acos($arg));
 }

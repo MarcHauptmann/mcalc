@@ -30,7 +30,7 @@ sub evaluateTree {
     my $result = $func->evaluate($context, $tree->children);
 
     if (defined($result)) {
-      return Tree->new($result);
+      return $result;
     } else {
       return undef;
     }

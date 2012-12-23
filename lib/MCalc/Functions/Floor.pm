@@ -3,6 +3,7 @@ package MCalc::Functions::Floor;
 use MCalc::Evaluator;
 use Moose;
 use POSIX;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -11,7 +12,7 @@ sub evaluate {
 
   my $arg = evaluateTree($context, $args[0])->value();
 
-  return POSIX::floor($arg);
+  return Tree->new(POSIX::floor($arg));
 }
 
 1;

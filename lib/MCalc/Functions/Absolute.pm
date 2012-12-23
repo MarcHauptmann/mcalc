@@ -1,6 +1,7 @@
 package MCalc::Functions::Absolute;
 
 use Moose;
+use Tree;
 use MCalc::Evaluator;
 
 with "MCalc::Evaluateable";
@@ -10,7 +11,7 @@ sub evaluate {
 
   my $arg = evaluateTree($contextRef, $args[0])->value();
 
-  return abs($arg);
+  return Tree->new(abs($arg));
 }
 
 1;

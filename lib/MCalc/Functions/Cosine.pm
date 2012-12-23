@@ -2,6 +2,7 @@ package MCalc::Functions::Cosine;
 
 use MCalc::Evaluator;
 use Moose;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -10,7 +11,7 @@ sub evaluate {
 
   my $arg = evaluateTree($context, $args[0])->value();
 
-  return cos($arg);
+  return Tree->new(cos($arg));
 }
 
 1;
