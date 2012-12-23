@@ -12,7 +12,7 @@ sub evaluate {
   my $v1 = evaluateTree($context, $args[0])->value();
   my $v2 = evaluateTree($context, $args[1])->value();
 
-  return $v1 + $v2;
+  return Tree->new($v1 + $v2);
 }
 
 1;
