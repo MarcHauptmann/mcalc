@@ -5,7 +5,7 @@ use Test::Exception;
 use MCalc::Util::TreeBuilder;
 
 BEGIN {
-  use_ok("MCalc::Util::Simplification", qw(rule_matches extract_values trees_equal substitute));
+  use_ok("MCalc::Util::Simplification", qw(rule_matches extract_values trees_equal substitute complexity));
 }
 
 use MCalc::Util::Simplification qw(trees_equal);
@@ -308,6 +308,18 @@ EOF
 EOF
 
   is_deeply($result, tree($expected));
+};
+
+################################################################################
+
+subtest "a sum is more complex than a number" => sub {
+  my $sum = <<'EOF';
+   +
+  / \
+ 2   1
+EOF
+
+  cmp_ok(complexity(tree($sum)), ">", complexity(tree("3")));
 };
 
 done_testing();

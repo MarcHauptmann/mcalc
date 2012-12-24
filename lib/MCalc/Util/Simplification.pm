@@ -5,7 +5,7 @@ use Error::Simple;
 use MCalc::Language;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(rule_matches extract_values substitute);
+@EXPORT = qw(rule_matches extract_values substitute complexity);
 @EXPORT_OK = qw(trees_equal);
 
 sub rule_matches {
@@ -119,4 +119,9 @@ sub trees_equal {
   }
 }
 
+sub complexity {
+  my ($tree) = @_;
+
+  return $tree->size;
+}
 1;
