@@ -51,8 +51,8 @@ sub matches {
 sub apply {
   my ($this, $tree) = @_;
 
-  my $lhs = $this->getLhs();
-  my $rhs = $this->getRhs();
+  my $lhs = $this->getLhs()->clone;
+  my $rhs = $this->getRhs()->clone;
 
   my %values = extract_values($lhs, $tree);
 

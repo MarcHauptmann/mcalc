@@ -19,15 +19,14 @@ has "rules" => (isa => "ArrayRef",
 sub BUILD {
   my ($this) = @_;
 
-  # $this->addRule("varA*varB=varB*varA", "multiplication is commutative");
-  # $this->addRule("varA+varB=varB+varA", "addition is commutative");
+  $this->addRule("varA*(varB*varC)=(varA*varB)*varC", "multiplication is associative");
+
+  $this->addRule("varA*varB=varB*varA", "multiplication is commutative");
+  $this->addRule("varA+varB=varB+varA", "addition is commutative");
 
   $this->addRule("var*1=var", "multiplication by 1");
-  $this->addRule("1*var=var", "multiplication by 1");
-  $this->addRule("var*0=0", "multiplication by 0");
   $this->addRule("0*var=0", "multiplication by 0");
   $this->addRule("var+0=var", "addition of 0");
-  $this->addRule("0+var=var", "addition of 0");
 
   $this->addRule("var-var=0", "substraction is 0");
   $this->addRule("var/var=1", "division results in one");
@@ -42,24 +41,16 @@ sub addRule {
 sub evaluate {
   my ($this, $context, $tree) = @_;
 
-  # my $newTree = $this->simplify($context, $tree);
-
-  # return $newTree;
-
   my @trees = $this->simplify($context, $tree);
-
 
   my $min = LONG_MAX;
   my $finalResult = undef;
 
+  my $printer = MCalc::SimplePrinter->new();
   foreach my $result (@trees) {
-    printf "checking %s: ", $printer->to_string($result);
-
     if (complexity($result) < $min) {
-      print "ok\n";
       $finalResult = $result;
-    } else {
-      print "not ok\n";
+      $min = complexity($finalResult);
     }
   }
 
@@ -69,23 +60,85 @@ sub evaluate {
 sub simplify {
   my ($this, $context, $tree) = @_;
 
+  my @simplifidTrees = ($tree->clone);
+
   my $printer = MCalc::SimplePrinter->new();
-  # printf "simplifying %s\n", $printer->to_string($tree);
 
-  # for (my $i = 0; $i < scalar($tree->children()); $i++) {
-  # my $newChild = $this->simplify($context, $tree->children($i));
+  # simplify children
+  for (my $i = 0; $i < scalar($tree->children()); $i++) {
+    foreach my $newChild ($this->simplify($context, $tree->children($i))) {
 
-  # $tree->remove_child($i);
-  # $tree->add_child({ at => $i }, evaluateTree($context, $newChild));
-  # }
+      my $newTree = $tree->clone();
+      $newTree->remove_child($i);
+      $newTree->add_child({ at => $i }, evaluateTree($context, $newChild));
 
-  return $this->getResults($context, $tree, 1);
+      $this->appendTree(\@simplifidTrees, $newTree);
+    }
+  }
+
+  @simplifidTrees = $this->getCombinations(@simplifidTrees);
+
+  # applying rules to all new trees
+  my @resultTrees = ();
+
+  foreach my $treeToSimplify (@simplifidTrees) {
+    # printf "simplifying %s\n", $printer->to_string($treeToSimplify);
+
+    my @newRules = $this->applyRules($context, $treeToSimplify, 2);
+
+    foreach my $newResult (@newRules) {
+      $this->appendTree(\@resultTrees, $newResult);
+    }
+  }
+
+  return @resultTrees;
 }
 
-sub getResults {
+sub getCombinations {
+  my ($this, @trees) = @_;
+
+  my @newTrees = ();
+
+  foreach my $tree (@trees) {
+    $this->appendTree(\@newTrees, $tree);
+
+    for (my $i=0; $i<scalar($tree->children); $i++) {
+      foreach my $otherTree (@trees) {
+        my $newTree = $tree->clone();
+
+        $newTree->remove_child($i);
+        $newTree->add_child({at => $i}, $otherTree->children($i)->clone);
+
+        $this->appendTree(\@newTrees, $newTree);
+      }
+    }
+  }
+
+  return @newTrees;
+}
+
+sub appendTree {
+  my ($this, $listRef, @trees) = @_;
+
+  foreach my $tree (@trees) {
+    my $contains = 0;
+
+    # check whether tree already in list
+    foreach my $elem (@{$listRef}) {
+      $contains = $contains || trees_equal($elem, $tree);
+    }
+
+    # append if not in list
+    if (not($contains)) {
+      push @{$listRef}, $tree;
+    }
+  }
+}
+
+sub applyRules {
   my ($this, $context, $tree, $num) = @_;
 
-  # printf "level %d\n", $num;
+  my $printer = MCalc::SimplePrinter->new();
 
   if ($num == 0) {
     return ($tree);
@@ -93,17 +146,15 @@ sub getResults {
     my @results = ($tree);
     my @rules = $this->findMatchingRules($tree);
 
-    # printf "%d matching rules\n", scalar(@rules);
-
+    # printf "---> %s (%d)\n", $printer->to_string($tree), $num;
     foreach my $rule (@rules) {
-      printf "applied '%s'\n", $rule->getDescription;
+      # printf "applied '%s'\n", $rule->getDescription;
 
-      push @results, evaluateTree($context, $rule->apply($tree->clone));
+      my $result = $rule->apply($tree->clone);
+
+      $this->appendTree(\@results, $result);
+      $this->appendTree(\@results, $this->applyRules($context, $result, $num-1));
     }
-
-    # @results = map { $this->getResults($context, $_, $num-1) } @results;
-
-    # printf "%d results\n", scalar(@results);
 
     return @results;
   }

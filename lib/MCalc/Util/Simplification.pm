@@ -1,12 +1,13 @@
 package MCalc::Util::Simplification;
 
 use Exporter;
-use Error::Simple;
-use MCalc::Language;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(rule_matches extract_values substitute complexity);
-@EXPORT_OK = qw(trees_equal);
+@EXPORT = qw(rule_matches extract_values substitute complexity trees_equal);
+
+use Error::Simple;
+use MCalc::Language;
+use strict;
 
 sub rule_matches {
   my ($rule, $expression, $valRef) = @_;
@@ -92,7 +93,7 @@ sub substitute {
     }
   }
 
-  return $expression;
+  return $expression->clone;
 }
 
 sub trees_equal {

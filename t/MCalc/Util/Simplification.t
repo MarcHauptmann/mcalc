@@ -113,6 +113,25 @@ EOF
   not_ok(rule_matches(tree($rule), tree($expression)));
 };
 
+subtest "rule for associativity matches" => sub {
+  my $rule = <<'EOF';
+      *
+     / \
+    *   c
+   / \
+  a   b
+EOF
+  my $expression = <<'EOF';
+        *
+      /   \
+    *      /
+   / \    / \
+  1   2  3   4
+EOF
+
+  ok(rule_matches(tree($rule), tree($expression)));
+};
+
 ################################################################################
 
 subtest "trees with size 1 can be equal" => sub {
@@ -305,6 +324,30 @@ EOF
     +
    / \
   1   3
+EOF
+
+  is_deeply($result, tree($expected));
+};
+
+subtest "variables in associativity rule can be substituted" => sub {
+  my $expression = <<'EOF';
+    +
+   / \
+  a   +
+  ^  / \
+    b   c
+EOF
+
+  my %values = (a => tree("3"), b => tree("2"), c => tree(1));
+
+  my $result = substitute(tree($expression), %values);
+
+  my $expected = <<'EOF';
+    +
+   / \
+  3   +
+  ^  / \
+    2   1
 EOF
 
   is_deeply($result, tree($expected));
