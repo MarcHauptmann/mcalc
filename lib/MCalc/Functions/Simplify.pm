@@ -42,25 +42,12 @@ sub addRule {
 sub evaluate {
   my ($this, $context, $tree) = @_;
 
-  my $newTree = $this->simplify($context, $tree);
+  # my $newTree = $this->simplify($context, $tree);
 
-  return $newTree;
-}
+  # return $newTree;
 
-sub simplify {
-  my ($this, $context, $tree) = @_;
+  my @trees = $this->simplify($context, $tree);
 
-  my $printer = MCalc::SimplePrinter->new();
-  # printf "simplifying %s\n", $printer->to_string($tree);
-
-  for (my $i = 0; $i < scalar($tree->children()); $i++) {
-    my $newChild = $this->simplify($context, $tree->children($i));
-
-    $tree->remove_child($i);
-    $tree->add_child({ at => $i }, evaluateTree($context, $newChild));
-  }
-
-  my @trees = $this->getResults($context, $tree, 1);
 
   my $min = LONG_MAX;
   my $finalResult = undef;
@@ -77,6 +64,22 @@ sub simplify {
   }
 
   return $finalResult;
+}
+
+sub simplify {
+  my ($this, $context, $tree) = @_;
+
+  my $printer = MCalc::SimplePrinter->new();
+  # printf "simplifying %s\n", $printer->to_string($tree);
+
+  # for (my $i = 0; $i < scalar($tree->children()); $i++) {
+  # my $newChild = $this->simplify($context, $tree->children($i));
+
+  # $tree->remove_child($i);
+  # $tree->add_child({ at => $i }, evaluateTree($context, $newChild));
+  # }
+
+  return $this->getResults($context, $tree, 1);
 }
 
 sub getResults {
