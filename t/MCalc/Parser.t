@@ -375,4 +375,16 @@ EOF
   is_deeply($tree, tree($expectedTree), "tree matches");
 };
 
+subtest "parser can be used two times" => sub {
+  my $parser = MCalc::Parser->new();
+
+
+  lives_ok( sub {
+              $parser->parse("int(x,x,-1,1)");
+              $parser->parse("int(x,x,-1,1)");
+            });
+
+};
+
+
 done_testing();
