@@ -165,10 +165,12 @@ EOF
   my $expected = <<'EOF';
      *
     / \
-   15  x
+   x   15
 EOF
 
   my $result = $simplify->evaluate($context, tree($expression));
+
+  printf "result = %s\n", $printer->to_string($result);
 
   is_deeply($result, tree($expected), "result is a");
 };
