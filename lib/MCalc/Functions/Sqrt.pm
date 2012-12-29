@@ -3,6 +3,7 @@ package MCalc::Functions::Sqrt;
 use MCalc::Evaluator;
 use Moose;
 use Math::Complex;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -11,7 +12,7 @@ sub evaluate {
 
   my $arg = evaluateTree($context, $args[0])->value();
 
-  return sqrt($arg);
+  return Tree->new(sqrt($arg));
 }
 
 1;

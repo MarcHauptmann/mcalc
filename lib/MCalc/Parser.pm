@@ -228,6 +228,12 @@ sub functionAssignment {
 
 sub parse {
   my ($this, $input) = @_;
+
+  # clear lists
+  $this->operators([]);
+  $this->operands([]);
+  $this->tokens([]);
+
   push @{$this->operators}, ";";
   push @{$this->operands}, ";";
 

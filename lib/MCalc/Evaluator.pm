@@ -12,9 +12,13 @@ sub evaluateTree {
 
   # wenn am Ende
   if ($tree->size() == 1) {
+    # Variable
     if ($val =~ /[a-zA-Z]+/) {
-      # Variable
-      return Tree->new($context->getVariable($val));
+      if ($context->variableIsDefined($val)) {
+        return Tree->new($context->getVariable($val));
+      } else {
+        return Tree->new($val);
+      }
     } else {
       # Zahl
       return Tree->new($val);
@@ -26,7 +30,7 @@ sub evaluateTree {
     my $result = $func->evaluate($context, $tree->children);
 
     if (defined($result)) {
-      return Tree->new($result);
+      return $result;
     } else {
       return undef;
     }

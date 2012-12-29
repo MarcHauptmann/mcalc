@@ -8,7 +8,7 @@ use Exporter;
 sub is_operator {
   my ($op) = @_;
 
-  if ($op =~ /\+|\-|\*|\/|\^|=/) {
+  if ($op =~ /^(\+|\-|\*|\/|\^|=)$/) {
     return 1;
   } else {
     return 0;

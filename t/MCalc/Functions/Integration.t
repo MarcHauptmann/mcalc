@@ -16,7 +16,7 @@ subtest "int(x,x,0,1) can be calculated" => sub {
   my $result = $integration->evaluate($context, tree("x"), tree("x"),
                                       tree("0"), tree("1"));
 
-  is($result, 0.5, "result is 0.5");
+  is_deeply($result, tree(0.5), "result is 0.5");
 };
 
 subtest "int(x,x,0,5) can be calculated" => sub {
@@ -26,7 +26,7 @@ subtest "int(x,x,0,5) can be calculated" => sub {
   my $result = $integration->evaluate($context, tree("x"), tree("x"),
                                       tree("0"), tree("5"));
 
-  is($result, 12.5, "result is 12.5");
+  is_deeply($result, tree(12.5), "result is 12.5");
 };
 
 subtest "int(sin(x),x,0,pi) can be calculated" => sub {
@@ -42,7 +42,7 @@ EOF
   my $result = $integration->evaluate($context, tree($expression), tree("x"),
                                       tree("0"), tree("pi"));
 
-  cmp_ok(abs($result-2), "<", 1e-8, "result is near 2");
+  cmp_ok(abs($result->value()-2), "<", 1e-8, "result is near 2");
 };
 
 subtest "int(x^3, x, -1, 1) must be nearly 0" => sub {
@@ -63,7 +63,7 @@ EOF
 
   my $result = $integration->evaluate($context, tree($expression), tree("x"), tree($lowerBound), tree("1"));
 
-  cmp_ok($result, "<", 1e-15, "result is nearly 0");
+  cmp_ok($result->value(), "<", 1e-15, "result is nearly 0");
 };
 
 done_testing();

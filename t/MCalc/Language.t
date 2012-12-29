@@ -10,6 +10,7 @@ subtest "a operator can be checked" => sub {
   is(is_operator("+"), 1, "+ is operator");
   is(is_operator("test"), 0, "'test' is no operator");
   is(is_operator("^"), 1, "^ is operator");
+  is(is_operator("0.1e-15"), 0, "'0.1e-15' is no operator");
 };
 
 subtest "an identifiert can be checked" => sub {

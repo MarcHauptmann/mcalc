@@ -23,6 +23,12 @@ subtest "Zahl" => sub {
   is_deeply(evaluateTree($context, $tree), tree(2), "Ergebnis ist 2");
 };
 
+subtest "unknown variable will not be replaced" => sub {
+  my $context = MCalc::DefaultContext->new();
+
+  is_deeply(evaluateTree($context, tree("x")), tree("x"));
+};
+
 print <<"EOF";
 # ----------------------------------------
 # Testet die Auswertung einer Addition

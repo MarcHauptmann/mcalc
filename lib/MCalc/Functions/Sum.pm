@@ -4,6 +4,7 @@ use MCalc::Evaluator;
 use MCalc::CompoundContext;
 use Error::Simple;
 use Moose;
+use Tree;
 
 with "MCalc::Evaluateable";
 
@@ -37,7 +38,7 @@ sub evaluate {
     $result += evaluateTree($sumContext, $ex)->value();
   }
 
-  return $result;
+  return Tree->new($result);
 }
 
 1;
