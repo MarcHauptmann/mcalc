@@ -85,7 +85,7 @@ sub simplify {
   my @resultTrees = ();
 
   foreach my $treeToSimplify (@simplifidTrees) {
-    my @newRules = $this->applyRules($context, $treeToSimplify, 2);
+    my @newRules = $this->applyRules($context, $treeToSimplify, 4);
 
     $this->appendTree(\@resultTrees, @newRules);
   }

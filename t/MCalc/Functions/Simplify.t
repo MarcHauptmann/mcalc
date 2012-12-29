@@ -10,8 +10,8 @@ our $parser = MCalc::Parser->new();
 
 BEGIN {
   use_ok("MCalc::Functions::Simplify");
-}
-
+}	
+	
 subtest "variable is not simplified" => sub {
   my $context = MCalc::DefaultContext->new();
   my $simplify = MCalc::Functions::Simplify->new();
@@ -56,12 +56,8 @@ subtest "complex products with one 0-factor are 0" => sub {
   my $simplify = MCalc::Functions::Simplify->new();
 
   my $expression = <<'EOF';
-       *
-      / \
-     a   *
-     ^  / \
-       b   *
-       ^  / \
+           *
+          / \
          c   *
          ^  / \
            d   0
