@@ -271,6 +271,18 @@ This section describes the trigonimetric functions available in B<mcalc>. All th
 
 =over 8
 
+=item B<acos>(x)
+
+Computes the arc cosine of a real number x C<x>
+
+=item B<asin>(x)
+
+Computes the arc sine of a real number x C<x>
+
+=item B<atan>(x)
+
+Computes the arc tangent of a real number x C<x>
+
 =item B<cos>(x)
 
 computes the cosine of a real number C<x>
@@ -315,6 +327,14 @@ This function calculates a sum expression. C<var> takes the values from the expr
 
 Calculates the product of an expression. Use it like the C<sum> function.
 
+=item B<int>(expr, var, from, to)
+
+Calculates the numerical integral for C<expr> over C<var>. It uses the Gauß-Legendre quadrature with five points.
+
+=item B<simplify>(expression)
+
+Simplifies an expression. This feature is highly exprerimental. Use it at your own risk ;)
+
 =back
 
 =head2 Special commands
@@ -352,44 +372,31 @@ and evaluate it:
    > f(2)
    4
 
-=head1 SYNTAX
-
-=over 4
-
-I<statement>    := [ I<identifier> = ] I<expression>
-
-I<expression>   := [ - ] I<term> [ I<operator> I<term> ] ...
-
-I<term>         := I<number> | ( I<expression> ) | I<identifier> [ ( I<args> ) ]
-
-I<args>         := I<expression> [ , I<expression> ] ...
-
-I<identifier>   := regex([a-zA-Z]+)
-
-I<number>       := regex(\d+\.?\d*)
-
-I<operator>     := + | - | * | / | ^ | =
-
-=back
-
 =head1 EXAMPLES
 
 You can use B<mcalc> to calculate the answer to life, the universe and everything else:
 
-    mcalc> 2^2*(7+3)+2
-    42
+    mcalc> 2^2*(7+3)+2 
+     2
+    2  * ( 7 + 3 ) + 2 = 42
 
 Some trigonometry stuff with a variable:
 
-    mcalc> alpha=pi/5
-    alpha = 0.6238
+    mcalc> alpha=pi/5  
+             π
+    alpha = ---
+             5
     mcalc> sin(alpha)^2+cos(alpha)^2
-    1
+                 2                2
+    sin ( alpha )  + cos ( alpha )  = 1
 
 Calculating a phytagorean triple using B<mcalc>'s batch mode:
 
     $> mcalc "sqrt(3^2+4^2)"
-    5
+     ----------
+     |  2    2
+    \| 3  + 4   = 5
+
 
 =head1 AUTHOR
 
