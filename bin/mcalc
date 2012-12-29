@@ -150,7 +150,7 @@ $attribs->{redisplay_function} = sub {
   print "\r";
   print $prompt." ";
 
-  print $colorizer->colorize($string);
+  print $colorizer->colorize($string, $attribs->{point});
 
   # position cursor
   for (my $i=0; $i<$attribs->{end} - $attribs->{point}; $i++) {
