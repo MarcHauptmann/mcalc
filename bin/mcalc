@@ -142,7 +142,7 @@ $attribs->{redisplay_function} = sub {
   # clear line
   print "\r";
 
-  for(my $i=0; $i<$lastEnd+length($prompt)+2; $i++) {
+  for (my $i=0; $i<$lastEnd+length($prompt)+2; $i++) {
     print " ";
   }
 
@@ -179,7 +179,9 @@ while (1) {
     exit;
   }
 
-  calculate($input);
+  if ($input ne "") {
+    calculate($input);
+  }
 }
 
 
