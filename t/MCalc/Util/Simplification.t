@@ -3,6 +3,9 @@
 use Test::More;
 use Test::Exception;
 use MCalc::Util::TreeBuilder;
+use MCalc::Parser;
+
+our $parser = MCalc::Parser->new();
 
 BEGIN {
   use_ok("MCalc::Util::Simplification", qw(rule_matches extract_values trees_equal substitute complexity));
@@ -286,6 +289,21 @@ EOF
 EOF
 
   lives_ok( sub { extract_values(tree($rule), tree($expression)) } );
+};
+
+subtest "..." => sub {
+  my $rule = $parser->parse("(a*b)*c");
+  my $expression = $parser->parse("((2*x)*3)*4");
+
+  my $expected_a = $parser->parse("2*x");
+  my $expected_b = $parser->parse("3");
+  my $expected_c = $parser->parse("4");
+
+  my %values = extract_values($rule, $expression);
+
+  is_deeply($values{"a"}, $expected_a, "a is 2*x");
+  is_deeply($values{"b"}, $expected_b, "b is 3");
+  is_deeply($values{"c"}, $expected_c, "c is 4");
 };
 
 ################################################################################
