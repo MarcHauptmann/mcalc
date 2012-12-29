@@ -1,5 +1,6 @@
 package MCalc::PrettyPrinter;
 
+use Tree;
 use Moose;
 use MCalc::SimplePrinter;
 use MCalc::Language;
@@ -46,6 +47,8 @@ sub handle_internal {
     ($result, $base) = $this->handle_sqrt($tree);
   } elsif (is_identifier($tree->value()) && $tree->size() > 1) {
     ($result, $base) = $this->handle_function_call($tree);
+  } elsif (is_identifier($tree->value())) {
+    ($result, $base) = $this->handle_variable($tree);
   } else {
     $result = $this->simplePrinter->to_string($tree);
   }
@@ -57,34 +60,75 @@ sub handle_internal {
   }
 }
 
+sub handle_variable {
+  my ($this, $tree) = @_;
+
+  my $val = $tree->value();
+
+  if ($val eq "pi") {
+    return ("π", 0);
+  } else {
+    return ($val, 0);
+  }
+}
+
+sub handle_nary_function {
+  my ($this, $tree, $symbol) = @_;
+
+  my $lowerTree = Tree->new("=");
+  $lowerTree->add_child($tree->children(1)->clone);
+  $lowerTree->add_child($tree->children(2)->clone);
+  my ($lower, $lowerBase) = $this->handle_internal($lowerTree);
+
+  my ($upper, $upperBase) = $this->handle_internal($tree->children(3));
+
+  my $l = max_line_length($upper, $lower);
+
+  my $leftStr = offset($upper, ($l - max_line_length($upper))/2)."\n"
+    .offset($symbol, $l/2-1)."\n".offset($lower, ($l - max_line_length($lower))/2);
+  my $sumBase = count_lines($upper);
+
+  my ($rightStr, $rightBase) = $this->handle_internal($tree->children(0));
+
+  my ($sumStr, $right, $base) = equalize($leftStr, $rightStr, $sumBase, $rightBase);
+
+  return (append($sumStr, offset($right, 1)), $base);
+}
+
 sub handle_function_call {
   my ($this, $tree) = @_;
 
-  my $callStr = "";
-  my $callBase = 0;
+  if ($tree->value eq "sum") {
+    return $this->handle_nary_function($tree, "∑");
+  } elsif ($tree->value eq "product") {
+    return $this->handle_nary_function($tree, "∏");
+  } else {
+    my $callStr = "";
+    my $callBase = 0;
 
-  my $count = 0;
+    my $count = 0;
 
-  foreach my $arg ($tree->children()) {
-    my ($result, $base) = $this->handle_internal($arg);
+    foreach my $arg ($tree->children()) {
+      my ($result, $base) = $this->handle_internal($arg);
 
-    if ($count == 0) {
-      $callStr = $result;
-      $callBase = $base;
-    } else {
-      ($callStr, $result, $callBase) = equalize($callStr, $result, $callBase, $base);
+      if ($count == 0) {
+        $callStr = $result;
+        $callBase = $base;
+      } else {
+        ($callStr, $result, $callBase) = equalize($callStr, $result, $callBase, $base);
 
-      my $comma = operator(",", count_lines($result), $callBase);
+        my $comma = operator(",", count_lines($result), $callBase);
 
-      $callStr = append($callStr, $comma, $result);
+        $callStr = append($callStr, $comma, $result);
+      }
+
+      $count++;
     }
 
-    $count++;
+    my $funcName = operator($tree->value(), count_lines($callStr), $callBase, 0);
+
+    return (append($funcName, offset(brace($callStr), 1)), $callBase);
   }
-
-  my $funcName = operator($tree->value(), count_lines($callStr), $callBase, 0);
-
-  return (append($funcName, offset(brace($callStr), 1)), $callBase);
 }
 
 sub brace {

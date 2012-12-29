@@ -2,10 +2,13 @@
 
 use Test::More;
 use MCalc::Util::TreeBuilder;
+use MCalc::Parser;
 
 BEGIN {
   use_ok("MCalc::PrettyPrinter");
 }
+
+our $parser = MCalc::Parser->new();
 
 subtest "numbers can be printed" => sub {
   my $printer = MCalc::PrettyPrinter->new();
@@ -362,6 +365,32 @@ subtest "number in scientific notation can be printed" => sub {
   my $result = $printer->to_string(tree($tree));
 
   is($result, $expected);
+};
+
+subtest "'pi' is replaced by greek letter" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $expression = $parser->parse("pi");
+
+  my $expected = "π";
+
+  my $result = $printer->to_string($expression);
+
+  is($result, $expected);
+};
+
+subtest "sum function is printed pretty" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $expression = $parser->parse("sum(1/n,n,1,100)");
+
+  my $expected = <<'EOF';
+ 100   1
+  ∑   ‒‒‒
+n = 1  n
+EOF
+
+  my $result = $printer->to_string($expression);
+
+  is($result."\n", $expected);
 };
 
 done_testing();
