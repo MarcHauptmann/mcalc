@@ -1,10 +1,11 @@
 package MCalc::Util::TreeBuilder;
 
+use strict;
 use Exporter;
 use Tree;
 
-@ISA = qw(Exporter);
-@EXPORT = qw(tree);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(tree);
 
 sub tree {
   my ($str) = @_;
@@ -43,7 +44,7 @@ sub tree {
     } else {
       my $childIndex = 0;
 
-      foreach $elem (split(/[ \n]+/, $line)) {
+      foreach my $elem (split(/[ \n]+/, $line)) {
         if ($elem ne "") {
           my $child = $children[$childIndex++];
           $child->set_value($elem)

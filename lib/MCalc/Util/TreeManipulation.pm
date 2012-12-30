@@ -1,9 +1,10 @@
 package MCalc::Util::TreeManipulation;
 
+use strict;
 use Exporter;
 
-@ISA = qw(Exporter);
-@EXPORT = qw(get_equal_trees);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(get_equal_trees);
 
 sub get_equal_trees {
   my ($tree) = @_;

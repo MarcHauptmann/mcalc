@@ -158,13 +158,13 @@ sub args {
   push @{$this->operands}, $node;
 }
 
-sub number() {
+sub number {
   my $this = shift;
 
   return is_number($this->getNext());
 }
 
-sub identifier() {
+sub identifier {
   my $this = shift;
 
   return is_identifier($this->getNext());

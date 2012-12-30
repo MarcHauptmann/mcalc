@@ -41,7 +41,7 @@ sub onlyNumbers {
                     $this->isNumericValue($b) } @trees;
 }
 
-sub isNumericValue() {
+sub isNumericValue {
   my ($this, $tree) = @_;
 
   return $tree->is_leaf() && is_number($tree->value());

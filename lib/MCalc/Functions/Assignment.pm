@@ -21,7 +21,7 @@ sub evaluate {
     } else {
       $context->setVariable($var, $value);
 
-      return undef;
+      return;
     }
   } else {
     my $key = $lhs->value();
@@ -45,7 +45,7 @@ sub evaluate {
 
     $context->setFunction($key, $function);
 
-    return undef;
+    return;
   }
 }
 

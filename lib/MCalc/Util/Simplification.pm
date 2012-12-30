@@ -1,9 +1,10 @@
 package MCalc::Util::Simplification;
 
+use strict;
 use Exporter;
 
-@ISA = qw(Exporter);
-@EXPORT = qw(rule_matches extract_values substitute complexity trees_equal);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(rule_matches extract_values substitute complexity trees_equal);
 
 use Error::Simple;
 use MCalc::Language;

@@ -1,9 +1,10 @@
 package MCalc::Language;
 
+use strict;
 use Exporter;
 
-@ISA = qw(Exporter);
-@EXPORT = qw(is_operator is_identifier operator_weight is_number is_keyword);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(is_operator is_identifier operator_weight is_number is_keyword);
 
 sub is_operator {
   my ($op) = @_;

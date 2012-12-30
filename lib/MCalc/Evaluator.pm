@@ -1,10 +1,12 @@
 package MCalc::Evaluator;
 
-use Exporter;
+use strict;
 use Tree;
+use Exporter;
 
-@ISA = qw(Exporter);
-@EXPORT= qw(evaluateTree);
+our @ISA = qw(Exporter);
+our @EXPORT= qw(evaluateTree);
+
 
 sub evaluateTree {
   my ($context, $tree) = @_;
@@ -32,7 +34,7 @@ sub evaluateTree {
     if (defined($result)) {
       return $result;
     } else {
-      return undef;
+      return;
     }
   }
 }
