@@ -20,7 +20,7 @@ has unknownStyle => (isa => "Str",
                      is => "rw",
                      reader => "getUnknownStyle",
                      writer => "setUnknownStyle",
-                     default => sub { "" });
+                     default => sub { "bright_white" });
 
 has variableStyle => (isa => "Str",
                       is => "rw",

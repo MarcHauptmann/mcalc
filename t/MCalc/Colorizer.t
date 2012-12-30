@@ -83,9 +83,9 @@ sub braces_are_highlighted : Tests {
   my $colorizer = MCalc::Colorizer->new();
   $colorizer->setContext($context);
   $colorizer->setBraceHighlightStyles(["red"]);
-  $colorizer->setUnknownStyle("");
+  $colorizer->setUnknownStyle("bright_white");
 
-  my $expected = colored("sin", "").colored("(", "red")."3".colored(")", "red");
+  my $expected = colored("sin", "bright_white").colored("(", "red")."3".colored(")", "red");
 
   is($colorizer->colorize("sin(3)", 3), $expected);
   is($colorizer->colorize("sin(3)", 6), $expected);
