@@ -63,7 +63,6 @@ sub calculate {
     # auswerten
     my $result = evaluateTree($context, $tree);
 
-
     if (defined($result)) {
       my $outputTree = Tree->new("=");
       $outputTree->add_child($tree);
@@ -376,13 +375,13 @@ and evaluate it:
 
 You can use B<mcalc> to calculate the answer to life, the universe and everything else:
 
-    mcalc> 2^2*(7+3)+2 
+    mcalc> 2^2*(7+3)+2
      2
     2  * ( 7 + 3 ) + 2 = 42
 
 Some trigonometry stuff with a variable:
 
-    mcalc> alpha=pi/5  
+    mcalc> alpha=pi/5
              π
     alpha = ---
              5

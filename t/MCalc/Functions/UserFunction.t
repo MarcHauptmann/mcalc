@@ -4,6 +4,7 @@ use Test::More;
 use Test::Exception;
 use MCalc::Evaluator;
 use MCalc::DefaultContext;
+use MCalc::Util::TreeBuilder;
 use Tree;
 
 BEGIN {
@@ -20,7 +21,7 @@ subtest "function can be evaluated" => sub {
 
   my $result = $func->evaluate($context, $arg);
 
-  is($result, 2, "result is 2");
+  is_deeply($result, tree(2), "result is 2");
 };
 
 subtest "variables are not redefined" => sub {
@@ -53,7 +54,7 @@ subtest "two parameters can be handled" => sub {
 
   my $result = $func->evaluate($context, $arg1, $arg2);
 
-  is($result, 5, "result is 5");
+  is_deeply($result, tree(5), "result is 5");
 };
 
 subtest "throws error with too few parameters" => sub {
