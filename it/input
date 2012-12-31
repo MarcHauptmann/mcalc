@@ -1,0 +1,17 @@
+1+1
+2+2
+3*4+4
+(3*4+4*5+4)/6
+abs(-3)
+sqrt(2)
+sin(0)
+ln(sin(1))
+f(x)=1/(x+1)
+f(4)
+sum(1/n^2,n,1,1000)
+product(n,n,1,10)
+sin(1)^2+cos(1)^2
+sin(pi)+cos(pi)
+e^ln(4)
+sqrt(3^2+4^2)
+quit

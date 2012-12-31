@@ -15,7 +15,22 @@ sub ACTION_deb {
   $self->depends_on("distdir");
   $self->do_system("dh-make-perl --build -p mcalc --depends $deps -e marc.hauptmann\@stud.uni-hannover.de ".$self->dist_dir);
 }
+
+sub ACTION_testit {
+  my $diff = `perl -I lib bin/mcalc < it/input | diff -c3 - it/output`;
+
+  if(length($diff) > 0) {
+    print $diff;
+  } else {
+    print "everything fine\n";
+  }
+}
+
+sub ACTION_recordit {
+  my $diff = `perl -I lib bin/mcalc < it/input > it/output`;
+}
 SUBCLASS
+
 
 my $builder = $class->new
   (

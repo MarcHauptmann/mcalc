@@ -124,7 +124,7 @@ if (!$silent) {
   printWelcome();
 }
 
-$term = Term::ReadLine->new("mcalc");
+$term = Term::ReadLine->new("mcalc", STDIN, STDOUT);
 my $attribs = $term->Attribs;
 
 # length of input on the last call of redisplay_function
