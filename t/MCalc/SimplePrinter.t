@@ -2,6 +2,7 @@
 
 use Test::More;
 use MCalc::Util::TreeBuilder;
+use MCalc::Parser;
 
 BEGIN {
   use_ok("MCalc::SimplePrinter");
@@ -10,9 +11,9 @@ BEGIN {
 subtest "an addition can be printed" => sub {
   my $printer = MCalc::SimplePrinter->new();
 
-  my $tree = <<EOF;
+  my $tree = <<'EOF';
      +
-    / \\
+    / \
    2   3
 EOF
 
@@ -24,9 +25,9 @@ EOF
 subtest "a function call can be printed" => sub {
   my $printer = MCalc::SimplePrinter->new();
 
-  my $tree = <<EOF;
+  my $tree = <<'EOF';
      f
-   / | \\
+   / | \
   x  y  z
 EOF
 
@@ -38,11 +39,11 @@ EOF
 subtest "a complex expression can be printed" => sub {
   my $printer = MCalc::SimplePrinter->new();
 
-  my $tree = <<EOF;
+  my $tree = <<'EOF';
      +
-    / \\
+    / \
    x   -
-   ^  / \\
+   ^  / \
      3   4
 EOF
 
@@ -54,11 +55,11 @@ EOF
 subtest "braces are printed correctly" => sub {
   my $printer = MCalc::SimplePrinter->new();
 
-  my $tree = <<EOF;
+  my $tree = <<'EOF';
         *
-       / \\
+       / \
       +   x
-     / \\
+     / \
     3   4
 EOF
 
@@ -70,7 +71,7 @@ EOF
 subtest "'neg' prints minus sign" => sub {
   my $printer = MCalc::SimplePrinter->new();
 
-  my $tree = <<EOF;
+  my $tree = <<'EOF';
         neg
          |
          1
@@ -127,6 +128,18 @@ EOF
   my $result = $printer->to_string(tree($tree));
 
   is($result, "func(1, -1)");
+};
+
+subtest "double subtraction uses braces" => sub {
+  my $printer = MCalc::SimplePrinter->new();
+  my $parser = MCalc::Parser->new();
+  my $expression = $parser->parse("5-(3-2)");
+
+  my $result = $printer->to_string($expression);
+
+  my $expected = "5 - ( 3 - 2 )";
+
+  is($result, $expected);
 };
 
 done_testing();

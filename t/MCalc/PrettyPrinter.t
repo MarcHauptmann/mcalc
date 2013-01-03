@@ -393,4 +393,28 @@ EOF
   is($result."\n", $expected);
 };
 
+subtest "double subtraction uses braces" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $parser = MCalc::Parser->new();
+  my $expression = $parser->parse("5-(3-2)");
+
+  my $result = $printer->to_string($expression);
+
+  my $expected = "5 - ( 3 - 2 )";
+
+  is($result, $expected);
+};
+
+subtest "double subtraction uses braces" => sub {
+  my $printer = MCalc::PrettyPrinter->new();
+  my $parser = MCalc::Parser->new();
+  my $expression = $parser->parse("5-(3-2)");
+
+  my $result = $printer->to_string($expression);
+
+  my $expected = "5 - ( 3 - 2 )";
+
+  is($result, $expected);
+};
+
 done_testing();

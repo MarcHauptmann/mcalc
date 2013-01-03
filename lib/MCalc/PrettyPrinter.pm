@@ -262,6 +262,11 @@ sub handle_operator {
 
   ($lhs, $rhs, $base) = equalize($lhs, $rhs, $lbase, $rbase);
 
+  # braces for substraction of complex expressions
+  if($tree->value eq "-" && isSum($tree->children(1))) {
+    $rhs = brace($rhs);
+  }
+
   my $height = count_lines($lhs);
   my $opString = operator($tree->value(), $height, $base);
 
@@ -270,6 +275,12 @@ sub handle_operator {
   } else {
     return (append(justify($lhs), $opString, justify($rhs)), $base);
   }
+}
+
+sub isSum {
+  my ($tree) = @_;
+
+  return $tree->value() eq "+" || $tree->value() eq "-";
 }
 
 sub equalize {

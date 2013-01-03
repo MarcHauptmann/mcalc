@@ -19,7 +19,13 @@ sub to_string {
 
     my @args = map { $this->to_string($_, $opWeight, $op, $index++) } $tree->children();
 
-    if (is_operator($op)) {
+    if($op eq "-") {
+      if($tree->children(1)->is_leaf()) {
+          return sprintf "%s - %s", $args[0], $args[1];
+        } else {
+          return sprintf "%s - ( %s )", $args[0], $args[1];
+        }
+    } elsif (is_operator($op)) {
       my $str = sprintf "%s %s %s", $args[0], $op, $args[1];
 
       if (defined($weight) && $weight > $opWeight) {

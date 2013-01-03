@@ -11,7 +11,7 @@ BEGIN {
 subtest "eine Zahl" => sub {
   my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("1");
-
+  
   is_deeply($tree, tree("1"), "result matches");
 };
 
@@ -19,9 +19,9 @@ subtest "Addition" => sub {
   my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("1+2");
 
-  my $expectedTree = <<EOF;
+  my $expectedTree = <<'EOF';
           +
-         / \\
+         / \
         1   2
 EOF
 
@@ -32,30 +32,60 @@ subtest "Bruch mal Kehrwert" => sub {
   my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("1/2*2");
 
-  my $expectedTree = <<EOF;
+  my $expectedTree = <<'EOF';
              *
-            / \\
+            / \
            /   2
-          / \\
+          / \
          1   2
 EOF
 
   is_deeply($tree, tree($expectedTree), "result matches");
 };
 
-subtest "3-er Addition" => sub {
+subtest "addition of three numbers" => sub {
   my $parser = MCalc::Parser->new();
   my $tree = $parser->parse("1+2+3");
 
-  my $expectedTree = <<EOF;
+  my $expectedTree = <<'EOF';
         +
-       / \\
+       / \
       1   +
-      ^  / \\
-         2   3
+      ^  / \
+        2   3
 EOF
 
   is_deeply($tree, tree($expectedTree), "result matches");
+};
+
+subtest "subtraction of three numbers" => sub {
+  my $parser = MCalc::Parser->new();
+  my $tree = $parser->parse("3-2-1");
+
+  my $expectedTree = <<'EOF';
+       -
+      / \
+     -   1
+    / \
+   3   2
+EOF
+
+  is_deeply($tree, tree($expectedTree));
+};
+
+subtest "subtraction of three numbers" => sub {
+  my $parser = MCalc::Parser->new();
+  my $tree = $parser->parse("3-2+2-1");
+
+  my $expectedTree = <<'EOF';
+        +
+      /   \
+     -     -
+    / \   / \
+   3   2 2   1
+EOF
+
+  is_deeply($tree, tree($expectedTree));
 };
 
 subtest "Operatorrangfolge" => sub {
