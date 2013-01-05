@@ -5,49 +5,66 @@ use Tree;
 use Error;
 use MCalc::Language;
 
-has "operators" => (is => "rw",
-										isa => "ArrayRef",
-										default => sub { [] });
-has "operands" => (is => "rw",
-									 isa => "ArrayRef",
-									 default => sub { [] });
+use Readonly;
 
-has "tokens" => (is => "rw",
+Readonly::Scalar my $TERMINATOR => qw{;};
+Readonly::Scalar my $NEGATION => "neg";
+Readonly::Scalar my $MINUS => "-";
+Readonly::Scalar my $EQUAL => qw{=};
+Readonly::Scalar my $COMMA => ",";
+Readonly::Scalar my $BRACE_OPEN => "(";
+Readonly::Scalar my $BRACE_CLOSE => ")";
+
+has operators => (is => "rw",
+									isa => "ArrayRef",
+									default => sub { [] });
+
+has operands => (is => "rw",
 								 isa => "ArrayRef",
 								 default => sub { [] });
 
+has tokens => (is => "rw",
+							 isa => "ArrayRef",
+							 default => sub { [] });
+
 sub consume {
-	my $this = shift;
+	my ($this) = @_;
 
 	shift(@{$this->tokens()});
+
+	return;
 }
 
 sub getNext {
-	my $this = shift;
+	my ($this) = @_;
 
 	return ${$this->tokens()}[0];
 }
 
 sub top {
-	my $size = scalar(@_);
+	my (@args) = @_;
+
+	my $size = scalar(@args);
 
 	if ($size > 0) {
-		return $_[$size - 1];
+		return $args[$size - 1];
 	} else {
 		throw Error::Simple "element expected";
 	}
 }
 
 sub weight {
-	return operator_weight($_[0]);
+	my ($operator) = @_;
+
+	return operator_weight($operator);
 }
 
 sub popOperator {
 	my $this = shift;
-	
+
 	my $operator = pop @{$this->operators};
 
-	if ($operator ne "neg") {
+	if ($operator ne $NEGATION) {
 		my $node1 = pop @{$this->operands};
 		my $node2 = pop @{$this->operands};
 
@@ -63,18 +80,21 @@ sub popOperator {
 
 		push @{$this->operands}, $newNode;
 	}
+
+	return;
 }
 
 sub pushOperator {
-	my $this = shift;
-	my $op = $_[0];
+	my ($this, $op) = @_;
 
 	while (weight(top(@{$this->operators})) > weight($op) 
-		|| (top(@{$this->operators}) eq "-" && ($op eq "-" || $op eq "+"))) {
+		|| (top(@{$this->operators}) eq $MINUS && ($op eq $MINUS || $op eq q{+}))) {
 		$this->popOperator();
 	}
 
 	push @{$this->operators}, $op;
+
+	return;
 }
 
 sub expect {
@@ -83,6 +103,8 @@ sub expect {
 
 	if ($sym eq $expected) {
 		$this->consume();
+
+		return;
 	} else {
 		throw Error::Simple "'$sym' expected";
 	}
@@ -94,18 +116,20 @@ sub isOp {
 	return is_operator($this->getNext());
 }
 
+# negation = -
 sub negation {
 	my $this = shift;
 
-	return $this->getNext() eq "-";
+	return $this->getNext() eq $MINUS;
 }
 
+# expression = [negation] term ((operator term) | (= expression))*
 sub expression {
 	my $this = shift;
 
 	if ($this->negation()) {
 		$this->consume();
-		push @{$this->operators}, "neg";
+		push @{$this->operators}, $NEGATION;
 	}
 
 	$this->term();
@@ -116,8 +140,8 @@ sub expression {
 		$this->pushOperator($this->getNext());
 		$this->consume();
 
-		if ($operator eq "=") {
-			push @{$this->operators}, ";";
+		if ($operator eq $EQUAL) {
+			push @{$this->operators}, $TERMINATOR;
 			$this->expression();
 			pop @{$this->operators}
 		} else {
@@ -125,24 +149,27 @@ sub expression {
 		}
 	}
 
-	while (top(@{$this->operators}) ne ";") {
+	while (top(@{$this->operators}) ne $TERMINATOR) {
 		$this->popOperator();
 	}
+
+	return;
 }
 
+# args = expression ( ',' expression )*
 sub args {
 	my $this = shift;
 
-	push @{$this->operands}, ";";
+	push @{$this->operands}, $TERMINATOR;
 
-	push @{$this->operators}, ";";
+	push @{$this->operators}, $TERMINATOR;
 	$this->expression();
 	pop @{$this->operators};
 
-	while ($this->getNext() eq ",") {
+	while ($this->getNext() eq $COMMA) {
 		$this->consume();
 
-		push @{$this->operators}, ";";
+		push @{$this->operators}, $TERMINATOR;
 		$this->expression();
 		pop @{$this->operators};
 	}
@@ -150,13 +177,15 @@ sub args {
 	my $node = Tree->new(pop @{$this->operators});
 	my @values = ();
 
-	while (top(@{$this->operands}) ne ";") {
+	while (top(@{$this->operands}) ne $TERMINATOR) {
 		push @values, pop @{$this->operands};
 	}
 	map { $node->add_child($_) } reverse @values;
 	pop @{$this->operands};
 
 	push @{$this->operands}, $node;
+
+	return;
 }
 
 sub number {
@@ -171,6 +200,13 @@ sub identifier {
 	return is_identifier($this->getNext());
 }
 
+sub openingBrace {
+	my ($this) = @_;
+
+	return $this->getNext() eq $BRACE_OPEN;
+}
+
+# term = number | '(' expression ')' | identifier [ '(' args ')' ]
 sub term {
 	my $this = shift;
 	my $sym = $this->getNext();
@@ -179,27 +215,32 @@ sub term {
 		my $num = Tree->new($sym);
 		push @{$this->operands}, $num;
 		$this->consume();
-	} elsif ($sym eq "(") {
-		push @{$this->operators}, ";";
+	} elsif ($this->openingBrace()) {
+		push @{$this->operators}, $TERMINATOR;
 		$this->consume();
 		$this->expression();
-		$this->expect(")");
+		$this->expect($BRACE_CLOSE);
 		pop @{$this->operators};
 	} elsif ($this->identifier()) {
 		$this->consume();
 
-		if ($this->getNext() eq "(") {
+		# function call
+		if ($this->openingBrace()) {
 			$this->consume();
 
 			push @{$this->operators}, $sym;
 			$this->args();
-			$this->expect(")");
-		} else {
+			$this->expect($BRACE_CLOSE);
+		} 
+		# variable
+		else {
 			push @{$this->operands}, Tree->new($sym);
 		}
 	} else {
 		throw Error::Simple "unknown symbol: '$sym'";
 	}
+
+	return;
 }
 
 sub varAssignment {
@@ -207,24 +248,27 @@ sub varAssignment {
 
 	return $this->identifier()
 		&& scalar(@{$this->tokens}) >= 2
-			&& ${$this->tokens}[1] eq "=";
+			&& ${$this->tokens}[1] eq $EQUAL;
 }
 
-sub functionAssignment {
-	my ($this) = @_;
+sub setInput {
+	my ($this, $input) = @_;
 
-	if ($this->identifier() && ${$this->tokens}[1] eq "(") {
-		my $index = 2;
+	my $regex = qr/([
+		$BRACE_OPEN$BRACE_CLOSE\-\+\*\/\^$COMMA=
+	])/x;
 
-		while (${$this->tokens}[$index] =~ /[a-zA-Z]/ && ${$this->tokens}[$index + 1] eq ",") {
-			$index += 2;
+	my @tokens_plain = split($regex, $input);
+
+	foreach my $token (@tokens_plain) {
+		if (length($token) > 0) {
+			push @{$this->tokens}, $token;
 		}
-
-		return ${$this->tokens}[$index] =~ /[a-zA-Z]/ && ${$this->tokens}[$index+1] eq ")"
-			&& ${$this->tokens}[$index+2] eq "=";
-	} else {
-		return 0;
 	}
+
+	push @{$this->tokens}, $TERMINATOR;
+
+	return;
 }
 
 sub parse {
@@ -235,22 +279,14 @@ sub parse {
 	$this->operands([]);
 	$this->tokens([]);
 
-	push @{$this->operators}, ";";
-	push @{$this->operands}, ";";
+	push @{$this->operators}, $TERMINATOR;
+	push @{$this->operands}, $TERMINATOR;
 
-	my @tokens_plain = split(/([\(\)\+\-\*\/,\^=])/, $input);
-
-	foreach my $token (@tokens_plain) {
-		if ($token ne "") {
-			push @{$this->tokens}, $token;
-		}
-	}
-
-	push @{$this->tokens}, ";";
+	$this->setInput($input);
 
 	$this->expression();
 
-	if ($this->getNext() ne ";") {
+	if ($this->getNext() ne $TERMINATOR) {
 		throw Error::Simple "unexpected end of input";
 	}
 
