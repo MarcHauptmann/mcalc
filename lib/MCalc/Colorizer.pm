@@ -56,18 +56,17 @@ sub colorize {
   my $level = 0;
   my $output = "";
   my $pos = 0;
-  my $highlightLevel = -1;
 
-  if (defined($cursor)) {
-    $highlightLevel = $this->_determineBraceLevel($expression, $cursor);
-  }
+  my $length = 1;
 
   foreach my $token (@tokens) {
+    $pos += length($token);
+
     # handle opening brace
     if ($token eq "(" && $level >= 0) {
       my $c;
 
-      if ($level == $highlightLevel) {
+      if ($this->_highlightPosition($expression, $cursor, $pos-1)) {
         $c = $this->getBraceHighlightStyle($level);
       } else {
         $c = $this->getBraceStyle($level);
@@ -83,12 +82,11 @@ sub colorize {
 
       $level--;
 
-      if ($level == $highlightLevel) {
+      if ($this->_highlightPosition($expression, $cursor, $pos)) {
         $c = $this->getBraceHighlightStyle($level);
       } else {
         $c = $this->getBraceStyle($level);
       }
-
 
       $output .= colored($token, $c);
     } elsif ($token =~ /[a-zA-Z]+/) {
@@ -154,6 +152,78 @@ sub _determineBraceLevel {
   }
 
   return -1;
+}
+
+sub _searchForward {
+  my ($this, $string, $pos) = @_;
+
+  my $level = 0;
+
+  for(my $i=$pos+1; $i<length($string); $i++) {
+    my $sign = substr($string, $i, 1);
+
+    if($sign eq ")") {
+      if($level == 0) {
+        return $i;
+      } else {
+        $level++;
+      }
+    } elsif($sign eq "(") {
+      $level--;
+    }
+  }
+
+  return -1;
+}
+
+sub _searchBackward {
+  my ($this, $string, $pos) = @_;
+
+  my $level = 1;
+
+  for(my $i=$pos-1; $i>=0; $i--) {
+    my $sign = substr($string, $i, 1);
+
+    if($sign eq "(") {
+      if($level == 0) {
+        return $i;
+      } else {
+        $level++;
+      }
+    } elsif($sign eq ")") {
+      $level--;
+    }
+  }
+
+  return -1;
+}
+
+sub _highlightPosition {
+  my ($this, $expression, $cursor, $position) = @_;
+
+  if(not(defined($cursor))) {
+    return 0;
+  }
+
+  my $highlightLevel = $this->_determineBraceLevel($expression, $cursor);
+
+  if($highlightLevel >= 0)  {
+    if(substr($expression, $position, 1) eq "(") {
+        if($cursor == $position) {
+          return 1;
+        } else {
+          return  $cursor == $this->_searchForward($expression, $position)+1;
+        }
+      } elsif(substr($expression, $position-1, 1) eq ")") {
+        if($cursor == $position) {
+          return 1;
+        } else {
+          return $cursor == $this->_searchBackward($expression, $position);
+        }
+      }
+  } else {
+    return 0;
+  }
 }
 
 1;

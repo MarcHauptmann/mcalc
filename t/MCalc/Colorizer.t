@@ -91,6 +91,26 @@ sub braces_are_highlighted : Tests {
   is($colorizer->colorize("sin(3)", 6), $expected);
 }
 
+sub double_braces_are_highlighted_only_once : Tests {
+  my $context = MCalc::SimpleContext->new();
+
+  my $colorizer = MCalc::Colorizer->new();
+  $colorizer->setContext($context);
+  $colorizer->setBraceHighlightStyles(["red"]);
+  $colorizer->setUnknownStyle("bright_white");
+  $colorizer->setBraceStyles(["white"]);
+
+  my $expected = colored("sin", "bright_white")
+  .colored("(", "red")."32".colored(")", "red")
+          ."+"
+  .colored("cos", "bright_white")
+  .colored("(", "white")."2".colored(")", "white");
+
+  is($colorizer->colorize("sin(32)+cos(2)", 3), $expected);
+  is($colorizer->colorize("sin(32)+cos(2)", 7), $expected);
+}
+
+
 ################################################################################
 
 sub brace_level_can_be_determined : Tests {
@@ -99,6 +119,27 @@ sub brace_level_can_be_determined : Tests {
   is($colorizer->_determineBraceLevel("sin(x)", 3), 0, "opening brace increases level");
   is($colorizer->_determineBraceLevel("sin(x)", 6), 0, "closing brace decreases level");
   is($colorizer->_determineBraceLevel("sin(x)", 1), -1, "level -1 by default");
+}
+
+################################################################################
+
+sub highlight_position_can_be_determined : Tests {
+  my $colorizer = MCalc::Colorizer->new();
+
+  ok($colorizer->_highlightPosition("sin(x)", 3, 3));
+  ok($colorizer->_highlightPosition("sin(x)", 3, 6));
+  ok($colorizer->_highlightPosition("sin(x)", 6, 3));
+  ok($colorizer->_highlightPosition("sin(x)", 6, 6));
+  ok(not($colorizer->_highlightPosition("sin(x)", 3, 1)));
+
+  ok($colorizer->_highlightPosition("sin(xyz)", 3, 3));
+  ok($colorizer->_highlightPosition("sin(xyz)", 3, 8));
+  ok($colorizer->_highlightPosition("sin(xyz)", 8, 3));
+  ok($colorizer->_highlightPosition("sin(xyz)", 8, 8));
+  ok(not($colorizer->_highlightPosition("sin(xyz)", 3, 1)));
+
+  ok($colorizer->_highlightPosition("(sin(x)+z)", 0, 0));
+  ok($colorizer->_highlightPosition("(sin(x)+z)", 0, 10));
 }
 
 Test::Class->runtests;
