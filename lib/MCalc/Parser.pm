@@ -9,11 +9,15 @@ use Readonly;
 
 Readonly::Scalar my $TERMINATOR => qw{;};
 Readonly::Scalar my $NEGATION => "neg";
-Readonly::Scalar my $MINUS => "-";
-Readonly::Scalar my $EQUAL => qw{=};
+Readonly::Scalar my $MINUS => q{-};
+Readonly::Scalar my $PLUS => q{+};
+Readonly::Scalar my $TIMES => q{*};
+Readonly::Scalar my $DIVISION => q{/};
+Readonly::Scalar my $POWER => q{^};
+Readonly::Scalar my $EQUAL => q{=};
 Readonly::Scalar my $COMMA => ",";
-Readonly::Scalar my $BRACE_OPEN => "(";
-Readonly::Scalar my $BRACE_CLOSE => ")";
+Readonly::Scalar my $OPENING_BRACE => "(";
+Readonly::Scalar my $CLOSING_BRACE => ")";
 
 has operators => (is => "rw",
 									isa => "ArrayRef",
@@ -88,7 +92,7 @@ sub pushOperator {
 	my ($this, $op) = @_;
 
 	while (weight(top(@{$this->operators})) > weight($op) 
-		|| (top(@{$this->operators}) eq $MINUS && ($op eq $MINUS || $op eq q{+}))) {
+		|| (top(@{$this->operators}) eq $MINUS && ($op eq $MINUS || $op eq $PLUS))) {
 		$this->popOperator();
 	}
 
@@ -203,7 +207,8 @@ sub identifier {
 sub openingBrace {
 	my ($this) = @_;
 
-	return $this->getNext() eq $BRACE_OPEN;
+	return $this->getNext() eq $OPENING_BRACE
+;
 }
 
 # term = number | '(' expression ')' | identifier [ '(' args ')' ]
@@ -219,7 +224,7 @@ sub term {
 		push @{$this->operators}, $TERMINATOR;
 		$this->consume();
 		$this->expression();
-		$this->expect($BRACE_CLOSE);
+		$this->expect($CLOSING_BRACE);
 		pop @{$this->operators};
 	} elsif ($this->identifier()) {
 		$this->consume();
@@ -230,7 +235,7 @@ sub term {
 
 			push @{$this->operators}, $sym;
 			$this->args();
-			$this->expect($BRACE_CLOSE);
+			$this->expect($CLOSING_BRACE);
 		} 
 		# variable
 		else {
@@ -254,9 +259,18 @@ sub varAssignment {
 sub setInput {
 	my ($this, $input) = @_;
 
+	# wtf! why does $MINUS not work?
 	my $regex = qr/([
-		$BRACE_OPEN$BRACE_CLOSE\-\+\*\/\^$COMMA=
-	])/x;
+		\-
+		$OPENING_BRACE
+		$CLOSING_BRACE
+		$PLUS
+		$TIMES
+		$DIVISION
+		$POWER
+		$COMMA
+		$EQUAL
+	])/;
 
 	my @tokens_plain = split($regex, $input);
 

@@ -159,7 +159,6 @@ $attribs->{redisplay_function} = sub {
   $lastEnd = $attribs->{end};
 };
 
-
 $attribs->{completion_function} = \&complete;
 $attribs->{completer_word_break_characters} = "+-*/^()";
 
